@@ -4,14 +4,17 @@ import com.letssalon.dao.ColaboradorDAO;
 import com.letssalon.dao.EmpresaDAO;
 import com.letssalon.model.Colaborador;
 import com.letssalon.model.Empresa;
+import com.letssalon.util.MascaraUtil;
 import com.letssalon.util.SenhaUtil;
+import com.letssalon.util.CPFUtil;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
 public class TelaInscricao extends JFrame {
 
-    private JTextField txtNome, txtCpf, txtTelefone;
+    private JTextField txtNome;
+    private JFormattedTextField txtCpf, txtTelefone;
     private JTextField txtNomeEmpresa, txtFuncao, txtEmailColaborador;
     private JPasswordField txtSenha, txtConfirmarSenha;
     private JButton btnInscrever, btnVoltar;
@@ -51,14 +54,14 @@ public class TelaInscricao extends JFrame {
         // ── Linha 2: CPF ──
         gbc.gridx = 0; gbc.gridy = 2;
         add(new JLabel("CPF:"), gbc);
-        txtCpf = new JTextField(20);
+        txtCpf = MascaraUtil.criarCampoCPF();
         gbc.gridx = 1;
         add(txtCpf, gbc);
 
         // ── Linha 3: Telefone ──
         gbc.gridx = 0; gbc.gridy = 3;
         add(new JLabel("Telefone (Whatsapp):"), gbc);
-        txtTelefone = new JTextField(20);
+        txtTelefone = MascaraUtil.criarCampoTelefone();
         gbc.gridx = 1;
         add(txtTelefone, gbc);
 
@@ -145,6 +148,18 @@ public class TelaInscricao extends JFrame {
             return;
         }
 
+        if (!CPFUtil.validarCPF(txtCpf.getText())) {
+
+    JOptionPane.showMessageDialog(
+        this,
+        "CPF inválido!",
+        "Erro",
+        JOptionPane.ERROR_MESSAGE
+    );
+
+    return;
+}
+
         // Busca ou cria a empresa
         EmpresaDAO empresaDAO = new EmpresaDAO();
         int codigoEmpresa = 0;
@@ -173,7 +188,8 @@ public class TelaInscricao extends JFrame {
         colaborador.setTelefoneColaborador(txtTelefone.getText().trim());
         colaborador.setFuncaoColaborador(txtFuncao.getText().trim());
         colaborador.setEmailColaborador(txtEmailColaborador.getText().trim());
-        colaborador.setSenhaColaborador(senha);
+        String senhaCriptografada = SenhaUtil.criptografarSenha(senha);
+        colaborador.setSenhaColaborador(senhaCriptografada);
         colaborador.setPerfil("administrador");
         colaborador.setCodigoEmpresa(codigoEmpresa);
 

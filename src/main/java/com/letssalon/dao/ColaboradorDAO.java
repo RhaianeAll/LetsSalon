@@ -3,6 +3,7 @@ package com.letssalon.dao;
 
 import com.letssalon.model.Colaborador;
 import com.letssalon.util.Conexao;
+import com.letssalon.util.SenhaUtil;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,19 @@ public class ColaboradorDAO {
         stmt.executeUpdate();
         System.out.println("Colaborador cadastrado com sucesso!");
     } catch (SQLException e) {
+        
+        if (e.getMessage().contains("unique_cpf_colaborador")) {
+
+    System.out.println("CPF já cadastrado!");
+
+    } else if (e.getMessage().contains("unique_email_colaborador")) {
+
+        System.out.println("E-mail já cadastrado!");
+
+    } else {
+
         System.out.println("Erro ao cadastrar colaborador: " + e.getMessage());
+}
     }
 }
 
@@ -112,28 +125,42 @@ public class ColaboradorDAO {
         }
     }
 
-    public Colaborador buscarPorLogin(String email, String senha, int codigoEmpresa) {
-    // AGORA busca por:   email_colaborador=?
-    String sql = "SELECT * FROM colaborador WHERE email_colaborador=? AND senha_colaborador=? AND codigo_empresa=?";
+public Colaborador buscarPorLogin(String email, String senha, int codigoEmpresa) {
+
+    String sql = "SELECT * FROM colaborador WHERE email_colaborador=? AND codigo_empresa=?";
+
     try (Connection conn = Conexao.conectar();
          PreparedStatement stmt = conn.prepareStatement(sql)) {
-        stmt.setString(1, email);   // 1º ? = email
-        stmt.setString(2, senha);   // 2º ? = senha
-        stmt.setInt(3, codigoEmpresa); // 3º ? = código da empresa
+
+        stmt.setString(1, email);
+        stmt.setInt(2, codigoEmpresa);
+
         ResultSet rs = stmt.executeQuery();
+
         if (rs.next()) {
-            Colaborador c = new Colaborador();
-            c.setIdColaborador(rs.getInt("id_colaborador"));
-            c.setNomeColaborador(rs.getString("nome_colaborador"));
-            c.setFuncaoColaborador(rs.getString("funcao_colaborador"));
-            c.setPerfil(rs.getString("perfil"));
-            c.setCodigoEmpresa(rs.getInt("codigo_empresa"));
-            c.setEmailColaborador(rs.getString("email_colaborador")); // ← novo
-            return c;
+
+            String senhaBanco = rs.getString("senha_colaborador");
+
+            // Verifica senha com BCrypt
+            if (SenhaUtil.verificarSenha(senha, senhaBanco)) {
+
+                Colaborador c = new Colaborador();
+
+                c.setIdColaborador(rs.getInt("id_colaborador"));
+                c.setNomeColaborador(rs.getString("nome_colaborador"));
+                c.setFuncaoColaborador(rs.getString("funcao_colaborador"));
+                c.setPerfil(rs.getString("perfil"));
+                c.setCodigoEmpresa(rs.getInt("codigo_empresa"));
+                c.setEmailColaborador(rs.getString("email_colaborador"));
+
+                return c;
+            }
         }
+
     } catch (SQLException e) {
         System.out.println("Erro ao buscar login: " + e.getMessage());
     }
+
     return null;
 }
 }

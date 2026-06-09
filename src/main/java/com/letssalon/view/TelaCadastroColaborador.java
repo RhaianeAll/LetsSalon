@@ -2,6 +2,9 @@ package com.letssalon.view;
 
 import com.letssalon.dao.ColaboradorDAO;
 import com.letssalon.model.Colaborador;
+import com.letssalon.util.CPFUtil;
+import com.letssalon.util.SenhaUtil;
+import com.letssalon.util.MascaraUtil;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -10,7 +13,8 @@ import java.util.List;
 public class TelaCadastroColaborador extends JFrame {
 
     private Colaborador colaboradorLogado;
-    private JTextField txtId, txtNome, txtCpf, txtTelefone, txtEmailColaborador;
+    private JTextField txtId, txtNome, txtEmailColaborador;
+    private JFormattedTextField txtCpf, txtTelefone;
     private JPasswordField txtSenha;
     private JComboBox<String> cmbServicos;
     private JButton btnCadastrar, btnAtualizar, btnExcluir, btnLimpar, btnVoltar;
@@ -78,7 +82,7 @@ public class TelaCadastroColaborador extends JFrame {
         gbc.gridwidth = 1;
         gbc.gridx = 0; gbc.gridy = 2;
         painelForm.add(new JLabel("CPF:"), gbc);
-        txtCpf = new JTextField(15);
+        txtCpf = new JFormattedTextField(15);
         txtCpf.setToolTipText("Ex: 000.000.000-00");
         gbc.gridx = 1;
         painelForm.add(txtCpf, gbc);
@@ -86,7 +90,7 @@ public class TelaCadastroColaborador extends JFrame {
         // Telefone
         gbc.gridx = 2;
         painelForm.add(new JLabel("Telefone:"), gbc);
-        txtTelefone = new JTextField(15);
+        txtTelefone = new JFormattedTextField(15);
         txtTelefone.setToolTipText("Ex: 49 99999999");
         gbc.gridx = 3;
         painelForm.add(txtTelefone, gbc);
@@ -196,7 +200,9 @@ public class TelaCadastroColaborador extends JFrame {
         c.setTelefoneColaborador(txtTelefone.getText().trim());
         c.setEmailColaborador(txtEmailColaborador.getText().trim());
         String senhaDigitada = new String(txtSenha.getPassword()).trim();
-        c.setSenhaColaborador(senhaDigitada.isEmpty() ? "123456" : senhaDigitada);
+        String senhaFinal = senhaDigitada.isEmpty() ? "123456" : senhaDigitada;
+        String senhaCriptografada = SenhaUtil.criptografarSenha(senhaFinal);
+        c.setSenhaColaborador(senhaCriptografada);
         c.setPerfil("colaborador");
         c.setCodigoEmpresa(colaboradorLogado.getCodigoEmpresa());
 
@@ -204,6 +210,18 @@ public class TelaCadastroColaborador extends JFrame {
         carregarTabela();
         limparCampos();
         JOptionPane.showMessageDialog(this, "Profissional cadastrado com sucesso!");
+    
+        if (!CPFUtil.validarCPF(txtCpf.getText())) {
+
+    JOptionPane.showMessageDialog(
+        this,
+        "CPF inválido!",
+        "Erro",
+        JOptionPane.ERROR_MESSAGE
+    );
+
+    return;
+}
     }
 
     private void atualizar() {
