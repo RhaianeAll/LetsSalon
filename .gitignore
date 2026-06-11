@@ -1,1 +1,10 @@
 target/
+*.class
+*.log
+.idea/
+.vscode/
+nbproject/private/
+.DS_Store
+
+# Banco
+db.properties
