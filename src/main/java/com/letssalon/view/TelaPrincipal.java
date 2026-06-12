@@ -26,139 +26,183 @@ public class TelaPrincipal extends JFrame {
     }
 
     private void initComponents() {
+
     setTitle("Let's Salon - Dashboard");
-    setSize(900, 650);
+    setExtendedState(JFrame.MAXIMIZED_BOTH);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    setLocationRelativeTo(null);
     setLayout(new BorderLayout());
     getContentPane().setBackground(new Color(255, 240, 243));
 
-    // ── TOPO ──
+    // TOPO
+
     JPanel painelTopo = new JPanel(new BorderLayout());
     painelTopo.setBackground(new Color(201, 72, 105));
-    painelTopo.setPreferredSize(new Dimension(900, 60));
+    painelTopo.setPreferredSize(new Dimension(0, 60));
 
     JLabel lblLogo = new JLabel("  LET'S SALON");
-    lblLogo.setFont(new Font("Arial", Font.BOLD, 20));
+    lblLogo.setFont(new Font("Arial", Font.BOLD, 22));
     lblLogo.setForeground(Color.WHITE);
-    painelTopo.add(lblLogo, BorderLayout.WEST);
 
     lblEmpresa = new JLabel("Empresa  ");
     lblEmpresa.setFont(new Font("Arial", Font.BOLD, 16));
     lblEmpresa.setForeground(Color.WHITE);
+
+    painelTopo.add(lblLogo, BorderLayout.WEST);
     painelTopo.add(lblEmpresa, BorderLayout.EAST);
 
     add(painelTopo, BorderLayout.NORTH);
 
-    // ── PAINEL PRINCIPAL ──
-    JPanel painelPrincipal = new JPanel(new BorderLayout());
-    painelPrincipal.setBackground(new Color(255, 240, 243));
+    // MENU LATERAL
 
-    // Perfil + Notificações
-    JPanel painelTopo2 = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 20));
-    painelTopo2.setBackground(new Color(255, 240, 243));
+    JPanel painelMenu = new JPanel();
+    painelMenu.setBackground(new Color(245, 220, 225));
+    painelMenu.setPreferredSize(new Dimension(240, 0));
+    painelMenu.setLayout(new BoxLayout(painelMenu, BoxLayout.Y_AXIS));
+    painelMenu.setBorder(BorderFactory.createEmptyBorder(20, 15, 20, 15));
 
-    JPanel painelInfo = new JPanel(new GridLayout(2, 1));
-    painelInfo.setBackground(new Color(255, 240, 243));
-
-    lblNome = new JLabel("Nome do Colaborador");
-    lblNome.setFont(new Font("Arial", Font.BOLD, 16));
+    lblNome = new JLabel(colaboradorLogado.getNomeColaborador());
+    lblNome.setFont(new Font("Arial", Font.BOLD, 18));
     lblNome.setForeground(new Color(201, 72, 105));
 
-    lblFuncao = new JLabel("Função");
+    lblFuncao = new JLabel(colaboradorLogado.getFuncaoColaborador());
     lblFuncao.setFont(new Font("Arial", Font.PLAIN, 14));
     lblFuncao.setForeground(Color.GRAY);
 
-    painelInfo.add(lblNome);
-    painelInfo.add(lblFuncao);
-    painelTopo2.add(painelInfo);
+    painelMenu.add(lblNome);
+    painelMenu.add(Box.createVerticalStrut(5));
+    painelMenu.add(lblFuncao);
+    painelMenu.add(Box.createVerticalStrut(25));
+
+    // BOTÕES MENU
+
+    btnAgendamentos          = criarBotao("Agendamentos");
+    btnCadastroProfissionais = criarBotao("Profissionais");
+    btnCadastroServicos      = criarBotao("Serviços");
+    btnCadastroInsumos       = criarBotao("Insumos");
+    btnEstoque               = criarBotao("Estoque");
+    btnRelatorios            = criarBotao("Relatórios");
+
+    painelMenu.add(btnAgendamentos);
+    painelMenu.add(Box.createVerticalStrut(10));
+
+    painelMenu.add(btnCadastroProfissionais);
+    painelMenu.add(Box.createVerticalStrut(10));
+
+    painelMenu.add(btnCadastroServicos);
+    painelMenu.add(Box.createVerticalStrut(10));
+
+    painelMenu.add(btnCadastroInsumos);
+    painelMenu.add(Box.createVerticalStrut(10));
+
+    painelMenu.add(btnEstoque);
+    painelMenu.add(Box.createVerticalStrut(10));
+
+    painelMenu.add(btnRelatorios);
+    painelMenu.add(Box.createVerticalGlue());
+
+    // BOTÃO SAIR
+
+    btnSair = new JButton("Sair");
+    btnSair.setBackground(Color.WHITE);
+    btnSair.setForeground(new Color(201, 72, 105));
+    btnSair.setFont(new Font("Arial", Font.BOLD, 14));
+    btnSair.setFocusPainted(false);
+    btnSair.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+    painelMenu.add(btnSair);
+
+    add(painelMenu, BorderLayout.WEST);
+
+    // PAINEL CENTRAL
+
+    JPanel painelCentro = new JPanel(new BorderLayout());
+    painelCentro.setBackground(new Color(255, 240, 243));
+    painelCentro.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+    // NOTIFICAÇÕES
 
     JPanel painelNotificacoes = new JPanel(new GridLayout(2, 1, 5, 5));
     painelNotificacoes.setBackground(new Color(255, 240, 243));
-    painelNotificacoes.setBorder(BorderFactory.createTitledBorder("Notificações"));
+    painelNotificacoes.setBorder(BorderFactory.createTitledBorder(
+            BorderFactory.createLineBorder(new Color(201, 72, 105)),
+            "Notificações"
+    ));
 
     JLabel notif1 = new JLabel("⚠ Verifique agendamentos pendentes");
     notif1.setForeground(new Color(201, 72, 105));
+
     JLabel notif2 = new JLabel("⚠ Verifique atendimentos realizados");
     notif2.setForeground(new Color(201, 72, 105));
 
     painelNotificacoes.add(notif1);
     painelNotificacoes.add(notif2);
-    painelTopo2.add(painelNotificacoes);
 
-    painelPrincipal.add(painelTopo2, BorderLayout.NORTH);
+    painelCentro.add(painelNotificacoes, BorderLayout.NORTH);
 
-    // ── BOTÕES DO MENU ──
-    JPanel painelBotoes = new JPanel(new GridLayout(3, 2, 15, 15));
-    painelBotoes.setBackground(new Color(255, 240, 243));
-    painelBotoes.setBorder(BorderFactory.createEmptyBorder(10, 30, 10, 30));
+    // TABELA
 
-    btnAgendamentos          = criarBotao("Agendamentos");
-    btnCadastroProfissionais = criarBotao("Cadastro de Profissionais");
-    btnCadastroServicos      = criarBotao("Cadastro de Serviços");
-    btnCadastroInsumos       = criarBotao("Cadastro de Insumos");
-    btnEstoque               = criarBotao("Estoque");
-    btnRelatorios            = criarBotao("Relatórios");
-
-    painelBotoes.add(btnAgendamentos);
-    painelBotoes.add(btnCadastroInsumos);
-    painelBotoes.add(btnCadastroProfissionais);
-    painelBotoes.add(btnEstoque);
-    painelBotoes.add(btnCadastroServicos);
-    painelBotoes.add(btnRelatorios);
-
-    painelPrincipal.add(painelBotoes, BorderLayout.CENTER);
-
-    // ── TABELA atendimentos > 15 dias ──
     JPanel painelTabela = new JPanel(new BorderLayout());
     painelTabela.setBackground(new Color(255, 240, 243));
+
     painelTabela.setBorder(BorderFactory.createTitledBorder(
-        BorderFactory.createLineBorder(new Color(201, 72, 105)),
-        "Atendimentos Realizados a Mais de 15 Dias Atrás",
-        0, 0,
-        new Font("Arial", Font.BOLD, 13),
-        new Color(201, 72, 105)
+            BorderFactory.createLineBorder(new Color(201, 72, 105)),
+            "Atendimentos Realizados Há Mais de 15 Dias",
+            0,
+            0,
+            new Font("Arial", Font.BOLD, 13),
+            new Color(201, 72, 105)
     ));
 
-    String[] colunas = {"Nome Cliente", "Telefone", "Data/Hora", "Id Funcionário", "Serviço", "Realizado a"};
+    String[] colunas = {
+        "Cliente",
+        "Telefone",
+        "Data/Hora",
+        "Funcionário",
+        "Serviço",
+        "Realizado"
+    };
+
     modeloTabela = new DefaultTableModel(colunas, 0);
+
     tabelaAtendimentos = new JTable(modeloTabela);
+
     tabelaAtendimentos.setRowHeight(28);
+
     tabelaAtendimentos.getTableHeader().setBackground(new Color(201, 72, 105));
     tabelaAtendimentos.getTableHeader().setForeground(Color.WHITE);
 
-    painelTabela.add(new JScrollPane(tabelaAtendimentos));
-    painelPrincipal.add(painelTabela, BorderLayout.SOUTH);
+    JScrollPane scrollTabela = new JScrollPane(tabelaAtendimentos);
 
-    add(painelPrincipal, BorderLayout.CENTER);
+    painelTabela.add(scrollTabela);
 
-    // ── RODAPÉ ──
-    JPanel painelRodape = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-    painelRodape.setBackground(new Color(201, 72, 105));
+    painelCentro.add(painelTabela, BorderLayout.CENTER);
 
-    btnSair = new JButton("Sair");
-    btnSair.setBackground(Color.WHITE);
-    btnSair.setForeground(new Color(201, 72, 105));
-    btnSair.setFont(new Font("Arial", Font.BOLD, 12));
-    painelRodape.add(btnSair);
-    add(painelRodape, BorderLayout.SOUTH);
+    add(painelCentro, BorderLayout.CENTER);
 
-    // Preenche dados
+    // DADOS
+
     preencherDados();
 
-    // ── AÇÕES DOS BOTÕES ──
+    // AÇÕES
+
     btnAgendamentos.addActionListener(e ->
-        new TelaAgendamentos(colaboradorLogado).setVisible(true));
+            new TelaAgendamentos(colaboradorLogado).setVisible(true));
+
     btnCadastroProfissionais.addActionListener(e ->
-        new TelaCadastroColaborador(colaboradorLogado).setVisible(true));
+            new TelaCadastroColaborador(colaboradorLogado).setVisible(true));
+
     btnCadastroServicos.addActionListener(e ->
-        new TelaCadastroServico(colaboradorLogado).setVisible(true));
+            new TelaCadastroServico(colaboradorLogado).setVisible(true));
+
     btnCadastroInsumos.addActionListener(e ->
-        new TelaCadastroInsumo(colaboradorLogado).setVisible(true));
+            new TelaCadastroInsumo(colaboradorLogado).setVisible(true));
+
     btnEstoque.addActionListener(e ->
-        new TelaEstoque(colaboradorLogado).setVisible(true));
+            new TelaEstoque(colaboradorLogado).setVisible(true));
+
     btnRelatorios.addActionListener(e ->
-        new TelaRelatorios(colaboradorLogado).setVisible(true));
+            new TelaRelatorios(colaboradorLogado).setVisible(true));
+
     btnSair.addActionListener(e -> {
         new TelaLogin().setVisible(true);
         dispose();
@@ -166,14 +210,25 @@ public class TelaPrincipal extends JFrame {
 }
 
     private JButton criarBotao(String texto) {
-        JButton btn = new JButton(texto);
-        btn.setBackground(new Color(201, 72, 105));
-        btn.setForeground(Color.WHITE);
-        btn.setFont(new Font("Arial", Font.BOLD, 13));
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.setPreferredSize(new Dimension(200, 45));
-        return btn;
-    }
+
+    JButton btn = new JButton(texto);
+
+    btn.setMaximumSize(new Dimension(220, 45));
+    btn.setMinimumSize(new Dimension(220, 45));
+    btn.setPreferredSize(new Dimension(220, 45));
+
+    btn.setBackground(new Color(201, 72, 105));
+    btn.setForeground(Color.WHITE);
+
+    btn.setFont(new Font("Arial", Font.BOLD, 14));
+
+    btn.setFocusPainted(false);
+    btn.setBorderPainted(false);
+
+    btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+    return btn;
+}
 
     private void preencherDados() {
     lblNome.setText(colaboradorLogado.getNomeColaborador());

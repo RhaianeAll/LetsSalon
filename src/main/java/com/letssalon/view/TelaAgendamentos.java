@@ -16,7 +16,8 @@ import java.util.List;
 public class TelaAgendamentos extends JFrame {
 
     private Colaborador colaboradorLogado;
-    private JTextField txtData, txtHora, txtNomeCliente;
+    private JTextField txtData, txtHora;
+    private JComboBox<String> cmbCliente;
     private JComboBox<String> cmbColaborador, cmbServico;
     private JButton btnCadastrar, btnAtualizar, btnExcluir, btnLimpar, btnVoltar;
     private JTable tabelaAgendamentos, tabelaPendentes;
@@ -81,12 +82,15 @@ public class TelaAgendamentos extends JFrame {
         gbc.gridx = 3;
         painelForm.add(txtHora, gbc);
 
-        // Nome Cliente
+        // Cliente
         gbc.gridx = 0; gbc.gridy = 1;
-        painelForm.add(new JLabel("Nome Cliente:"), gbc);
-        txtNomeCliente = new JTextField(20);
-        gbc.gridx = 1; gbc.gridwidth = 3;
-        painelForm.add(txtNomeCliente, gbc);
+        painelForm.add(new JLabel("Cliente:"), gbc);
+
+        cmbCliente = new JComboBox<>();
+
+        gbc.gridx = 1;
+        gbc.gridwidth = 3;
+        painelForm.add(cmbCliente, gbc);
 
         // Colaborador
         gbc.gridwidth = 1;
@@ -199,6 +203,16 @@ public class TelaAgendamentos extends JFrame {
     }
 
     private void carregarDados() {
+        // Carrega clientes
+        cmbCliente.removeAllItems();
+
+        List<Cliente> clientes = clienteDAO.listar();
+
+        for (Cliente c : clientes) {
+            cmbCliente.addItem(
+            c.getCpfCliente() + " - " + c.getNomeCliente()
+    );
+}
         // Carrega colaboradores no combo (somente da empresa logada)
         cmbColaborador.removeAllItems();
         List<Colaborador> colaboradores = colaboradorDAO.listarPorEmpresa(colaboradorLogado.getCodigoEmpresa());
@@ -238,14 +252,31 @@ public class TelaAgendamentos extends JFrame {
     }
 
     private void cadastrarAgendamento() {
-        if (txtData.getText().isEmpty() || txtNomeCliente.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Preencha todos os campos!", "Atenção", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
+        if (txtData.getText().isEmpty()
+        || txtHora.getText().isEmpty()
+        || cmbCliente.getSelectedItem() == null) {
+
+    JOptionPane.showMessageDialog(
+        this,
+        "Preencha todos os campos!",
+        "Atenção",
+        JOptionPane.WARNING_MESSAGE
+    );
+
+    return;
+}
 
         Agenda agenda = new Agenda();
-        agenda.setCpfCliente(txtNomeCliente.getText().trim());
-        agenda.setData(txtData.getText().trim());
+        if (cmbCliente.getSelectedItem() != null) {
+
+            String clienteSelecionado =
+            cmbCliente.getSelectedItem().toString();
+
+            String cpfCliente =
+            clienteSelecionado.split(" - ")[0];
+
+        agenda.setCpfCliente(cpfCliente);
+}       agenda.setData(txtData.getText().trim());
         agenda.setHorario(txtHora.getText().trim());
         agenda.setConfirmado(false);
         agenda.setCodigoEmpresa(colaboradorLogado.getCodigoEmpresa());
@@ -311,14 +342,14 @@ public class TelaAgendamentos extends JFrame {
         if (linha != -1) {
             txtData.setText(modeloAgendamentos.getValueAt(linha, 0).toString());
             txtHora.setText(modeloAgendamentos.getValueAt(linha, 1).toString());
-            txtNomeCliente.setText(modeloAgendamentos.getValueAt(linha, 2).toString());
+            cmbCliente.setSelectedIndex(0);
         }
     }
 
     private void limparCampos() {
         txtData.setText("");
         txtHora.setText("");
-        txtNomeCliente.setText("");
+        cmbCliente.setSelectedIndex(0);
         cmbColaborador.setSelectedIndex(0);
         cmbServico.setSelectedIndex(0);
     }
