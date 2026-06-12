@@ -1,4 +1,3 @@
-// EmpresaDAO.java
 package com.letssalon.dao;
 
 import com.letssalon.model.Empresa;
