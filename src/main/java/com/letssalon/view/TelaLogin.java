@@ -7,6 +7,7 @@ import com.letssalon.model.Colaborador;
 import com.letssalon.util.SenhaUtil;
 import javax.swing.*;
 import java.awt.*;
+import com.letssalon.util.CoresUtil;
 
 public class TelaLogin extends JFrame {
 
@@ -25,7 +26,7 @@ public class TelaLogin extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new GridBagLayout());
-        getContentPane().setBackground(new Color(255, 240, 243));
+        getContentPane().setBackground(CoresUtil.ROSA_FUNDO);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets  = new Insets(8, 10, 8, 10);
@@ -70,12 +71,12 @@ public class TelaLogin extends JFrame {
         add(btnEntrar, gbc);
 
         // ── Linha 5: Botão INSCREVA-SE ───────────────────────
-        btnInscrever = criarBotao("INSCREVA-SE", new Color(240, 150, 170));
+        btnInscrever = criarBotao("INSCREVA-SE", CoresUtil.ROSA_SECUNDARIO);
         gbc.gridy = 5;
         add(btnInscrever, gbc);
 
         // ── Linha 6: Botão VOLTAR ─────────────────────────────
-        btnVoltar = criarBotao("VOLTAR", new Color(150, 150, 150));
+        btnVoltar = criarBotao("VOLTAR", CoresUtil.CINZA_VOLTAR);
         gbc.gridy = 6;
         add(btnVoltar, gbc);
 
@@ -92,15 +93,19 @@ public class TelaLogin extends JFrame {
     }
 
     private JButton criarBotao(String texto, Color cor) {
-        JButton btn = new JButton(texto);
-        btn.setBackground(cor);
+    JButton btn = new JButton(texto);
+    btn.setBackground(cor);
+
+    if (cor.equals(CoresUtil.CINZA_VOLTAR) || cor.equals(CoresUtil.VERDE_CONFIRMAR)) {
+        btn.setForeground(new Color(60, 60, 60));
+    } else {
         btn.setForeground(Color.WHITE);
-        btn.setFont(new Font("Arial", Font.BOLD, 14));
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.setBorderPainted(false);
-        btn.setFocusPainted(false);
-        return btn;
     }
+
+    btn.setFont(new Font("Arial", Font.BOLD, 12));
+    btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    return btn;
+}
 
     private void realizarLogin() {
         String email = txtEmail.getText().trim();

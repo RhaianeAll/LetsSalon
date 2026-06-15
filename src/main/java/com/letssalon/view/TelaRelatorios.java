@@ -8,6 +8,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
+import com.letssalon.util.CoresUtil;
 
 public class TelaRelatorios extends JFrame {
 
@@ -31,7 +32,7 @@ public class TelaRelatorios extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
-        getContentPane().setBackground(new Color(255, 240, 243));
+        getContentPane().setBackground(CoresUtil.ROSA_FUNDO);
 
         // ── TOPO ──
         JPanel painelTopo = new JPanel(new BorderLayout());
@@ -51,12 +52,12 @@ public class TelaRelatorios extends JFrame {
 
         // ── CENTRO: duas tabelas empilhadas ──
         JPanel painelCentro = new JPanel(new GridLayout(2, 1, 0, 15));
-        painelCentro.setBackground(new Color(255, 240, 243));
+        painelCentro.setBackground(CoresUtil.ROSA_FUNDO);
         painelCentro.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
 
         // ── RESUMO GERAL ──
         JPanel painelResumo = new JPanel(new BorderLayout());
-        painelResumo.setBackground(new Color(255, 240, 243));
+        painelResumo.setBackground(CoresUtil.ROSA_FUNDO);
         painelResumo.setBorder(BorderFactory.createTitledBorder(
             BorderFactory.createLineBorder(new Color(201, 72, 105)),
             "Resumo Geral",
@@ -66,7 +67,7 @@ public class TelaRelatorios extends JFrame {
         ));
 
         JPanel painelBuscaResumo = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        painelBuscaResumo.setBackground(new Color(255, 240, 243));
+        painelBuscaResumo.setBackground(CoresUtil.ROSA_FUNDO);
         painelBuscaResumo.add(new JLabel("Buscar:"));
         txtBuscarResumo = new JTextField(20);
         painelBuscaResumo.add(txtBuscarResumo);
@@ -95,7 +96,7 @@ public class TelaRelatorios extends JFrame {
 
         // ── REGISTRO DE ATENDIMENTOS ──
         JPanel painelAtendimentos = new JPanel(new BorderLayout());
-        painelAtendimentos.setBackground(new Color(255, 240, 243));
+        painelAtendimentos.setBackground(CoresUtil.ROSA_FUNDO);
         painelAtendimentos.setBorder(BorderFactory.createTitledBorder(
             BorderFactory.createLineBorder(new Color(201, 72, 105)),
             "Registro de Atendimentos",
@@ -105,7 +106,7 @@ public class TelaRelatorios extends JFrame {
         ));
 
         JPanel painelBuscaAtend = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        painelBuscaAtend.setBackground(new Color(255, 240, 243));
+        painelBuscaAtend.setBackground(CoresUtil.ROSA_FUNDO);
         painelBuscaAtend.add(new JLabel("Buscar:"));
         txtBuscarAtendimentos = new JTextField(20);
         painelBuscaAtend.add(txtBuscarAtendimentos);
@@ -211,7 +212,7 @@ public class TelaRelatorios extends JFrame {
         tabela.getTableHeader().setForeground(Color.WHITE);
         tabela.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
         tabela.setBackground(Color.WHITE);
-        tabela.setGridColor(new Color(240, 150, 170));
+        tabela.setGridColor(CoresUtil.ROSA_SECUNDARIO);
         tabela.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
     }
 }

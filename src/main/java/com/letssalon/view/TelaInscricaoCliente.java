@@ -7,6 +7,7 @@ import com.letssalon.util.CPFUtil;
 import javax.swing.*;
 import java.awt.*;
 import javax.swing.text.MaskFormatter;
+import com.letssalon.util.CoresUtil;
 
 public class TelaInscricaoCliente extends JFrame {
 
@@ -26,11 +27,11 @@ private JButton btnInscrever, btnLimpar, btnVoltar;
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
-        getContentPane().setBackground(new Color(255, 240, 243));
+        getContentPane().setBackground(CoresUtil.ROSA_FUNDO);
 
         // ── PAINEL ESQUERDO: Logo ──
         JPanel painelEsquerdo = new JPanel(new GridBagLayout());
-        painelEsquerdo.setBackground(new Color(255, 240, 243));
+        painelEsquerdo.setBackground(CoresUtil.ROSA_FUNDO);
         painelEsquerdo.setPreferredSize(new Dimension(320, 550));
 
         JLabel lblNome = new JLabel("Let's Salon.");
@@ -42,7 +43,7 @@ private JButton btnInscrever, btnLimpar, btnVoltar;
 
         // ── PAINEL DIREITO: Formulário ──
         JPanel painelDireito = new JPanel(new GridBagLayout());
-        painelDireito.setBackground(new Color(247, 180, 193));
+        painelDireito.setBackground(CoresUtil.ROSA_PAINEL_FORM);
         painelDireito.setBorder(BorderFactory.createEmptyBorder(15, 30, 15, 30));
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -176,12 +177,12 @@ private JButton btnInscrever, btnLimpar, btnVoltar;
         
         btnLimpar = criarBotao(
         "LIMPAR",
-        new Color(230, 120, 150));
+        CoresUtil.ROSA_PAINEL_FORM);
 
         gbc.gridy = 16;
         painelDireito.add(btnLimpar, gbc);
 
-        btnVoltar = criarBotao("VOLTAR", new Color(150, 150, 150));
+        btnVoltar = criarBotao("VOLTAR", CoresUtil.CINZA_VOLTAR);
         gbc.gridy = 17;
         painelDireito.add(btnVoltar, gbc);
 
@@ -354,13 +355,17 @@ if (dataNascimento.contains("_")) {
 }
     
     private JButton criarBotao(String texto, Color cor) {
-        JButton btn = new JButton(texto);
-        btn.setBackground(cor);
+    JButton btn = new JButton(texto);
+    btn.setBackground(cor);
+
+    if (cor.equals(CoresUtil.CINZA_VOLTAR) || cor.equals(CoresUtil.VERDE_CONFIRMAR)) {
+        btn.setForeground(new Color(60, 60, 60));
+    } else {
         btn.setForeground(Color.WHITE);
-        btn.setFont(new Font("Arial", Font.BOLD, 13));
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.setBorderPainted(false);
-        btn.setFocusPainted(false);
-        return btn;
     }
+
+    btn.setFont(new Font("Arial", Font.BOLD, 12));
+    btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    return btn;
+}
 }

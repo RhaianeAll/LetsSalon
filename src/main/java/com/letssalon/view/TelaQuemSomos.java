@@ -2,6 +2,7 @@ package com.letssalon.view;
 
 import javax.swing.*;
 import java.awt.*;
+import com.letssalon.util.CoresUtil;
 
 public class TelaQuemSomos extends JFrame {
 
@@ -16,12 +17,12 @@ public class TelaQuemSomos extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // fecha o sistema ao fechar
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
-        getContentPane().setBackground(new Color(255, 240, 243));
+        getContentPane().setBackground(CoresUtil.ROSA_FUNDO);
 
         // ── TOPO: Logo e slogan ──
         JPanel painelTopo = new JPanel();
         painelTopo.setLayout(new BoxLayout(painelTopo, BoxLayout.Y_AXIS));
-        painelTopo.setBackground(new Color(255, 240, 243));
+        painelTopo.setBackground(CoresUtil.ROSA_FUNDO);
         painelTopo.setBorder(BorderFactory.createEmptyBorder(20, 0, 10, 0));
 
         JLabel lblNome = new JLabel("Let's Salon.");
@@ -40,14 +41,14 @@ public class TelaQuemSomos extends JFrame {
 
         // ── CENTRO: Card com título e texto completo ──
         JPanel painelCentro = new JPanel(new GridBagLayout());
-        painelCentro.setBackground(new Color(255, 240, 243));
+        painelCentro.setBackground(CoresUtil.ROSA_FUNDO);
 
         // Card branco arredondado com sombra simulada
         JPanel card = new JPanel();
         card.setBackground(Color.WHITE);
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(220, 220, 220), 1, true),
+            BorderFactory.createLineBorder(CoresUtil.CINZA_BORDA_CARD, 1, true),
             BorderFactory.createEmptyBorder(25, 30, 25, 30)
         ));
 
@@ -91,7 +92,7 @@ public class TelaQuemSomos extends JFrame {
         // ── RODAPÉ: Texto e botão ──
         JPanel painelRodape = new JPanel();
         painelRodape.setLayout(new BoxLayout(painelRodape, BoxLayout.Y_AXIS));
-        painelRodape.setBackground(new Color(255, 240, 243));
+        painelRodape.setBackground(CoresUtil.ROSA_FUNDO);
         painelRodape.setBorder(BorderFactory.createEmptyBorder(5, 0, 20, 0));
 
         JLabel lblTexto = new JLabel("Clique aqui se desejar fazer a inscrição e gerenciar seu negócio.");
@@ -103,7 +104,7 @@ public class TelaQuemSomos extends JFrame {
 
         // Botão principal de inscrição
         JButton btnInscrever = new JButton("DESEJO SER UM COLABORADOR");
-        btnInscrever.setBackground(new Color(240, 150, 170));
+        btnInscrever.setBackground(CoresUtil.ROSA_SECUNDARIO);
         btnInscrever.setForeground(Color.WHITE);
         btnInscrever.setFont(new Font("Arial", Font.BOLD, 14));
         btnInscrever.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -127,7 +128,7 @@ public class TelaQuemSomos extends JFrame {
     private JTextArea criarTextArea(String texto) {
         JTextArea txt = new JTextArea(texto);
         txt.setFont(new Font("Arial", Font.PLAIN, 13));
-        txt.setForeground(new Color(80, 80, 80));
+        txt.setForeground(CoresUtil.CINZA_TEXTO_CORPO);
         txt.setBackground(Color.WHITE);
         txt.setEditable(false);
         txt.setFocusable(false);

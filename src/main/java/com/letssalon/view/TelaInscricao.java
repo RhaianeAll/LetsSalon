@@ -10,6 +10,7 @@ import com.letssalon.util.CPFUtil;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+import com.letssalon.util.CoresUtil;
 
 public class TelaInscricao extends JFrame {
 
@@ -29,7 +30,7 @@ public class TelaInscricao extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new GridBagLayout());
-        getContentPane().setBackground(new Color(255, 240, 243));
+        getContentPane().setBackground(CoresUtil.ROSA_FUNDO);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets  = new Insets(7, 10, 7, 10);
@@ -106,7 +107,7 @@ public class TelaInscricao extends JFrame {
         add(btnInscrever, gbc);
 
         // ── Linha 10: Botão VOLTAR ──
-        btnVoltar = criarBotao("VOLTAR", new Color(150, 150, 150));
+        btnVoltar = criarBotao("VOLTAR", CoresUtil.CINZA_VOLTAR);
         gbc.gridy = 10;
         add(btnVoltar, gbc);
 
@@ -119,15 +120,19 @@ public class TelaInscricao extends JFrame {
     }
 
     private JButton criarBotao(String texto, Color cor) {
-        JButton btn = new JButton(texto);
-        btn.setBackground(cor);
+    JButton btn = new JButton(texto);
+    btn.setBackground(cor);
+
+    if (cor.equals(CoresUtil.CINZA_VOLTAR) || cor.equals(CoresUtil.VERDE_CONFIRMAR)) {
+        btn.setForeground(new Color(60, 60, 60));
+    } else {
         btn.setForeground(Color.WHITE);
-        btn.setFont(new Font("Arial", Font.BOLD, 14));
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.setBorderPainted(false);
-        btn.setFocusPainted(false);
-        return btn;
     }
+
+    btn.setFont(new Font("Arial", Font.BOLD, 12));
+    btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    return btn;
+}
 
     private void realizarInscricao() {
         String senha     = new String(txtSenha.getPassword());

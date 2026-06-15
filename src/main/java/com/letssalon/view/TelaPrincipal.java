@@ -7,7 +7,9 @@ import com.letssalon.model.Colaborador;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.Font;
 import java.util.List;
+import com.letssalon.util.CoresUtil;
 
 public class TelaPrincipal extends JFrame {
 
@@ -31,7 +33,7 @@ public class TelaPrincipal extends JFrame {
     setExtendedState(JFrame.MAXIMIZED_BOTH);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setLayout(new BorderLayout());
-    getContentPane().setBackground(new Color(255, 240, 243));
+    getContentPane().setBackground(CoresUtil.ROSA_FUNDO);
 
     // TOPO
 
@@ -40,7 +42,7 @@ public class TelaPrincipal extends JFrame {
     painelTopo.setPreferredSize(new Dimension(0, 60));
 
     JLabel lblLogo = new JLabel("  LET'S SALON");
-    lblLogo.setFont(new Font("Arial", Font.BOLD, 22));
+    lblLogo.setFont(new Font("Georgia", Font.ITALIC, 52));
     lblLogo.setForeground(Color.WHITE);
 
     lblEmpresa = new JLabel("Empresa  ");
@@ -81,6 +83,7 @@ public class TelaPrincipal extends JFrame {
     btnCadastroInsumos       = criarBotao("Insumos");
     btnEstoque               = criarBotao("Estoque");
     btnRelatorios            = criarBotao("Relatórios");
+    btnSair                  = criarBotao("Sair");
 
     painelMenu.add(btnAgendamentos);
     painelMenu.add(Box.createVerticalStrut(10));
@@ -102,9 +105,9 @@ public class TelaPrincipal extends JFrame {
 
     // BOTÃO SAIR
 
-    btnSair = new JButton("Sair");
-    btnSair.setBackground(Color.WHITE);
-    btnSair.setForeground(new Color(201, 72, 105));
+    btnSair.setBackground(CoresUtil.CINZA_VOLTAR);
+    btnSair.setForeground(new Color(60, 60, 60));
+    btnSair.setFont(new Font("Arial", Font.BOLD, 12));
     btnSair.setFont(new Font("Arial", Font.BOLD, 14));
     btnSair.setFocusPainted(false);
     btnSair.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -116,13 +119,13 @@ public class TelaPrincipal extends JFrame {
     // PAINEL CENTRAL
 
     JPanel painelCentro = new JPanel(new BorderLayout());
-    painelCentro.setBackground(new Color(255, 240, 243));
+    painelCentro.setBackground(CoresUtil.ROSA_FUNDO);
     painelCentro.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
     // NOTIFICAÇÕES
 
     JPanel painelNotificacoes = new JPanel(new GridLayout(2, 1, 5, 5));
-    painelNotificacoes.setBackground(new Color(255, 240, 243));
+    painelNotificacoes.setBackground(CoresUtil.ROSA_FUNDO);
     painelNotificacoes.setBorder(BorderFactory.createTitledBorder(
             BorderFactory.createLineBorder(new Color(201, 72, 105)),
             "Notificações"
@@ -142,7 +145,7 @@ public class TelaPrincipal extends JFrame {
     // TABELA
 
     JPanel painelTabela = new JPanel(new BorderLayout());
-    painelTabela.setBackground(new Color(255, 240, 243));
+    painelTabela.setBackground(CoresUtil.ROSA_FUNDO);
 
     painelTabela.setBorder(BorderFactory.createTitledBorder(
             BorderFactory.createLineBorder(new Color(201, 72, 105)),
@@ -246,7 +249,7 @@ public class TelaPrincipal extends JFrame {
     modeloTabela.setRowCount(0);
     java.time.LocalDate limite = java.time.LocalDate.now().minusDays(15);
     for (Agenda a : agendaDAO.listar()) {
-        if (!a.isConfirmado()) continue;
+        if (!"CONFIRMADO".equals(a.getStatus())) continue;
         try {
             // data no formato dd/MM/yyyy
             java.time.format.DateTimeFormatter fmt = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");

@@ -8,20 +8,20 @@ public class Agenda {
     private String horario;
     private int idColaborador;
     private int codigoServico;
-    private boolean confirmado;
+    private String status;
     private int codigoEmpresa;
 
     public Agenda() {
 }
     
-    public Agenda(int idAgendamento, String cpfCliente, String data, String horario, int idColaborador, int codigoServico, boolean confirmado, int codigoEmpresa) {
+    public Agenda(int idAgendamento, String cpfCliente, String data, String horario, int idColaborador, int codigoServico, String status, int codigoEmpresa) {
         this.idAgendamento = idAgendamento;
         this.cpfCliente = cpfCliente;
         this.data = data;
         this.horario = horario;
         this.idColaborador = idColaborador;
         this.codigoServico = codigoServico;
-        this.confirmado = confirmado;
+        this.status = status;
         this.codigoEmpresa = codigoEmpresa;
     }
 
@@ -49,8 +49,8 @@ public class Agenda {
         return codigoServico;
     }
 
-    public boolean isConfirmado() {
-        return confirmado;
+    public String getStatus() {
+        return status;
     }
 
     public int getCodigoEmpresa() {
@@ -81,8 +81,8 @@ public class Agenda {
         this.codigoServico = codigoServico;
     }
 
-    public void setConfirmado(boolean confirmado) {
-        this.confirmado = confirmado;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public void setCodigoEmpresa(int codigoEmpresa) {

@@ -2,6 +2,7 @@ package com.letssalon.view;
 
 import javax.swing.*;
 import java.awt.*;
+import com.letssalon.util.CoresUtil;
 
 public class TelaSelecao extends JFrame {
 
@@ -16,11 +17,11 @@ public class TelaSelecao extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
-        getContentPane().setBackground(new Color(255, 240, 243));
+        getContentPane().setBackground(CoresUtil.ROSA_FUNDO);
 
         // ── PAINEL ESQUERDO: Logo e slogan ──
         JPanel painelEsquerdo = new JPanel(new GridBagLayout());
-        painelEsquerdo.setBackground(new Color(255, 240, 243));
+        painelEsquerdo.setBackground(CoresUtil.ROSA_FUNDO);
         painelEsquerdo.setPreferredSize(new Dimension(380, 500));
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -30,14 +31,14 @@ public class TelaSelecao extends JFrame {
         // Nome do sistema
         JLabel lblNome = new JLabel("Let's Salon.");
         lblNome.setFont(new Font("Serif", Font.ITALIC, 48));
-        lblNome.setForeground(new Color(201, 72, 105));
+        lblNome.setForeground(CoresUtil.ROSA_PRINCIPAL);
         gbc.gridy = 0;
         painelEsquerdo.add(lblNome, gbc);
 
         // Slogan
         JLabel lblSlogan = new JLabel("Seu sistema de controle para seu studio de beleza");
         lblSlogan.setFont(new Font("Arial", Font.PLAIN, 12));
-        lblSlogan.setForeground(new Color(201, 72, 105));
+        lblSlogan.setForeground(CoresUtil.ROSA_PRINCIPAL);
         gbc.gridy = 1;
         painelEsquerdo.add(lblSlogan, gbc);
 
@@ -45,7 +46,7 @@ public class TelaSelecao extends JFrame {
 
         // ── PAINEL DIREITO: Botões de seleção ──
         JPanel painelDireito = new JPanel(new GridBagLayout());
-        painelDireito.setBackground(new Color(255, 240, 243));
+        painelDireito.setBackground(CoresUtil.ROSA_FUNDO);
 
         GridBagConstraints gbcD = new GridBagConstraints();
         gbcD.insets = new Insets(10, 20, 5, 20);
@@ -114,7 +115,7 @@ public class TelaSelecao extends JFrame {
     // Método auxiliar para criar botões padronizados
     private JButton criarBotao(String texto) {
         JButton btn = new JButton(texto);
-        btn.setBackground(new Color(240, 150, 170));
+        btn.setBackground(CoresUtil.ROSA_SECUNDARIO);
         btn.setForeground(Color.WHITE);
         btn.setFont(new Font("Arial", Font.BOLD, 14));
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));

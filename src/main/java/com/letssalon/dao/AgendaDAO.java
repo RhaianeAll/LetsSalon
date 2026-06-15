@@ -10,7 +10,7 @@ import java.util.List;
 public class AgendaDAO {
 
     public void cadastrar(Agenda agenda) {
-        String sql = "INSERT INTO agenda (cpf_cliente, data, horario, id_colaborador, codigo_servico, confirmado, codigo_empresa) VALUES (?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO agenda (cpf_cliente, data, horario, id_colaborador, codigo_servico, status, codigo_empresa) VALUES (?,?,?,?,?,?,?)";
         try (Connection conn = Conexao.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, agenda.getCpfCliente());
@@ -18,7 +18,7 @@ public class AgendaDAO {
             stmt.setString(3, agenda.getHorario());
             stmt.setInt(4, agenda.getIdColaborador());
             stmt.setInt(5, agenda.getCodigoServico());
-            stmt.setBoolean(6, agenda.isConfirmado());
+            stmt.setString(6, agenda.getStatus());
             stmt.setInt(7, agenda.getCodigoEmpresa());
             stmt.executeUpdate();
             System.out.println("Agendamento cadastrado com sucesso!");
@@ -41,7 +41,7 @@ public class AgendaDAO {
                 a.setHorario(rs.getString("horario"));
                 a.setIdColaborador(rs.getInt("id_colaborador"));
                 a.setCodigoServico(rs.getInt("codigo_servico"));
-                a.setConfirmado(rs.getBoolean("confirmado"));
+                a.setStatus(rs.getString("status"));
                 a.setCodigoEmpresa(rs.getInt("codigo_empresa"));
                 lista.add(a);
             }
@@ -52,7 +52,7 @@ public class AgendaDAO {
     }
 
     public void confirmar(int idAgendamento) {
-        String sql = "UPDATE agenda SET confirmado=true WHERE id_agendamento=?";
+        String sql = "UPDATE agenda SET status='CONFIRMADO' WHERE id_agendamento=?";
         try (Connection conn = Conexao.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, idAgendamento);
@@ -64,14 +64,121 @@ public class AgendaDAO {
     }
 
     public void excluir(int idAgendamento) {
-        String sql = "DELETE FROM agenda WHERE id_agendamento=?";
-        try (Connection conn = Conexao.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, idAgendamento);
-            stmt.executeUpdate();
-            System.out.println("Agendamento excluído com sucesso!");
-        } catch (SQLException e) {
-            System.out.println("Erro ao excluir agendamento: " + e.getMessage());
-        }
+
+    String sql =
+        "DELETE FROM agenda WHERE id_agendamento=?";
+
+    try (
+        Connection conn = Conexao.conectar();
+        PreparedStatement stmt =
+                conn.prepareStatement(sql)
+    ) {
+
+        stmt.setInt(1, idAgendamento);
+
+        stmt.executeUpdate();
+
+    } catch (SQLException e) {
+
+        System.out.println(
+            "Erro ao excluir: " + e.getMessage()
+        );
     }
 }
+    
+    public void cancelar(int idAgendamento) {
+
+        String sql =
+            "UPDATE agenda " +
+            "SET status = 'CANCELADO' " +
+            "WHERE id_agendamento = ?";
+
+        try (
+            Connection conn = Conexao.conectar();
+            PreparedStatement stmt = conn.prepareStatement(sql)
+    ) {
+
+            stmt.setInt(1, idAgendamento);
+
+            stmt.executeUpdate();
+
+            System.out.println(
+                "Agendamento cancelado com sucesso!"
+        );
+
+    }   catch (SQLException e) {
+
+            System.out.println(
+                "Erro ao cancelar agendamento: "
+                + e.getMessage()
+        );
+    }
+}
+
+    public boolean verificarConflitoHorario(
+        String data,
+        String horario,
+        int idColaborador
+) {
+
+        String sql =
+            "SELECT * FROM agenda " +
+            "WHERE data = ? " +
+            "AND horario = ? " +
+            "AND id_colaborador = ? " +
+            "AND status != 'CANCELADO'";
+
+        try (
+            Connection conn = Conexao.conectar();
+            PreparedStatement stmt = conn.prepareStatement(sql)
+    ) {
+
+            stmt.setString(1, data);
+            stmt.setString(2, horario);
+            stmt.setInt(3, idColaborador);
+
+            ResultSet rs = stmt.executeQuery();
+
+            return rs.next();
+
+    }   catch (SQLException e) {
+
+            System.out.println(
+                "Erro ao verificar conflito: " +
+                e.getMessage()
+            );
+
+            return false;
+    }
+}
+    public void finalizar(int idAgendamento) {
+
+    String sql =
+        "UPDATE agenda " +
+        "SET status = 'FINALIZADO' " +
+        "WHERE id_agendamento = ?";
+
+    try (
+        Connection conn = Conexao.conectar();
+        PreparedStatement stmt =
+                conn.prepareStatement(sql)
+    ) {
+
+        stmt.setInt(1, idAgendamento);
+
+        stmt.executeUpdate();
+
+        System.out.println(
+            "Agendamento finalizado!"
+        );
+
+    } catch (SQLException e) {
+
+        System.out.println(
+            "Erro ao finalizar agendamento: "
+            + e.getMessage()
+        );
+    }
+}
+}
+    

@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import com.letssalon.util.CoresUtil;
 
 public class TelaLoginCliente extends JFrame {
 
@@ -25,11 +26,11 @@ public class TelaLoginCliente extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
-        getContentPane().setBackground(new Color(255, 240, 243));
+        getContentPane().setBackground(CoresUtil.ROSA_FUNDO);
 
         // ── PAINEL ESQUERDO: Logo ──
         JPanel painelEsquerdo = new JPanel(new GridBagLayout());
-        painelEsquerdo.setBackground(new Color(255, 240, 243));
+        painelEsquerdo.setBackground(CoresUtil.ROSA_FUNDO);
         painelEsquerdo.setPreferredSize(new Dimension(350, 500));
 
         GridBagConstraints gbcE = new GridBagConstraints();
@@ -52,7 +53,7 @@ public class TelaLoginCliente extends JFrame {
 
         // ── PAINEL DIREITO: Formulário de login ──
         JPanel painelDireito = new JPanel(new GridBagLayout());
-        painelDireito.setBackground(new Color(247, 180, 193));
+        painelDireito.setBackground(CoresUtil.ROSA_PAINEL_FORM);
         painelDireito.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -85,7 +86,7 @@ public class TelaLoginCliente extends JFrame {
         // Link esqueci minha senha
         JLabel lblEsqueci = new JLabel("<html><u>Não lembra sua senha? Clique aqui.</u></html>");
         lblEsqueci.setFont(new Font("Arial", Font.PLAIN, 11));
-        lblEsqueci.setForeground(new Color(100, 50, 60));
+        lblEsqueci.setForeground(CoresUtil.ROSA_ESCURO_LINK);
         lblEsqueci.setCursor(new Cursor(Cursor.HAND_CURSOR));
         gbc.gridy = 5;
         painelDireito.add(lblEsqueci, gbc);
@@ -149,11 +150,11 @@ public class TelaLoginCliente extends JFrame {
         gbc.gridy = 7;
         painelDireito.add(lblConta, gbc);
 
-        btnInscrever = criarBotao("INSCREVA-SE", new Color(230, 120, 150));
+        btnInscrever = criarBotao("INSCREVA-SE", CoresUtil.ROSA_PAINEL_FORM);
         gbc.gridy = 8;
         painelDireito.add(btnInscrever, gbc);
 
-        btnVoltar = criarBotao("VOLTAR", new Color(150, 150, 150));
+        btnVoltar = criarBotao("VOLTAR", CoresUtil.CINZA_VOLTAR);
         gbc.gridy = 9;
         painelDireito.add(btnVoltar, gbc);
 

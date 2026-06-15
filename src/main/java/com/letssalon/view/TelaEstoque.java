@@ -7,6 +7,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
+import com.letssalon.util.CoresUtil;
 
 public class TelaEstoque extends JFrame {
 
@@ -31,7 +32,7 @@ public class TelaEstoque extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
-        getContentPane().setBackground(new Color(255, 240, 243));
+        getContentPane().setBackground(CoresUtil.ROSA_FUNDO);
 
         // ── TOPO ──
         JPanel painelTopo = new JPanel(new BorderLayout());
@@ -51,7 +52,7 @@ public class TelaEstoque extends JFrame {
 
         // ── FORMULÁRIO ──
         JPanel painelForm = new JPanel(new GridBagLayout());
-        painelForm.setBackground(new Color(255, 240, 243));
+        painelForm.setBackground(CoresUtil.ROSA_FUNDO);
         painelForm.setBorder(BorderFactory.createEmptyBorder(15, 30, 10, 30));
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -98,13 +99,13 @@ public class TelaEstoque extends JFrame {
 
         // Botões
         JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
-        painelBotoes.setBackground(new Color(255, 240, 243));
+        painelBotoes.setBackground(CoresUtil.ROSA_FUNDO);
 
         btnCadastrar = criarBotao("Cadastrar", new Color(201, 72, 105));
         btnAtualizar = criarBotao("Atualizar", new Color(201, 72, 105));
-        btnExcluir   = criarBotao("Excluir", new Color(220, 80, 80));
-        btnLimpar    = criarBotao("Limpar", new Color(240, 150, 170));
-        btnVoltar    = criarBotao("Voltar", new Color(150, 150, 150));
+        btnExcluir   = criarBotao("Excluir", CoresUtil.VERMELHO_EXCLUIR);
+        btnLimpar    = criarBotao("Limpar", CoresUtil.ROSA_SECUNDARIO);
+        btnVoltar    = criarBotao("Voltar", CoresUtil.CINZA_VOLTAR);
 
         painelBotoes.add(btnCadastrar);
         painelBotoes.add(btnAtualizar);
@@ -119,11 +120,11 @@ public class TelaEstoque extends JFrame {
 
         // ── TABELA ──
         JPanel painelTabela = new JPanel(new BorderLayout());
-        painelTabela.setBackground(new Color(255, 240, 243));
+        painelTabela.setBackground(CoresUtil.ROSA_FUNDO);
         painelTabela.setBorder(BorderFactory.createEmptyBorder(0, 20, 20, 20));
 
         JPanel painelBusca = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        painelBusca.setBackground(new Color(255, 240, 243));
+        painelBusca.setBackground(CoresUtil.ROSA_FUNDO);
         painelBusca.add(new JLabel("Buscar:"));
         txtBuscar = new JTextField(20);
         painelBusca.add(txtBuscar);
@@ -240,19 +241,25 @@ public class TelaEstoque extends JFrame {
     }
 
     private JButton criarBotao(String texto, Color cor) {
-        JButton btn = new JButton(texto);
-        btn.setBackground(cor);
+    JButton btn = new JButton(texto);
+    btn.setBackground(cor);
+
+    if (cor.equals(CoresUtil.CINZA_VOLTAR) || cor.equals(CoresUtil.VERDE_CONFIRMAR)) {
+        btn.setForeground(new Color(60, 60, 60));
+    } else {
         btn.setForeground(Color.WHITE);
-        btn.setFont(new Font("Arial", Font.BOLD, 12));
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        return btn;
     }
+
+    btn.setFont(new Font("Arial", Font.BOLD, 12));
+    btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    return btn;
+}
 
     private void estilizarTabela(JTable tabela) {
         tabela.getTableHeader().setBackground(new Color(201, 72, 105));
         tabela.getTableHeader().setForeground(Color.WHITE);
         tabela.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
         tabela.setBackground(Color.WHITE);
-        tabela.setGridColor(new Color(240, 150, 170));
+        tabela.setGridColor(CoresUtil.ROSA_SECUNDARIO);
     }
 }

@@ -12,6 +12,9 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
+import com.letssalon.util.CoresUtil;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class TelaAgendamentos extends JFrame {
 
@@ -19,7 +22,7 @@ public class TelaAgendamentos extends JFrame {
     private JTextField txtData, txtHora;
     private JComboBox<String> cmbCliente;
     private JComboBox<String> cmbColaborador, cmbServico;
-    private JButton btnCadastrar, btnAtualizar, btnExcluir, btnLimpar, btnVoltar;
+    private JButton btnCadastrar, btnAtualizar, btnExcluir, btnLimpar, btnVoltar, btnFinalizar;
     private JTable tabelaAgendamentos, tabelaPendentes;
     private DefaultTableModel modeloAgendamentos, modeloPendentes;
     private JTextField txtBuscar;
@@ -41,7 +44,7 @@ public class TelaAgendamentos extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
-        getContentPane().setBackground(new Color(255, 240, 243));
+        getContentPane().setBackground(CoresUtil.ROSA_FUNDO);
 
         // ── TOPO ──
         JPanel painelTopo = new JPanel(new BorderLayout());
@@ -61,7 +64,7 @@ public class TelaAgendamentos extends JFrame {
 
         // ── FORMULÁRIO ──
         JPanel painelForm = new JPanel(new GridBagLayout());
-        painelForm.setBackground(new Color(255, 240, 243));
+        painelForm.setBackground(CoresUtil.ROSA_FUNDO);
         painelForm.setBorder(BorderFactory.createEmptyBorder(15, 20, 10, 20));
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -109,19 +112,22 @@ public class TelaAgendamentos extends JFrame {
 
         // Botões
         JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
-        painelBotoes.setBackground(new Color(255, 240, 243));
+        painelBotoes.setBackground(CoresUtil.ROSA_FUNDO);
 
         btnCadastrar = criarBotao("Cadastrar", new Color(201, 72, 105));
         btnAtualizar = criarBotao("Atualizar", new Color(201, 72, 105));
-        btnExcluir   = criarBotao("Excluir", new Color(220, 80, 80));
-        btnLimpar    = criarBotao("Limpar", new Color(240, 150, 170));
-        btnVoltar    = criarBotao("Voltar", new Color(150, 150, 150));
+        btnExcluir   = criarBotao("Excluir", CoresUtil.VERMELHO_EXCLUIR);
+        btnLimpar    = criarBotao("Limpar", CoresUtil.ROSA_SECUNDARIO);
+        btnVoltar    = criarBotao("Voltar", CoresUtil.CINZA_VOLTAR);
+        btnFinalizar = criarBotao("Finalizar", new Color(120, 180, 120)
+);
 
         painelBotoes.add(btnCadastrar);
         painelBotoes.add(btnAtualizar);
         painelBotoes.add(btnExcluir);
         painelBotoes.add(btnLimpar);
         painelBotoes.add(btnVoltar);
+        painelBotoes.add(btnFinalizar);
 
         gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 4;
         painelForm.add(painelBotoes, gbc);
@@ -130,12 +136,12 @@ public class TelaAgendamentos extends JFrame {
 
         // ── CENTRO: Pendentes + Tabela principal ──
         JPanel painelCentro = new JPanel(new GridLayout(2, 1, 0, 10));
-        painelCentro.setBackground(new Color(255, 240, 243));
+        painelCentro.setBackground(CoresUtil.ROSA_FUNDO);
         painelCentro.setBorder(BorderFactory.createEmptyBorder(5, 20, 10, 20));
 
         // Tabela de confirmações pendentes
         JPanel painelPendentes = new JPanel(new BorderLayout());
-        painelPendentes.setBackground(new Color(255, 240, 243));
+        painelPendentes.setBackground(CoresUtil.ROSA_FUNDO);
         painelPendentes.setBorder(BorderFactory.createTitledBorder(
             BorderFactory.createLineBorder(new Color(201, 72, 105)),
             "Confirmações de Agendamentos Pendentes",
@@ -156,7 +162,7 @@ public class TelaAgendamentos extends JFrame {
         tabelaPendentes.getColumnModel().getColumn(0).setMaxWidth(0);
         tabelaPendentes.getColumnModel().getColumn(0).setWidth(0);
 
-        JButton btnConfirmarPendente = criarBotao("✔ Confirmar Selecionado", new Color(60, 150, 80));
+        JButton btnConfirmarPendente = criarBotao("✔ Confirmar Selecionado", CoresUtil.VERDE_CONFIRMAR);
         painelPendentes.add(btnConfirmarPendente, BorderLayout.SOUTH);
         btnConfirmarPendente.addActionListener(e -> confirmarAgendamentoPendente());
 
@@ -164,10 +170,10 @@ public class TelaAgendamentos extends JFrame {
 
         // Busca + Tabela principal
         JPanel painelPrincipal = new JPanel(new BorderLayout());
-        painelPrincipal.setBackground(new Color(255, 240, 243));
+        painelPrincipal.setBackground(CoresUtil.ROSA_FUNDO);
 
         JPanel painelBusca = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        painelBusca.setBackground(new Color(255, 240, 243));
+        painelBusca.setBackground(CoresUtil.ROSA_FUNDO);
         painelBusca.add(new JLabel("Buscar:"));
         txtBuscar = new JTextField(20);
         painelBusca.add(txtBuscar);
@@ -193,14 +199,20 @@ public class TelaAgendamentos extends JFrame {
         btnExcluir.addActionListener(e -> excluirAgendamento());
         btnLimpar.addActionListener(e -> limparCampos());
         btnVoltar.addActionListener(e -> dispose());
+        btnFinalizar.addActionListener(e -> finalizarAgendamento());
 
         // Clique na tabela para selecionar
-        tabelaAgendamentos.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent e) {
-                selecionarLinha();
-            }
-        });
+        tabelaAgendamentos.addMouseListener(
+            new java.awt.event.MouseAdapter() {
+
+            public void mouseClicked(
+                    java.awt.event.MouseEvent e
+        ) {
+            selecionarLinha();
+        }
     }
+);
+}
 
     private void carregarDados() {
         // Carrega clientes
@@ -239,17 +251,7 @@ public class TelaAgendamentos extends JFrame {
 
         // Carrega pendentes
         modeloPendentes.setRowCount(0);
-        for (Agenda a : agendamentos) {
-            if (!a.isConfirmado()) {
-                modeloPendentes.addRow(new Object[]{
-                    a.getIdAgendamento(),
-                    a.getCpfCliente(), "-",
-                    a.getData() + " " + a.getHorario(),
-                    a.getIdColaborador(), a.getCodigoServico(), "Confirmar"
-                });
-            }
         }
-    }
 
     private void cadastrarAgendamento() {
         if (txtData.getText().isEmpty()
@@ -278,7 +280,45 @@ public class TelaAgendamentos extends JFrame {
         agenda.setCpfCliente(cpfCliente);
 }       agenda.setData(txtData.getText().trim());
         agenda.setHorario(txtHora.getText().trim());
-        agenda.setConfirmado(false);
+
+    try {
+
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        LocalDate dataAgendamento =
+                LocalDate.parse(
+                        txtData.getText().trim(),
+                        formatter
+            );
+
+        LocalDate hoje = LocalDate.now();
+
+        if (dataAgendamento.isBefore(hoje)) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Não é permitido agendar datas passadas!",
+                    "Data inválida",
+                    JOptionPane.WARNING_MESSAGE
+        );
+
+            return;
+    }
+
+}   catch (Exception e) {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Data inválida! Use o formato dd/MM/yyyy",
+                "Erro",
+                JOptionPane.ERROR_MESSAGE
+    );
+
+        return;
+}
+
+        agenda.setStatus("AGENDADO");
         agenda.setCodigoEmpresa(colaboradorLogado.getCodigoEmpresa());
 
         if (cmbColaborador.getSelectedItem() != null) {
@@ -289,7 +329,26 @@ public class TelaAgendamentos extends JFrame {
             String codStr = cmbServico.getSelectedItem().toString().split(" - ")[0];
             agenda.setCodigoServico(Integer.parseInt(codStr));
         }
+        
+    boolean conflito =
+        agendaDAO.verificarConflitoHorario(
+            agenda.getData(),
+            agenda.getHorario(),
+            agenda.getIdColaborador()
+    );
 
+    if (conflito) {
+
+        JOptionPane.showMessageDialog(
+            this,
+            "Horário já está ocupado!",
+            "Conflito de horário",
+            JOptionPane.WARNING_MESSAGE
+    );
+
+        return;
+}
+        
         agendaDAO.cadastrar(agenda);
         carregarDados();
         limparCampos();
@@ -319,7 +378,7 @@ public class TelaAgendamentos extends JFrame {
         String hora = modeloAgendamentos.getValueAt(linhaSelecionada, 1).toString();
         String cpf  = modeloAgendamentos.getValueAt(linhaSelecionada, 2).toString();
         int idParaExcluir = -1;
-        for (Agenda a : agendaDAO.listar()) {
+        for (Agenda a : agendaDAO.listar()) {             
             if (a.getData().equals(data) && a.getHorario().equals(hora) && a.getCpfCliente().equals(cpf)) {
                 idParaExcluir = a.getIdAgendamento();
                 break;
@@ -331,11 +390,81 @@ public class TelaAgendamentos extends JFrame {
         }
         int confirmacao = JOptionPane.showConfirmDialog(this, "Deseja excluir este agendamento?", "Confirmar", JOptionPane.YES_NO_OPTION);
         if (confirmacao == JOptionPane.YES_OPTION) {
-            agendaDAO.excluir(idParaExcluir);
+            agendaDAO.cancelar(idParaExcluir);
             carregarDados();
-            JOptionPane.showMessageDialog(this, "Agendamento excluído com sucesso!");
+            JOptionPane.showMessageDialog(this, "Agendamento cancelado com sucesso!");
         }
     }
+    
+ 
+    private void finalizarAgendamento() {
+
+        int linhaSelecionada =
+                tabelaAgendamentos.getSelectedRow();
+
+        if (linhaSelecionada == -1) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Selecione um agendamento!",
+                    "Atenção",
+                    JOptionPane.WARNING_MESSAGE
+        );
+
+            return;
+    }
+
+        String data =
+                modeloAgendamentos
+                        .getValueAt(linhaSelecionada, 0)
+                        .toString();
+
+        String hora =
+                modeloAgendamentos
+                        .getValueAt(linhaSelecionada, 1)
+                        .toString();
+
+        String cpf =
+                modeloAgendamentos
+                        .getValueAt(linhaSelecionada, 2)
+                        .toString();
+
+        int idAgendamento = -1;
+
+        for (Agenda a : agendaDAO.listar()) {
+
+            if (a.getData().equals(data)
+                    && a.getHorario().equals(hora)
+                    && a.getCpfCliente().equals(cpf)) {
+
+                idAgendamento =
+                        a.getIdAgendamento();
+
+                break;
+        }
+    }
+
+        if (idAgendamento == -1) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Agendamento não encontrado!",
+                    "Erro",
+                    JOptionPane.ERROR_MESSAGE
+        );
+
+            return;
+    }
+
+        agendaDAO.finalizar(idAgendamento);
+
+        carregarDados();
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Agendamento finalizado!"
+    );
+}
 
     private void selecionarLinha() {
         int linha = tabelaAgendamentos.getSelectedRow();
@@ -355,19 +484,25 @@ public class TelaAgendamentos extends JFrame {
     }
 
     private JButton criarBotao(String texto, Color cor) {
-        JButton btn = new JButton(texto);
-        btn.setBackground(cor);
+    JButton btn = new JButton(texto);
+    btn.setBackground(cor);
+
+    if (cor.equals(CoresUtil.CINZA_VOLTAR) || cor.equals(CoresUtil.VERDE_CONFIRMAR)) {
+        btn.setForeground(new Color(60, 60, 60));
+    } else {
         btn.setForeground(Color.WHITE);
-        btn.setFont(new Font("Arial", Font.BOLD, 12));
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        return btn;
     }
+
+    btn.setFont(new Font("Arial", Font.BOLD, 12));
+    btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    return btn;
+}
 
     private void estilizarTabela(JTable tabela) {
         tabela.getTableHeader().setBackground(new Color(201, 72, 105));
         tabela.getTableHeader().setForeground(Color.WHITE);
         tabela.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
         tabela.setBackground(Color.WHITE);
-        tabela.setGridColor(new Color(240, 150, 170));
+        tabela.setGridColor(CoresUtil.ROSA_SECUNDARIO);
     }
 }

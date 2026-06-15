@@ -11,6 +11,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
+import com.letssalon.util.CoresUtil;
 
 public class TelaAgendaCliente extends JFrame {
 
@@ -37,7 +38,7 @@ public class TelaAgendaCliente extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
-        getContentPane().setBackground(new Color(255, 240, 243));
+        getContentPane().setBackground(CoresUtil.ROSA_FUNDO);
 
         // ── TOPO ──
         JPanel painelTopo = new JPanel(new BorderLayout());
@@ -58,7 +59,7 @@ public class TelaAgendaCliente extends JFrame {
 
         // ── FORMULÁRIO ──
         JPanel painelForm = new JPanel(new GridBagLayout());
-        painelForm.setBackground(new Color(255, 240, 243));
+        painelForm.setBackground(CoresUtil.ROSA_FUNDO);
         painelForm.setBorder(BorderFactory.createTitledBorder(
             BorderFactory.createLineBorder(new Color(201, 72, 105)),
             "Novo Agendamento",
@@ -101,11 +102,11 @@ public class TelaAgendaCliente extends JFrame {
 
         // Botões
         JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 5));
-        painelBotoes.setBackground(new Color(255, 240, 243));
+        painelBotoes.setBackground(CoresUtil.ROSA_FUNDO);
 
         btnAgendar  = criarBotao("Agendar", new Color(201, 72, 105));
-        btnCancelar = criarBotao("Cancelar Agendamento", new Color(220, 80, 80));
-        btnSair     = criarBotao("Sair", new Color(150, 150, 150));
+        btnCancelar = criarBotao("Cancelar Agendamento", CoresUtil.VERMELHO_EXCLUIR);
+        btnSair     = criarBotao("Sair", CoresUtil.CINZA_VOLTAR);
 
         painelBotoes.add(btnAgendar);
         painelBotoes.add(btnCancelar);
@@ -118,7 +119,7 @@ public class TelaAgendaCliente extends JFrame {
 
         // ── TABELA: Meus agendamentos ──
         JPanel painelTabela = new JPanel(new BorderLayout());
-        painelTabela.setBackground(new Color(255, 240, 243));
+        painelTabela.setBackground(CoresUtil.ROSA_FUNDO);
         painelTabela.setBorder(BorderFactory.createTitledBorder(
             BorderFactory.createLineBorder(new Color(201, 72, 105)),
             "Meus Agendamentos",
@@ -135,7 +136,7 @@ public class TelaAgendaCliente extends JFrame {
         tabelaMeusAgendamentos.getTableHeader().setForeground(Color.WHITE);
         tabelaMeusAgendamentos.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
         tabelaMeusAgendamentos.setBackground(Color.WHITE);
-        tabelaMeusAgendamentos.setGridColor(new Color(240, 150, 170));
+        tabelaMeusAgendamentos.setGridColor(CoresUtil.ROSA_SECUNDARIO);
 
         painelTabela.add(new JScrollPane(tabelaMeusAgendamentos));
         add(painelTabela, BorderLayout.SOUTH);
@@ -174,7 +175,7 @@ public class TelaAgendaCliente extends JFrame {
                     a.getHorario(),
                     a.getIdColaborador(),
                     a.getCodigoServico(),
-                    a.isConfirmado() ? "✅ Confirmado" : "⏳ Pendente"
+                    a.getStatus()
                 });
             }
         }
@@ -193,7 +194,7 @@ public class TelaAgendaCliente extends JFrame {
         agenda.setCpfCliente(clienteLogado.getCpfCliente());
         agenda.setData(txtData.getText().trim());
         agenda.setHorario(txtHora.getText().trim());
-        agenda.setConfirmado(false);
+        agenda.setStatus("AGENDADO");
 
         if (cmbColaborador.getSelectedItem() != null) {
             String idStr = cmbColaborador.getSelectedItem().toString().split(" - ")[0];
@@ -236,7 +237,7 @@ public class TelaAgendaCliente extends JFrame {
                 if (a.getCpfCliente().equals(clienteLogado.getCpfCliente())
                         && a.getData().equals(data)
                         && a.getHorario().equals(hora)) {
-                    agendaDAO.excluir(a.getIdAgendamento());
+                    agendaDAO.cancelar(a.getIdAgendamento());
                     break;
                 }
             }
@@ -253,11 +254,17 @@ public class TelaAgendaCliente extends JFrame {
     }
 
     private JButton criarBotao(String texto, Color cor) {
-        JButton btn = new JButton(texto);
-        btn.setBackground(cor);
+    JButton btn = new JButton(texto);
+    btn.setBackground(cor);
+
+    if (cor.equals(CoresUtil.CINZA_VOLTAR) || cor.equals(CoresUtil.VERDE_CONFIRMAR)) {
+        btn.setForeground(new Color(60, 60, 60));
+    } else {
         btn.setForeground(Color.WHITE);
-        btn.setFont(new Font("Arial", Font.BOLD, 12));
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        return btn;
     }
+
+    btn.setFont(new Font("Arial", Font.BOLD, 12));
+    btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    return btn;
+}
 }
