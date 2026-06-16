@@ -49,7 +49,74 @@ public class ServicoDAO {
         }
         return lista;
     }
+public List<Servico> listarPorEmpresa(int codigoEmpresa) {
 
+    List<Servico> lista = new ArrayList<>();
+
+    String sql =
+        "SELECT * FROM servico " +
+        "WHERE codigo_empresa = ?";
+
+    try (
+        Connection conn = Conexao.conectar();
+        PreparedStatement stmt =
+                conn.prepareStatement(sql)
+    ) {
+
+        stmt.setInt(1, codigoEmpresa);
+
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+
+            Servico s = new Servico();
+
+            s.setCodigoServico(
+                rs.getInt("codigo_servico")
+            );
+
+            s.setNomeServico(
+                rs.getString("nome_servico")
+            );
+
+            s.setValorServico(
+                rs.getDouble("valor_servico")
+            );
+
+            s.setDuracaoAproximada(
+                rs.getString("duracao_aproximada")
+            );
+
+            s.setIdColaborador(
+                rs.getInt("id_colaborador")
+            );
+
+            s.setCodigoInsumo(
+                rs.getInt("codigo_insumo")
+            );
+
+            s.setQuantidadeInsumo(
+                rs.getInt("quantidade_insumo")
+            );
+
+            s.setCodigoEmpresa(
+                rs.getInt("codigo_empresa")
+            );
+
+            lista.add(s);
+        }
+
+    } catch (SQLException e) {
+
+        System.out.println(
+            "Erro ao listar serviços: "
+            + e.getMessage()
+        );
+    }
+
+    return lista;
+}
+    
     public void atualizar(Servico servico) {
         String sql = "UPDATE servico SET nome_servico=?, valor_servico=?, duracao_aproximada=?, id_colaborador=?, codigo_insumo=?, quantidade_insumo=?, codigo_empresa=? WHERE codigo_servico=?";
         try (Connection conn = Conexao.conectar();
@@ -81,3 +148,4 @@ public class ServicoDAO {
         }
     }
 }
+        

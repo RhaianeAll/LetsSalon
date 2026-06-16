@@ -45,6 +45,7 @@ public class InsumoDAO {
         }
         return lista;
     }
+    
 
     public void atualizar(Insumo insumo) {
         String sql = "UPDATE insumo SET nome_insumo=?, valor_insumo=?, quantidade_insumo=?, capacidade=?, codigo_empresa=? WHERE codigo_insumo=?";
@@ -74,4 +75,46 @@ public class InsumoDAO {
             System.out.println("Erro ao excluir insumo: " + e.getMessage());
         }
     }
+    public Insumo buscarPorCodigo(int codigoInsumo) {
+
+    String sql =
+        "SELECT * FROM insumo WHERE codigo_insumo = ?";
+
+    try (
+        Connection conn = Conexao.conectar();
+        PreparedStatement stmt =
+                conn.prepareStatement(sql)
+    ) {
+
+        stmt.setInt(1, codigoInsumo);
+
+        ResultSet rs = stmt.executeQuery();
+
+        if (rs.next()) {
+
+            Insumo i = new Insumo();
+
+            i.setCodigoInsumo(
+                    rs.getInt("codigo_insumo")
+            );
+
+            i.setNomeInsumo(
+                    rs.getString("nome_insumo")
+            );
+
+            return i;
+        }
+
+    } catch (SQLException e) {
+
+        System.out.println(
+            "Erro ao buscar insumo: "
+            + e.getMessage()
+        );
+    }
+
+    return null;
+}
+ 
+   
 }

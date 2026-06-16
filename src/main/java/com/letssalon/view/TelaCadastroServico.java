@@ -10,12 +10,14 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 import com.letssalon.util.CoresUtil;
+import com.letssalon.dao.ColaboradorDAO;
 
 public class TelaCadastroServico extends JFrame {
 
     private Colaborador colaboradorLogado;
     private JTextField txtCodigo, txtNome, txtValor, txtDuracao, txtQuantidade;
     private JComboBox<String> cmbInsumos;
+    private JComboBox<String> cmbColaborador;
     private JButton btnCadastrar, btnAtualizar, btnExcluir, btnLimpar, btnVoltar;
     private JTable tabelaServicos;
     private DefaultTableModel modeloTabela;
@@ -23,12 +25,15 @@ public class TelaCadastroServico extends JFrame {
 
     private ServicoDAO servicoDAO = new ServicoDAO();
     private InsumoDAO insumoDAO = new InsumoDAO();
+    private ColaboradorDAO colaboradorDAO =
+        new ColaboradorDAO();
 
     public TelaCadastroServico(Colaborador colaborador) {
         this.colaboradorLogado = colaborador;
         initComponents();
         carregarTabela();
         carregarInsumos();
+        carregarColaboradores();
     }
 
     private void initComponents() {
@@ -96,10 +101,30 @@ public class TelaCadastroServico extends JFrame {
         gbc.gridx = 3;
         painelForm.add(txtDuracao, gbc);
 
+        // Colaborador
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+
+        painelForm.add(
+        new JLabel("Profissional Responsável:"),
+        gbc
+);
+
+        cmbColaborador = new JComboBox<>();
+
+        gbc.gridx = 1;
+
+        painelForm.add(
+        cmbColaborador,
+        gbc
+);
+        
         // Insumos
         gbc.gridx = 0; gbc.gridy = 3;
         painelForm.add(new JLabel("Insumos Necessários:"), gbc);
+
         cmbInsumos = new JComboBox<>();
+
         gbc.gridx = 1;
         painelForm.add(cmbInsumos, gbc);
 
@@ -126,7 +151,7 @@ public class TelaCadastroServico extends JFrame {
         painelBotoes.add(btnLimpar);
         painelBotoes.add(btnVoltar);
 
-        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 4;
+        gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 4;
         painelForm.add(painelBotoes, gbc);
 
         add(painelForm, BorderLayout.NORTH);
@@ -176,10 +201,34 @@ public class TelaCadastroServico extends JFrame {
             cmbInsumos.addItem(i.getCodigoInsumo() + " - " + i.getNomeInsumo());
         }
     }
+    
+    private void carregarColaboradores() {
+
+    cmbColaborador.removeAllItems();
+
+    colaboradorDAO
+            .listarPorEmpresa(
+                    colaboradorLogado
+                            .getCodigoEmpresa()
+            )
+            .forEach(c -> {
+
+                cmbColaborador.addItem(
+                    c.getIdColaborador()
+                    + " - "
+                    + c.getNomeColaborador()
+                );
+
+            });
+}
 
     private void carregarTabela() {
         modeloTabela.setRowCount(0);
-        List<Servico> lista = servicoDAO.listar();
+       List<Servico> lista =
+        servicoDAO.listarPorEmpresa(
+                colaboradorLogado
+                        .getCodigoEmpresa()
+        );
         for (Servico s : lista) {
             modeloTabela.addRow(new Object[]{
                 s.getCodigoServico(),
@@ -203,6 +252,18 @@ public class TelaCadastroServico extends JFrame {
         s.setDuracaoAproximada(txtDuracao.getText().trim());
         s.setQuantidadeInsumo(txtQuantidade.getText().isEmpty() ? 0 : Integer.parseInt(txtQuantidade.getText()));
         s.setCodigoEmpresa(colaboradorLogado.getCodigoEmpresa());
+        if (cmbColaborador.getSelectedItem() != null) {
+
+        String idStr =
+            cmbColaborador
+            .getSelectedItem()
+            .toString()
+            .split(" - ")[0];
+
+        s.setIdColaborador(
+            Integer.parseInt(idStr)
+    );
+}
 
         if (cmbInsumos.getSelectedItem() != null) {
             String codStr = cmbInsumos.getSelectedItem().toString().split(" - ")[0];
@@ -226,7 +287,27 @@ public class TelaCadastroServico extends JFrame {
         s.setValorServico(Double.parseDouble(txtValor.getText().replace(",", ".")));
         s.setDuracaoAproximada(txtDuracao.getText().trim());
         s.setQuantidadeInsumo(txtQuantidade.getText().isEmpty() ? 0 : Integer.parseInt(txtQuantidade.getText()));
+        s.setCodigoEmpresa(
+        colaboradorLogado
+                .getCodigoEmpresa()
+);
+        s.setCodigoEmpresa(
+        colaboradorLogado
+                .getCodigoEmpresa()
+);
+        if (cmbColaborador.getSelectedItem() != null) {
 
+    String idStr =
+            cmbColaborador
+            .getSelectedItem()
+            .toString()
+            .split(" - ")[0];
+
+    s.setIdColaborador(
+            Integer.parseInt(idStr)
+    );
+}
+        
         servicoDAO.atualizar(s);
         carregarTabela();
         limparCampos();
