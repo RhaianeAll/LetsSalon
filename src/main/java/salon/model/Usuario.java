@@ -78,4 +78,8 @@ public class Usuario {
         this.usuarioLogin = usuarioLogin; 
     }
     // ... implementar demais getters e setters
+
+    public byte[] getFoto() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }
