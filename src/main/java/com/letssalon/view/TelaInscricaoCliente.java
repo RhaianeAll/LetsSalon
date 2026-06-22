@@ -328,16 +328,29 @@ if (dataNascimento.contains("_")) {
         cliente.setPerfil("cliente");
 
         ClienteDAO clienteDAO = new ClienteDAO();
-        clienteDAO.cadastrar(cliente);
 
-        JOptionPane.showMessageDialog(this,
-            "Cadastro realizado com sucesso!\nAgora faça seu login.",
-            "Sucesso",
-            JOptionPane.INFORMATION_MESSAGE);
+boolean sucesso =
+    clienteDAO.cadastrar(cliente);
 
-        // Redireciona para o login de cliente
-        new TelaLoginCliente().setVisible(true);
-        dispose();
+if (sucesso) {
+
+    JOptionPane.showMessageDialog(
+        this,
+        "Cadastro realizado com sucesso!\nAgora faça seu login."
+    );
+
+    new TelaLoginCliente().setVisible(true);
+    dispose();
+
+} else {
+
+    JOptionPane.showMessageDialog(
+        this,
+        "Erro ao realizar cadastro!",
+        "Erro",
+        JOptionPane.ERROR_MESSAGE
+    );
+}       
     }
     
     private void limparCampos() {

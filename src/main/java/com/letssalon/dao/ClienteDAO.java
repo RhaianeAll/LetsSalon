@@ -1,4 +1,3 @@
-// ClienteDAO.java
 package com.letssalon.dao;
 
 import com.letssalon.model.Cliente;
@@ -7,52 +6,82 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import org.mindrot.jbcrypt.BCrypt;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class ClienteDAO {
 
-    public void cadastrar(Cliente cliente) {
-        String sql = "INSERT INTO cliente (cpf_cliente, nome_cliente, endereco_cliente, telefone_cliente, email_cliente, data_nascimento, senha_cliente, perfil) VALUES (?,?,?,?,?,?,?,?)";
-        try (Connection conn = Conexao.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, cliente.getCpfCliente());
-            stmt.setString(2, cliente.getNomeCliente());
-            stmt.setString(3, cliente.getEnderecoCliente());
-            stmt.setString(4, cliente.getTelefoneCliente());
-            stmt.setString(5, cliente.getEmailCliente());
-            stmt.setDate(6, java.sql.Date.valueOf(cliente.getDataNascimento()));
-            String senhaHash = org.mindrot.jbcrypt.BCrypt.hashpw(
-            cliente.getSenhaCliente(),
-            org.mindrot.jbcrypt.BCrypt.gensalt()
-);
+    public boolean cadastrar(Cliente cliente) {
 
-            stmt.setString(7, senhaHash);
-            stmt.setString(8, cliente.getPerfil());
-            stmt.executeUpdate();
-            System.out.println("Cliente cadastrado com sucesso!");
-        } catch(SQLException e) {
+    String sql =
+        "INSERT INTO cliente " +
+        "(cpf_cliente, nome_cliente, endereco_cliente, telefone_cliente, " +
+        "email_cliente, data_nascimento, senha_cliente, perfil) " +
+        "VALUES (?,?,?,?,?,?,?,?)";
 
-    System.out.println(
-        "ERRO AO CADASTRAR CLIENTE:"
-    );
+    try (
+        Connection conn = Conexao.conectar();
+        PreparedStatement stmt = conn.prepareStatement(sql)
+    ) {
 
-    String erro = e.getMessage();
+        stmt.setString(1, cliente.getCpfCliente());
+        stmt.setString(2, cliente.getNomeCliente());
+        stmt.setString(3, cliente.getEnderecoCliente());
+        stmt.setString(4, cliente.getTelefoneCliente());
+        stmt.setString(5, cliente.getEmailCliente());
 
-if (erro.contains("unique_cpf_cliente")) {
+        DateTimeFormatter formatter =
+            DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    System.out.println("CPF já cadastrado!");
+        LocalDate data =
+            LocalDate.parse(
+                cliente.getDataNascimento(),
+                formatter
+            );
 
-} else if (erro.contains("unique_email_cliente")) {
+        stmt.setDate(
+            6,
+            java.sql.Date.valueOf(data)
+        );
 
-    System.out.println("E-mail já cadastrado!");
+        String senhaHash =
+            BCrypt.hashpw(
+                cliente.getSenhaCliente(),
+                BCrypt.gensalt()
+            );
 
-} else {
+        stmt.setString(7, senhaHash);
+        stmt.setString(8, cliente.getPerfil());
 
-    System.out.println("Erro ao cadastrar cliente:");
-    e.printStackTrace();
-}
+        int linhas = stmt.executeUpdate();
 
-}
+        return linhas > 0;
+
+    } catch (Exception e) {
+
+        String erro = e.getMessage();
+
+        if (erro != null &&
+            erro.contains("unique_cpf_cliente")) {
+
+            System.out.println("CPF já cadastrado!");
+
+        } else if (
+            erro != null &&
+            erro.contains("unique_email_cliente")
+        ) {
+
+            System.out.println("E-mail já cadastrado!");
+
+        } else {
+
+            e.printStackTrace();
+
+        }
+
+        return false;
     }
+}
 
     public List<Cliente> listar() {
         List<Cliente> lista = new ArrayList<>();
@@ -77,7 +106,7 @@ if (erro.contains("unique_cpf_cliente")) {
         return lista;
     }
 
-    public void atualizar(Cliente cliente) {
+    public boolean atualizar(Cliente cliente) {
         String sql = "UPDATE cliente SET nome_cliente=?, endereco_cliente=?, telefone_cliente=?, email_cliente=?, data_nascimento=?, senha_cliente=?, perfil=? WHERE cpf_cliente=?";
         try (Connection conn = Conexao.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -89,22 +118,36 @@ if (erro.contains("unique_cpf_cliente")) {
             stmt.setString(6, cliente.getSenhaCliente());
             stmt.setString(7, cliente.getPerfil());
             stmt.setString(8, cliente.getCpfCliente());
-            stmt.executeUpdate();
-            System.out.println("Cliente atualizado com sucesso!");
-        } catch (SQLException e) {
-            System.out.println("Erro ao atualizar cliente: " + e.getMessage());
+            int linhas = stmt.executeUpdate();
+
+        return linhas > 0;
+
+    } catch(SQLException e){
+
+        System.out.println(
+            "Erro ao atualizar cliente: " + e.getMessage()
+        );
+
+        return false;
         }
     }
 
-    public void excluir(String cpfCliente) {
+    public boolean excluir(String cpfCliente) {
         String sql = "DELETE FROM cliente WHERE cpf_cliente=?";
         try (Connection conn = Conexao.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, cpfCliente);
-            stmt.executeUpdate();
-            System.out.println("Cliente excluído com sucesso!");
-        } catch (SQLException e) {
-            System.out.println("Erro ao excluir cliente: " + e.getMessage());
+           int linhas = stmt.executeUpdate();
+
+        return linhas > 0;
+
+    } catch(SQLException e){
+
+        System.out.println(
+            "Erro ao excluir : " + e.getMessage()
+        );
+
+        return false;
         }
     }
 

@@ -6,26 +6,60 @@ import com.letssalon.util.Conexao;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalTime;
 
 public class AgendaDAO {
 
-    public void cadastrar(Agenda agenda) {
-        String sql = "INSERT INTO agenda (cpf_cliente, data, horario, id_colaborador, codigo_servico, status, codigo_empresa) VALUES (?,?,?,?,?,?,?)";
-        try (Connection conn = Conexao.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, agenda.getCpfCliente());
-            stmt.setString(2, agenda.getData());
-            stmt.setString(3, agenda.getHorario());
-            stmt.setInt(4, agenda.getIdColaborador());
-            stmt.setInt(5, agenda.getCodigoServico());
-            stmt.setString(6, agenda.getStatus());
-            stmt.setInt(7, agenda.getCodigoEmpresa());
-            stmt.executeUpdate();
-            System.out.println("Agendamento cadastrado com sucesso!");
-        } catch (SQLException e) {
-            System.out.println("Erro ao cadastrar agendamento: " + e.getMessage());
-        }
+    public boolean cadastrar(Agenda agenda) {
+
+    String sql =
+        "INSERT INTO agenda " +
+        "(cpf_cliente, data, horario, id_colaborador, codigo_servico, status, codigo_empresa) " +
+        "VALUES (?,?,?,?,?,?,?)";
+
+    try (
+        Connection conn = Conexao.conectar();
+        PreparedStatement stmt = conn.prepareStatement(sql)
+    ) {
+
+        DateTimeFormatter formatterData =
+            DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        LocalDate data =
+            LocalDate.parse(
+                agenda.getData(),
+                formatterData
+            );
+
+        LocalTime horario =
+            LocalTime.parse(
+                agenda.getHorario()
+            );
+
+        stmt.setString(1, agenda.getCpfCliente());
+        stmt.setDate(2, java.sql.Date.valueOf(data));
+        stmt.setTime(3, java.sql.Time.valueOf(horario));
+        stmt.setInt(4, agenda.getIdColaborador());
+        stmt.setInt(5, agenda.getCodigoServico());
+        stmt.setString(6, agenda.getStatus());
+        stmt.setInt(7, agenda.getCodigoEmpresa());
+
+        int linhas = stmt.executeUpdate();
+
+        return linhas > 0;
+
+    } catch (Exception e) {
+
+        System.out.println(
+            "Erro ao cadastrar agendamento: "
+            + e.getMessage()
+        );
+
+        return false;
     }
+}
 
     public List<Agenda> listar() {
         List<Agenda> lista = new ArrayList<>();
@@ -51,19 +85,22 @@ public class AgendaDAO {
         return lista;
     }
 
-    public void confirmar(int idAgendamento) {
+    public boolean confirmar(int idAgendamento) {
         String sql = "UPDATE agenda SET status='CONFIRMADO' WHERE id_agendamento=?";
         try (Connection conn = Conexao.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, idAgendamento);
-            stmt.executeUpdate();
-            System.out.println("Agendamento confirmado!");
+            int linhas = stmt.executeUpdate();
+            return linhas > 0;
         } catch (SQLException e) {
-            System.out.println("Erro ao confirmar agendamento: " + e.getMessage());
+            System.out.println(
+                    "Erro ao confirmar agendamento: " + e.getMessage()
+            ); 
+            return false;
         }
     }
 
-    public void excluir(int idAgendamento) {
+    public boolean excluir(int idAgendamento) {
 
     String sql =
         "DELETE FROM agenda WHERE id_agendamento=?";
@@ -76,17 +113,21 @@ public class AgendaDAO {
 
         stmt.setInt(1, idAgendamento);
 
-        stmt.executeUpdate();
+        int linhas = stmt.executeUpdate();
 
-    } catch (SQLException e) {
+        return linhas > 0;
+
+    } catch(SQLException e){
 
         System.out.println(
             "Erro ao excluir: " + e.getMessage()
         );
+
+        return false;
     }
 }
     
-    public void cancelar(int idAgendamento) {
+    public boolean cancelar(int idAgendamento) {
 
         String sql =
             "UPDATE agenda " +
@@ -100,18 +141,17 @@ public class AgendaDAO {
 
             stmt.setInt(1, idAgendamento);
 
-            stmt.executeUpdate();
+            int linhas = stmt.executeUpdate();
 
-            System.out.println(
-                "Agendamento cancelado com sucesso!"
+        return linhas > 0;
+
+    } catch(SQLException e){
+
+        System.out.println(
+            "Erro ao cancelar agendamento: " + e.getMessage()
         );
 
-    }   catch (SQLException e) {
-
-            System.out.println(
-                "Erro ao cancelar agendamento: "
-                + e.getMessage()
-        );
+        return false;
     }
 }
 
@@ -133,25 +173,42 @@ public class AgendaDAO {
             PreparedStatement stmt = conn.prepareStatement(sql)
     ) {
 
-            stmt.setString(1, data);
-            stmt.setString(2, horario);
-            stmt.setInt(3, idColaborador);
+            DateTimeFormatter formatter =
+            DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-            ResultSet rs = stmt.executeQuery();
+        LocalDate dataAgenda =
+            LocalDate.parse(data, formatter);
 
-            return rs.next();
+        LocalTime horaAgenda =
+            LocalTime.parse(horario);
 
-    }   catch (SQLException e) {
+        stmt.setDate(
+            1,
+            java.sql.Date.valueOf(dataAgenda)
+        );
 
-            System.out.println(
-                "Erro ao verificar conflito: " +
-                e.getMessage()
-            );
+        stmt.setTime(
+            2,
+            java.sql.Time.valueOf(horaAgenda)
+        );
 
-            return false;
+        stmt.setInt(3, idColaborador);
+
+        ResultSet rs = stmt.executeQuery();
+
+        return rs.next();
+
+    } catch (Exception e) {
+
+        System.out.println(
+            "Erro ao verificar conflito: "
+            + e.getMessage()
+        );
+
+        return false;
     }
 }
-    public void finalizar(int idAgendamento) {
+    public boolean finalizar(int idAgendamento) {
 
     String sql =
         "UPDATE agenda " +
@@ -166,18 +223,17 @@ public class AgendaDAO {
 
         stmt.setInt(1, idAgendamento);
 
-        stmt.executeUpdate();
+        int linhas = stmt.executeUpdate();
+
+        return linhas > 0;
+
+    } catch(SQLException e){
 
         System.out.println(
-            "Agendamento finalizado!"
+            "Erro ao finalizar agendamento: " + e.getMessage()
         );
 
-    } catch (SQLException e) {
-
-        System.out.println(
-            "Erro ao finalizar agendamento: "
-            + e.getMessage()
-        );
+        return false;
     }
 }
 }

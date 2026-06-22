@@ -6,17 +6,21 @@ import java.sql.*;
 
 public class CadastroInsumoDAO {
 
-    public void cadastrar(CadastroInsumo ci) {
+    public boolean cadastrar(CadastroInsumo ci) {
         String sql = "INSERT INTO cadastro_insumo (codigo_insumo, rende_aplicacoes, codigo_servico) VALUES (?,?,?)";
         try (Connection conn = Conexao.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, ci.getCodigoInsumo());
             stmt.setInt(2, ci.getRendeAplicacoes());
             stmt.setInt(3, ci.getCodigoServico());
-            stmt.executeUpdate();
-            System.out.println("Cadastro de insumo realizado!");
+            int linhas = stmt.executeUpdate();
+            return linhas > 0;
         } catch (SQLException e) {
-            System.out.println("Erro ao cadastrar insumo: " + e.getMessage());
+            System.out.println(
+                    "Erro ao cadastrar insumo: " 
+                            + e.getMessage()
+            );
+            return false;
         }
     }
 

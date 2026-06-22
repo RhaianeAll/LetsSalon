@@ -270,10 +270,27 @@ public class TelaCadastroServico extends JFrame {
             s.setCodigoInsumo(Integer.parseInt(codStr));
         }
 
-        servicoDAO.cadastrar(s);
-        carregarTabela();
-        limparCampos();
-        JOptionPane.showMessageDialog(this, "Serviço cadastrado com sucesso!");
+       boolean sucesso = servicoDAO.cadastrar(s);
+
+if (sucesso) {
+
+    carregarTabela();
+    limparCampos();
+
+    JOptionPane.showMessageDialog(
+        this,
+        "Serviço cadastrado com sucesso!"
+    );
+
+} else {
+
+    JOptionPane.showMessageDialog(
+        this,
+        "Erro ao cadastrar serviço!",
+        "Erro",
+        JOptionPane.ERROR_MESSAGE
+    );
+}
     }
 
     private void atualizar() {
@@ -287,14 +304,9 @@ public class TelaCadastroServico extends JFrame {
         s.setValorServico(Double.parseDouble(txtValor.getText().replace(",", ".")));
         s.setDuracaoAproximada(txtDuracao.getText().trim());
         s.setQuantidadeInsumo(txtQuantidade.getText().isEmpty() ? 0 : Integer.parseInt(txtQuantidade.getText()));
-        s.setCodigoEmpresa(
-        colaboradorLogado
-                .getCodigoEmpresa()
-);
-        s.setCodigoEmpresa(
-        colaboradorLogado
-                .getCodigoEmpresa()
-);
+   
+        
+       
         if (cmbColaborador.getSelectedItem() != null) {
 
     String idStr =

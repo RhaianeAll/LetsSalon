@@ -181,16 +181,27 @@ private void carregarTabela() {
             .getCodigoEmpresa()
     );
 
-    insumoDAO.cadastrar(i);
+    boolean sucesso = insumoDAO.cadastrar(i);
+
+if (sucesso) {
 
     carregarTabela();
-
     limparCampos();
 
     JOptionPane.showMessageDialog(
         this,
         "Insumo cadastrado com sucesso!"
     );
+
+} else {
+
+    JOptionPane.showMessageDialog(
+        this,
+        "Erro ao cadastrar insumo!",
+        "Erro",
+        JOptionPane.ERROR_MESSAGE
+    );
+}
 }
 private void atualizar() {
 

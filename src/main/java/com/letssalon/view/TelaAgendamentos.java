@@ -15,6 +15,7 @@ import java.util.List;
 import com.letssalon.util.CoresUtil;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import javax.xml.crypto.Data;
 
 public class TelaAgendamentos extends JFrame {
 
@@ -45,7 +46,7 @@ public class TelaAgendamentos extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
         getContentPane().setBackground(CoresUtil.ROSA_FUNDO);
-
+    
         // ── TOPO ──
         JPanel painelTopo = new JPanel(new BorderLayout());
         painelTopo.setBackground(new Color(201, 72, 105));
@@ -60,8 +61,6 @@ public class TelaAgendamentos extends JFrame {
         lblColaborador.setForeground(Color.WHITE);
         painelTopo.add(lblColaborador, BorderLayout.EAST);
 
-        add(painelTopo, BorderLayout.NORTH);
-
         // ── FORMULÁRIO ──
         JPanel painelForm = new JPanel(new GridBagLayout());
         painelForm.setBackground(CoresUtil.ROSA_FUNDO);
@@ -70,6 +69,15 @@ public class TelaAgendamentos extends JFrame {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(6, 8, 6, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        //---PAINEL PRINCIPAL----
+        JPanel painelNorth = new JPanel();
+        painelNorth.setLayout(new BorderLayout());
+        
+        painelNorth.add(painelTopo, BorderLayout.NORTH);
+        painelNorth.add(painelForm, BorderLayout.CENTER);
+        
+        add(painelNorth, BorderLayout.NORTH);
 
         // Data
         gbc.gridx = 0; gbc.gridy = 0;
@@ -132,7 +140,6 @@ public class TelaAgendamentos extends JFrame {
         gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 4;
         painelForm.add(painelBotoes, gbc);
 
-        add(painelForm, BorderLayout.NORTH);
 
         // ── CENTRO: Pendentes + Tabela principal ──
         JPanel painelCentro = new JPanel(new GridLayout(2, 1, 0, 10));
@@ -182,9 +189,20 @@ public class TelaAgendamentos extends JFrame {
         painelBusca.add(btnBuscar);
         painelPrincipal.add(painelBusca, BorderLayout.NORTH);
 
-        String[] colunasAgendamentos = {"Data", "Hora", "Cliente", "Funcionário", "Serviço", "Qtd Insumos"};
+        String[] colunasAgendamentos = {"ID", "Data", "Hora", "Cliente", "Funcionário", "Serviço", "Quantidade Insumo"};
         modeloAgendamentos = new DefaultTableModel(colunasAgendamentos, 0);
         tabelaAgendamentos = new JTable(modeloAgendamentos);
+        tabelaAgendamentos.getColumnModel()
+                  .getColumn(0)
+                  .setMinWidth(0);
+
+        tabelaAgendamentos.getColumnModel()
+                  .getColumn(0)
+                  .setMaxWidth(0);
+
+        tabelaAgendamentos.getColumnModel()
+                  .getColumn(0)
+                  .setWidth(0);
         tabelaAgendamentos.setRowHeight(28);
         estilizarTabela(tabelaAgendamentos);
         painelPrincipal.add(new JScrollPane(tabelaAgendamentos));
@@ -193,7 +211,8 @@ public class TelaAgendamentos extends JFrame {
         painelCentro.add(painelPrincipal);
 
         add(painelCentro, BorderLayout.CENTER);
-
+    
+    
         // Ações
         btnCadastrar.addActionListener(e -> cadastrarAgendamento());
         btnExcluir.addActionListener(e -> excluirAgendamento());
@@ -212,8 +231,8 @@ public class TelaAgendamentos extends JFrame {
         }
     }
 );
-}
 
+    }
     private void carregarDados() {
         // Carrega clientes
         cmbCliente.removeAllItems();
@@ -244,9 +263,14 @@ public class TelaAgendamentos extends JFrame {
         List<Agenda> agendamentos = agendaDAO.listar();
         for (Agenda a : agendamentos) {
             modeloAgendamentos.addRow(new Object[]{
-                a.getData(), a.getHorario(), a.getCpfCliente(),
-                a.getIdColaborador(), a.getCodigoServico(), "-"
-            });
+    a.getIdAgendamento(),
+    a.getData(),
+    a.getHorario(),
+    a.getCpfCliente(),
+    a.getIdColaborador(),
+    a.getCodigoServico(),
+    "-"
+});
         }
 
         // Carrega pendentes
@@ -349,10 +373,27 @@ public class TelaAgendamentos extends JFrame {
         return;
 }
         
-        agendaDAO.cadastrar(agenda);
-        carregarDados();
-        limparCampos();
-        JOptionPane.showMessageDialog(this, "Agendamento cadastrado com sucesso!");
+        boolean sucesso = agendaDAO.cadastrar(agenda);
+
+if (sucesso) {
+
+    carregarDados();
+    limparCampos();
+
+    JOptionPane.showMessageDialog(
+        this,
+        "Agendamento cadastrado com sucesso!"
+    );
+
+} else {
+
+    JOptionPane.showMessageDialog(
+        this,
+        "Erro ao cadastrar agendamento!",
+        "Erro",
+        JOptionPane.ERROR_MESSAGE
+    );
+}
     }
 
     private void confirmarAgendamentoPendente() {

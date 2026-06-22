@@ -9,39 +9,52 @@ import java.util.List;
 
 public class ColaboradorDAO {
 
-    public void cadastrar(Colaborador colaborador) {
-    String sql = "INSERT INTO colaborador (cpf_colaborador, nome_colaborador, funcao_colaborador, " +
-                 "telefone_colaborador, foto_colaborador, email_colaborador, senha_colaborador, " +
-                 "perfil, codigo_empresa) VALUES (?,?,?,?,?,?,?,?,?)";
-    try (Connection conn = Conexao.conectar();
-         PreparedStatement stmt = conn.prepareStatement(sql)) {
+    public boolean cadastrar(Colaborador colaborador) {
+
+    String sql =
+        "INSERT INTO colaborador " +
+        "(cpf_colaborador, nome_colaborador, funcao_colaborador, " +
+        "telefone_colaborador, foto_colaborador, email_colaborador, " +
+        "senha_colaborador, perfil, codigo_empresa) " +
+        "VALUES (?,?,?,?,?,?,?,?,?)";
+
+    try (
+        Connection conn = Conexao.conectar();
+        PreparedStatement stmt = conn.prepareStatement(sql)
+    ) {
+
         stmt.setString(1, colaborador.getCpfColaborador());
         stmt.setString(2, colaborador.getNomeColaborador());
         stmt.setString(3, colaborador.getFuncaoColaborador());
         stmt.setString(4, colaborador.getTelefoneColaborador());
         stmt.setString(5, colaborador.getFotoColaborador());
-        stmt.setString(6, colaborador.getEmailColaborador()); // ← email aqui
-        stmt.setString(7, colaborador.getSenhaColaborador());
+        stmt.setString(6, colaborador.getEmailColaborador());
+
+        String senhaHash =
+            SenhaUtil.criptografarSenha(
+                colaborador.getSenhaColaborador()
+            );
+
+        stmt.setString(7, senhaHash);
+
         stmt.setString(8, colaborador.getPerfil());
         stmt.setInt(9, colaborador.getCodigoEmpresa());
-        stmt.executeUpdate();
-        System.out.println("Colaborador cadastrado com sucesso!");
+
+        int linhas = stmt.executeUpdate();
+
+        return linhas > 0;
+
     } catch (SQLException e) {
-        
-        if (e.getMessage().contains("unique_cpf_colaborador")) {
 
-    System.out.println("CPF já cadastrado!");
+        System.out.println(
+            "Erro ao cadastrar colaborador: "
+            + e.getMessage()
+        );
 
-    } else if (e.getMessage().contains("unique_email_colaborador")) {
+        return false;
 
-        System.out.println("E-mail já cadastrado!");
-
-    } else {
-
-        System.out.println("Erro ao cadastrar colaborador: " + e.getMessage());
-}
+        }
     }
-}
 
     public List<Colaborador> listarPorEmpresa(int codigoEmpresa) {
         List<Colaborador> lista = new ArrayList<>();
@@ -92,7 +105,7 @@ public class ColaboradorDAO {
         return lista;
     }
 
-    public void atualizar(Colaborador colaborador) {
+    public boolean atualizar(Colaborador colaborador) {
         String sql = "UPDATE colaborador SET cpf_colaborador=?, nome_colaborador=?, funcao_colaborador=?, telefone_colaborador=?, foto_colaborador=?, senha_colaborador=?, perfil=?, codigo_empresa=? WHERE id_colaborador=?";
         try (Connection conn = Conexao.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -105,22 +118,36 @@ public class ColaboradorDAO {
             stmt.setString(7, colaborador.getPerfil());
             stmt.setInt(8, colaborador.getCodigoEmpresa());
             stmt.setInt(9, colaborador.getIdColaborador());
-            stmt.executeUpdate();
-            System.out.println("Colaborador atualizado com sucesso!");
-        } catch (SQLException e) {
-            System.out.println("Erro ao atualizar colaborador: " + e.getMessage());
+            int linhas = stmt.executeUpdate();
+
+        return linhas > 0;
+
+    } catch(SQLException e){
+
+        System.out.println(
+            "Erro ao atualizar colaborador: " + e.getMessage()
+        );
+
+        return false;
         }
     }
 
-    public void excluir(int idColaborador) {
+    public boolean excluir(int idColaborador) {
         String sql = "DELETE FROM colaborador WHERE id_colaborador=?";
         try (Connection conn = Conexao.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, idColaborador);
-            stmt.executeUpdate();
-            System.out.println("Colaborador excluído com sucesso!");
-        } catch (SQLException e) {
-            System.out.println("Erro ao excluir colaborador: " + e.getMessage());
+            int linhas = stmt.executeUpdate();
+
+        return linhas > 0;
+
+    } catch(SQLException e){
+
+        System.out.println(
+            "Erro ao excluir colaborador: " + e.getMessage()
+        );
+
+        return false;
         }
     }
 

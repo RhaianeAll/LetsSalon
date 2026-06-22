@@ -182,10 +182,27 @@ public class TelaEstoque extends JFrame {
         i.setCapacidade(txtCapacidade.getText().trim());
         i.setCodigoEmpresa(colaboradorLogado.getCodigoEmpresa());
 
-        insumoDAO.cadastrar(i);
-        carregarTabela();
-        limparCampos();
-        JOptionPane.showMessageDialog(this, "Insumo cadastrado com sucesso!");
+        boolean sucesso = insumoDAO.cadastrar(i);
+
+if (sucesso) {
+
+    carregarTabela();
+    limparCampos();
+
+    JOptionPane.showMessageDialog(
+        this,
+        "Insumo cadastrado com sucesso!"
+    );
+
+} else {
+
+    JOptionPane.showMessageDialog(
+        this,
+        "Erro ao cadastrar insumo!",
+        "Erro",
+        JOptionPane.ERROR_MESSAGE
+    );
+}
     }
 
     private void atualizar() {

@@ -201,10 +201,29 @@ public class TelaAgendaCliente extends JFrame {
             agenda.setIdColaborador(Integer.parseInt(idStr));
         }
         if (cmbServico.getSelectedItem() != null) {
-            String codStr = cmbServico.getSelectedItem().toString().split(" - ")[0];
-            agenda.setCodigoServico(Integer.parseInt(codStr));
-        }
 
+    String codStr =
+        cmbServico.getSelectedItem()
+                  .toString()
+                  .split(" - ")[0];
+
+    int codigoServico =
+        Integer.parseInt(codStr);
+
+    agenda.setCodigoServico(codigoServico);
+
+    for (Servico s : servicoDAO.listar()) {
+
+        if (s.getCodigoServico() == codigoServico) {
+
+            agenda.setCodigoEmpresa(
+                s.getCodigoEmpresa()
+            );
+
+            break;
+        }
+    }
+}
         agendaDAO.cadastrar(agenda);
         JOptionPane.showMessageDialog(this,
             "Agendamento realizado!\nAguarde a confirmação do salão.",

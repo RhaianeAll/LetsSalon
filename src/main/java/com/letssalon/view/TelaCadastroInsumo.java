@@ -163,24 +163,61 @@ public class TelaCadastroInsumo extends JFrame {
         }
     }
 
-    private void cadastrar() {
-        if (cmbInsumo.getSelectedItem() == null || txtRendeAplicacoes.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Preencha todos os campos!", "Atenção", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        CadastroInsumo ci = new CadastroInsumo();
-        String codInsumo = cmbInsumo.getSelectedItem().toString().split(" - ")[0];
-        ci.setCodigoInsumo(Integer.parseInt(codInsumo));
-        ci.setRendeAplicacoes(Integer.parseInt(txtRendeAplicacoes.getText().trim()));
-        if (cmbServico.getSelectedItem() != null) {
-            String codServico = cmbServico.getSelectedItem().toString().split(" - ")[0];
-            ci.setCodigoServico(Integer.parseInt(codServico));
-        }
-        cadastroInsumoDAO.cadastrar(ci);
-        carregarTabela();
-        limparCampos();
-        JOptionPane.showMessageDialog(this, "Insumo cadastrado com sucesso!");
+   private void cadastrar() {
+
+    if (cmbInsumo.getSelectedItem() == null
+            || txtRendeAplicacoes.getText().isEmpty()) {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Preencha todos os campos!",
+                "Atenção",
+                JOptionPane.WARNING_MESSAGE
+        );
+
+        return;
     }
+
+    CadastroInsumo ci = new CadastroInsumo();
+
+    String codInsumo =
+            cmbInsumo.getSelectedItem()
+            .toString()
+            .split(" - ")[0];
+
+    ci.setCodigoInsumo(
+            Integer.parseInt(codInsumo)
+    );
+
+    ci.setRendeAplicacoes(
+            Integer.parseInt(
+                    txtRendeAplicacoes.getText().trim()
+            )
+    );
+
+    if (cmbServico.getSelectedItem() != null) {
+
+        String codServico =
+                cmbServico.getSelectedItem()
+                .toString()
+                .split(" - ")[0];
+
+        ci.setCodigoServico(
+                Integer.parseInt(codServico)
+        );
+    }
+
+    cadastroInsumoDAO.cadastrar(ci);
+
+    carregarTabela();
+
+    limparCampos();
+
+    JOptionPane.showMessageDialog(
+            this,
+            "Insumo cadastrado com sucesso!"
+    );
+}
 
     private void excluir() {
         int linha = tabelaInsumos.getSelectedRow();

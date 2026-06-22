@@ -5,26 +5,47 @@ import com.letssalon.util.Conexao;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 
 public class AtendimentoDAO {
 
-    public void cadastrar(Atendimento atendimento) {
+    public boolean cadastrar(Atendimento atendimento) {
         String sql = "INSERT INTO atendimento (id_colaborador, codigo_servico, cpf_cliente, data_hora, valor_arrecadado, codigo_insumo, qtd_aplicacoes, custo_insumo, codigo_empresa) VALUES (?,?,?,?,?,?,?,?,?)";
         try (Connection conn = Conexao.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, atendimento.getIdColaborador());
             stmt.setInt(2, atendimento.getCodigoServico());
             stmt.setString(3, atendimento.getCpfCliente());
-            stmt.setString(4, atendimento.getDataHora());
+            DateTimeFormatter formatter =
+            DateTimeFormatter.ofPattern(
+            "dd/MM/yyyy HH:mm"
+             );
+
+            LocalDateTime dataHora =
+            LocalDateTime.parse(
+            atendimento.getDataHora(),
+            formatter
+    );
+
+            stmt.setTimestamp(
+            4,
+            Timestamp.valueOf(dataHora)
+);
             stmt.setDouble(5, atendimento.getValorArrecadado());
             stmt.setInt(6, atendimento.getCodigoInsumo());
             stmt.setInt(7, atendimento.getQtdAplicacoes());
             stmt.setDouble(8, atendimento.getCustoInsumo());
             stmt.setInt(9, atendimento.getCodigoEmpresa());
-            stmt.executeUpdate();
-            System.out.println("Atendimento registrado com sucesso!");
-        } catch (SQLException e) {
-            System.out.println("Erro ao registrar atendimento: " + e.getMessage());
+            int linhas = stmt.executeUpdate();
+            return linhas > 0;
+            } catch (SQLException e) {
+            System.out.println(
+                    "Erro ao registrar atendimento: " 
+                            + e.getMessage()
+            );
+            return false;
         }
     }
 

@@ -8,7 +8,7 @@ import java.util.List;
 
 public class ServicoDAO {
 
-    public void cadastrar(Servico servico) {
+    public boolean cadastrar(Servico servico) {
         String sql = "INSERT INTO servico (nome_servico, valor_servico, duracao_aproximada, id_colaborador, codigo_insumo, quantidade_insumo, codigo_empresa) VALUES (?,?,?,?,?,?,?)";
         try (Connection conn = Conexao.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -19,10 +19,14 @@ public class ServicoDAO {
             stmt.setInt(5, servico.getCodigoInsumo());
             stmt.setInt(6, servico.getQuantidadeInsumo());
             stmt.setInt(7, servico.getCodigoEmpresa());
-            stmt.executeUpdate();
-            System.out.println("Serviço cadastrado com sucesso!");
+            int linhas = stmt.executeUpdate();
+            return linhas > 0;
         } catch (SQLException e) {
-            System.out.println("Erro ao cadastrar serviço: " + e.getMessage());
+            System.out.println(
+                    "Erro ao cadastrar serviço: " 
+                            + e.getMessage()
+            );
+            return false;
         }
     }
 
@@ -117,7 +121,7 @@ public List<Servico> listarPorEmpresa(int codigoEmpresa) {
     return lista;
 }
     
-    public void atualizar(Servico servico) {
+    public boolean atualizar(Servico servico) {
         String sql = "UPDATE servico SET nome_servico=?, valor_servico=?, duracao_aproximada=?, id_colaborador=?, codigo_insumo=?, quantidade_insumo=?, codigo_empresa=? WHERE codigo_servico=?";
         try (Connection conn = Conexao.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -130,21 +134,36 @@ public List<Servico> listarPorEmpresa(int codigoEmpresa) {
             stmt.setInt(7, servico.getCodigoEmpresa());
             stmt.setInt(8, servico.getCodigoServico());
             stmt.executeUpdate();
-            System.out.println("Serviço atualizado com sucesso!");
-        } catch (SQLException e) {
-            System.out.println("Erro ao atualizar serviço: " + e.getMessage());
+            int linhas = stmt.executeUpdate();
+
+        return linhas > 0;
+
+    } catch(SQLException e){
+
+        System.out.println(
+            "Erro ao atualizar serviço: " + e.getMessage()
+        );
+
+        return false;
         }
     }
 
-    public void excluir(int codigoServico) {
+    public boolean excluir(int codigoServico) {
         String sql = "DELETE FROM servico WHERE codigo_servico=?";
         try (Connection conn = Conexao.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, codigoServico);
-            stmt.executeUpdate();
-            System.out.println("Serviço excluído com sucesso!");
-        } catch (SQLException e) {
-            System.out.println("Erro ao excluir serviço: " + e.getMessage());
+           int linhas = stmt.executeUpdate();
+
+        return linhas > 0;
+
+    } catch(SQLException e){
+
+        System.out.println(
+            "Erro ao excluir serviço: " + e.getMessage()
+        );
+
+        return false;
         }
     }
 }

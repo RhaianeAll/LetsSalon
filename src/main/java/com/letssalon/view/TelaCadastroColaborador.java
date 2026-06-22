@@ -195,6 +195,17 @@ public class TelaCadastroColaborador extends JFrame {
             JOptionPane.showMessageDialog(this, "Preencha os campos obrigatórios!", "Atenção", JOptionPane.WARNING_MESSAGE);
             return;
         }
+         if (!CPFUtil.validarCPF(txtCpf.getText())) {
+
+    JOptionPane.showMessageDialog(
+        this,
+        "CPF inválido!",
+        "Erro",
+        JOptionPane.ERROR_MESSAGE
+    );
+
+    return;
+}
         Colaborador c = new Colaborador();
         c.setNomeColaborador(txtNome.getText().trim());
         c.setCpfColaborador(txtCpf.getText().trim());
@@ -207,23 +218,29 @@ public class TelaCadastroColaborador extends JFrame {
         c.setPerfil("colaborador");
         c.setCodigoEmpresa(colaboradorLogado.getCodigoEmpresa());
 
-        colaboradorDAO.cadastrar(c);
-        carregarTabela();
-        limparCampos();
-        JOptionPane.showMessageDialog(this, "Profissional cadastrado com sucesso!");
-    
-        if (!CPFUtil.validarCPF(txtCpf.getText())) {
+        boolean sucesso = colaboradorDAO.cadastrar(c);
+
+if (sucesso) {
+
+    carregarTabela();
+    limparCampos();
 
     JOptionPane.showMessageDialog(
         this,
-        "CPF inválido!",
+        "Profissional cadastrado com sucesso!"
+    );
+
+} else {
+
+    JOptionPane.showMessageDialog(
+        this,
+        "Erro ao cadastrar profissional!",
         "Erro",
         JOptionPane.ERROR_MESSAGE
     );
-
-    return;
 }
-    }
+    
+       }
 
     private void atualizar() {
         if (txtId.getText().isEmpty()) {
