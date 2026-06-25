@@ -63,7 +63,8 @@ public class AgendaDAO {
 
     public List<Agenda> listar() {
         List<Agenda> lista = new ArrayList<>();
-        String sql = "SELECT * FROM agenda";
+        String sql = "SELECT * FROM agenda " +
+                     "WHERE status = ('CONFIRMADO')";
         try (Connection conn = Conexao.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -84,6 +85,71 @@ public class AgendaDAO {
         }
         return lista;
     }
+    
+    public List<Object[]> listarComNomes() {
+
+    List<Object[]> lista = new ArrayList<>();
+
+    String sql =
+        "SELECT " +
+        "a.id_agendamento, " +
+        "a.data, " +
+        "a.horario, " +
+        "c.nome_cliente, " +
+        "col.nome_colaborador, " +
+        "s.nome_servico " +
+        "FROM agenda a " +
+        "INNER JOIN cliente c " +
+        "ON a.cpf_cliente = c.cpf_cliente " +
+        "INNER JOIN colaborador col " +
+        "ON a.id_colaborador = col.id_colaborador " +
+        "INNER JOIN servico s " +
+        "ON a.codigo_servico = s.codigo_servico " +
+        "WHERE a.status NOT IN ('CANCELADO', 'FINALIZADO')";
+
+    try (
+        Connection conn = Conexao.conectar();
+        PreparedStatement stmt =
+                conn.prepareStatement(sql);
+        ResultSet rs =
+                stmt.executeQuery()
+    ) {
+    DateTimeFormatter formatoData =
+        DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+    DateTimeFormatter formatoHora =
+        DateTimeFormatter.ofPattern("HH:mm");
+
+        while (rs.next()) {
+    String dataFormatada =
+        rs.getDate("data")
+          .toLocalDate()
+          .format(formatoData);
+
+    String horaFormatada =
+        rs.getTime("horario")
+          .toLocalTime()
+          .format(formatoHora);
+            lista.add(new Object[]{
+                rs.getInt("id_agendamento"),
+                dataFormatada,
+                horaFormatada,
+                rs.getString("nome_cliente"),
+                rs.getString("nome_colaborador"),
+                rs.getString("nome_servico")
+            });
+        }
+
+    } catch (SQLException e) {
+
+        System.out.println(
+            "Erro ao listar agendamentos: "
+            + e.getMessage()
+        );
+    }
+
+    return lista;
+}
 
     public boolean confirmar(int idAgendamento) {
         String sql = "UPDATE agenda SET status='CONFIRMADO' WHERE id_agendamento=?";
@@ -195,6 +261,8 @@ public class AgendaDAO {
         stmt.setInt(3, idColaborador);
 
         ResultSet rs = stmt.executeQuery();
+        
+        
 
         return rs.next();
 
@@ -236,5 +304,69 @@ public class AgendaDAO {
         return false;
     }
 }
-}
+    public List<Object[]> listarPendentesComNomes() {
+
+    List<Object[]> lista = new ArrayList<>();
+
+    String sql =
+        "SELECT " +
+        "a.id_agendamento, " +
+        "c.nome_cliente, " +
+        "c.telefone_cliente, " +
+        "a.data, " +
+        "a.horario, " +
+        "col.nome_colaborador, " +
+        "s.nome_servico " +
+        "FROM agenda a " +
+        "INNER JOIN cliente c " +
+        "ON a.cpf_cliente = c.cpf_cliente " +
+        "INNER JOIN colaborador col " +
+        "ON a.id_colaborador = col.id_colaborador " +
+        "INNER JOIN servico s " +
+        "ON a.codigo_servico = s.codigo_servico " +
+        "WHERE a.status = 'PENDENTE'";
     
+    try (
+        Connection conn = Conexao.conectar();
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        ResultSet rs = stmt.executeQuery()
+    ) {
+        
+    DateTimeFormatter formatoData =
+        DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+    DateTimeFormatter formatoHora =
+        DateTimeFormatter.ofPattern("HH:mm");
+    
+        while (rs.next()) {
+
+    String dataHora =
+        rs.getDate("data")
+          .toLocalDate()
+          .format(formatoData)
+        + " "
+        +
+        rs.getTime("horario")
+          .toLocalTime()
+          .format(formatoHora);
+
+    lista.add(new Object[]{
+        rs.getInt("id_agendamento"),
+        rs.getString("nome_cliente"),
+        rs.getString("telefone_cliente"),
+        dataHora,
+        rs.getString("nome_colaborador"),
+        rs.getString("nome_servico")
+    });
+        }
+    }   catch (SQLException e) {
+
+        System.out.println(
+            "Erro ao listar pendentes: "
+            + e.getMessage()
+              );
+    }
+        return lista;
+    }
+}
+   

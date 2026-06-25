@@ -157,7 +157,7 @@ public class TelaAgendamentos extends JFrame {
             new Color(201, 72, 105)
         ));
 
-        String[] colunasPendentes = {"ID", "Nome Cliente", "Telefone", "Data/Hora", "Id Funcionário", "Código Serviço", "Confirmar"};
+        String[] colunasPendentes = {"ID", "Cliente", "Telefone", "Data/Hora", "Profissional", "Serviço", "Confirmar"};
         modeloPendentes = new DefaultTableModel(colunasPendentes, 0) {
             @Override public boolean isCellEditable(int row, int col) { return false; }
         };
@@ -189,7 +189,14 @@ public class TelaAgendamentos extends JFrame {
         painelBusca.add(btnBuscar);
         painelPrincipal.add(painelBusca, BorderLayout.NORTH);
 
-        String[] colunasAgendamentos = {"ID", "Data", "Hora", "Cliente", "Funcionário", "Serviço", "Quantidade Insumo"};
+        String[] colunasAgendamentos = {
+    "ID",
+    "Data",
+    "Hora",
+    "Cliente",
+    "Profissional",
+    "Serviço",
+    };
         modeloAgendamentos = new DefaultTableModel(colunasAgendamentos, 0);
         tabelaAgendamentos = new JTable(modeloAgendamentos);
         tabelaAgendamentos.getColumnModel()
@@ -260,22 +267,26 @@ public class TelaAgendamentos extends JFrame {
 
         // Carrega agendamentos na tabela
         modeloAgendamentos.setRowCount(0);
-        List<Agenda> agendamentos = agendaDAO.listar();
-        for (Agenda a : agendamentos) {
-            modeloAgendamentos.addRow(new Object[]{
-    a.getIdAgendamento(),
-    a.getData(),
-    a.getHorario(),
-    a.getCpfCliente(),
-    a.getIdColaborador(),
-    a.getCodigoServico(),
-    "-"
-});
-        }
 
-        // Carrega pendentes
-        modeloPendentes.setRowCount(0);
-        }
+List<Object[]> agendamentos =
+        agendaDAO.listarComNomes();
+
+for (Object[] linha : agendamentos) {
+
+    modeloAgendamentos.addRow(linha);
+}
+
+       // Carrega pendentes
+modeloPendentes.setRowCount(0);
+
+List<Object[]> pendentes =
+        agendaDAO.listarPendentesComNomes();
+
+for (Object[] linha : pendentes) {
+
+    modeloPendentes.addRow(linha);
+}
+    }
 
     private void cadastrarAgendamento() {
         if (txtData.getText().isEmpty()
@@ -342,7 +353,7 @@ public class TelaAgendamentos extends JFrame {
         return;
 }
 
-        agenda.setStatus("AGENDADO");
+        agenda.setStatus("PENDENTE");
         agenda.setCodigoEmpresa(colaboradorLogado.getCodigoEmpresa());
 
         if (cmbColaborador.getSelectedItem() != null) {
@@ -414,26 +425,26 @@ if (sucesso) {
             JOptionPane.showMessageDialog(this, "Selecione um agendamento!", "Atenção", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        // Busca o id do agendamento pelo cpf+data na lista (coluna 0=data, 1=hora, 2=cpf)
-        String data = modeloAgendamentos.getValueAt(linhaSelecionada, 0).toString();
-        String hora = modeloAgendamentos.getValueAt(linhaSelecionada, 1).toString();
-        String cpf  = modeloAgendamentos.getValueAt(linhaSelecionada, 2).toString();
-        int idParaExcluir = -1;
-        for (Agenda a : agendaDAO.listar()) {             
-            if (a.getData().equals(data) && a.getHorario().equals(hora) && a.getCpfCliente().equals(cpf)) {
-                idParaExcluir = a.getIdAgendamento();
-                break;
-            }
-        }
-        if (idParaExcluir == -1) {
-            JOptionPane.showMessageDialog(this, "Agendamento não encontrado!", "Erro", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        int confirmacao = JOptionPane.showConfirmDialog(this, "Deseja excluir este agendamento?", "Confirmar", JOptionPane.YES_NO_OPTION);
+        int idParaExcluir = 
+                Integer.parseInt(
+                    modeloAgendamentos
+                            .getValueAt(linhaSelecionada, 0)
+                            .toString()
+                );
+        
+        int confirmacao = 
+                JOptionPane.showConfirmDialog(
+                        this, "Deseja excluir este agendamento?", 
+                        "Confirmar", 
+                        JOptionPane.YES_NO_OPTION
+                );
         if (confirmacao == JOptionPane.YES_OPTION) {
             agendaDAO.cancelar(idParaExcluir);
             carregarDados();
-            JOptionPane.showMessageDialog(this, "Agendamento cancelado com sucesso!");
+            JOptionPane.showMessageDialog(
+                    this, 
+                    "Agendamento cancelado com sucesso!"
+            );
         }
     }
     
@@ -455,35 +466,12 @@ if (sucesso) {
             return;
     }
 
-        String data =
-                modeloAgendamentos
+       int idAgendamento = 
+               Integer.parseInt(
+                    modeloAgendamentos
                         .getValueAt(linhaSelecionada, 0)
-                        .toString();
-
-        String hora =
-                modeloAgendamentos
-                        .getValueAt(linhaSelecionada, 1)
-                        .toString();
-
-        String cpf =
-                modeloAgendamentos
-                        .getValueAt(linhaSelecionada, 2)
-                        .toString();
-
-        int idAgendamento = -1;
-
-        for (Agenda a : agendaDAO.listar()) {
-
-            if (a.getData().equals(data)
-                    && a.getHorario().equals(hora)
-                    && a.getCpfCliente().equals(cpf)) {
-
-                idAgendamento =
-                        a.getIdAgendamento();
-
-                break;
-        }
-    }
+                        .toString()
+               );
 
         if (idAgendamento == -1) {
 
@@ -496,22 +484,28 @@ if (sucesso) {
 
             return;
     }
-
+        boolean sucesso =
         agendaDAO.finalizar(idAgendamento);
-
-        carregarDados();
-
-        JOptionPane.showMessageDialog(
-                this,
-                "Agendamento finalizado!"
-    );
+        if (sucesso) {
+            carregarDados();
+            JOptionPane.showMessageDialog(
+            this,
+                    "Agendamento finalizado!"
+            );
+            
+        } else {
+            JOptionPane.showMessageDialog(
+            this,
+                    ("Erro ao finalizar agendamento!")
+            );
+        }
 }
 
     private void selecionarLinha() {
         int linha = tabelaAgendamentos.getSelectedRow();
         if (linha != -1) {
-            txtData.setText(modeloAgendamentos.getValueAt(linha, 0).toString());
-            txtHora.setText(modeloAgendamentos.getValueAt(linha, 1).toString());
+            txtData.setText(modeloAgendamentos.getValueAt(linha, 1).toString());
+            txtHora.setText(modeloAgendamentos.getValueAt(linha, 2).toString());
             cmbCliente.setSelectedIndex(0);
         }
     }
