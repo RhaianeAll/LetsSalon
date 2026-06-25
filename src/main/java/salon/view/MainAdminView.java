@@ -57,4 +57,28 @@ public class MainAdminView extends JFrame {
         // Aqui você adicionaria as JTables e formulários respectivos
         return panel;
     }
+    
+    private JLabel criarLogo(int largura, int altura) {
+    JLabel lblLogo = new JLabel();
+    try {
+        // Busca a imagem na pasta resources
+        java.net.URL imgURL = getClass().getResource("/images/logo.png");
+        
+        if (imgURL != null) {
+            ImageIcon icon = new ImageIcon(imgURL);
+            // Redimensiona a imagem para os tamanhos passados por parâmetro
+            Image img = icon.getImage().getScaledInstance(largura, altura, Image.SCALE_SMOOTH);
+            lblLogo.setIcon(new ImageIcon(img));
+        } else {
+            // Fallback de segurança: se a imagem sumir, exibe o texto
+            lblLogo.setText("Let's Salon");
+            lblLogo.setFont(new Font("Segoe UI", Font.BOLD, 24));
+            lblLogo.setForeground(Color.decode("#F48FB1"));
+        }
+    } catch (Exception e) {
+        System.err.println("Erro ao carregar a logo: " + e.getMessage());
+    }
+    lblLogo.setAlignmentX(Component.CENTER_ALIGNMENT);
+    return lblLogo;
+    }
 }

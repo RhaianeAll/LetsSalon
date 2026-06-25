@@ -24,7 +24,7 @@ public class AuthView extends JFrame {
         cardLayout = new CardLayout();
         
         // 3. Inicializa o painel com a imagem de fundo (coloque as folhas/grafismos aqui)
-        mainContainer = new BackgroundPanel("/images/folhas_fundo.png", cardLayout);
+        mainContainer = new BackgroundPanel("/images/grafico_apoio.png", cardLayout);
 
         // Adicionando as telas ao contêiner no AuthView.java
         mainContainer.add(new WelcomePanel(this), "Welcome");
