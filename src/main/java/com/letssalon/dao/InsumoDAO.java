@@ -49,7 +49,125 @@ public class InsumoDAO {
         }
         return lista;
     }
-    
+    public List<Insumo> listarPorEmpresa(int codigoEmpresa) {
+
+    List<Insumo> lista = new ArrayList<>();
+
+    String sql =
+        "SELECT * FROM insumo " +
+        "WHERE codigo_empresa = ?";
+
+    try (
+        Connection conn = Conexao.conectar();
+        PreparedStatement stmt =
+                conn.prepareStatement(sql)
+    ) {
+
+        stmt.setInt(1, codigoEmpresa);
+
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+
+            Insumo i = new Insumo();
+
+            i.setCodigoInsumo(
+                rs.getInt("codigo_insumo")
+            );
+
+            i.setNomeInsumo(
+                rs.getString("nome_insumo")
+            );
+
+            i.setValorInsumo(
+                rs.getDouble("valor_insumo")
+            );
+
+            i.setQuantidadeInsumo(
+                rs.getInt("quantidade_insumo")
+            );
+
+            i.setCapacidade(
+                rs.getString("capacidade")
+            );
+
+            i.setCodigoEmpresa(
+                rs.getInt("codigo_empresa")
+            );
+
+            lista.add(i);
+        }
+
+    } catch (SQLException e) {
+
+        System.out.println(
+            "Erro ao listar insumos: "
+            + e.getMessage()
+        );
+    }
+
+    return lista;
+}
+    public List<Insumo> buscarPorNome(
+        String busca,
+        int codigoEmpresa
+) {
+
+    List<Insumo> lista = new ArrayList<>();
+
+    String sql =
+        "SELECT * FROM insumo " +
+        "WHERE codigo_empresa = ? " +
+        "AND LOWER(nome_insumo) LIKE LOWER(?)";
+
+    try (
+        Connection conn = Conexao.conectar();
+        PreparedStatement stmt =
+                conn.prepareStatement(sql)
+    ) {
+
+        stmt.setInt(1, codigoEmpresa);
+        stmt.setString(2, "%" + busca + "%");
+
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+
+            Insumo i = new Insumo();
+
+            i.setCodigoInsumo(
+                rs.getInt("codigo_insumo")
+            );
+
+            i.setNomeInsumo(
+                rs.getString("nome_insumo")
+            );
+
+            i.setValorInsumo(
+                rs.getDouble("valor_insumo")
+            );
+
+            i.setQuantidadeInsumo(
+                rs.getInt("quantidade_insumo")
+            );
+
+            i.setCapacidade(
+                rs.getString("capacidade")
+            );
+
+            lista.add(i);
+        }
+
+    } catch (SQLException e) {
+
+        System.out.println(
+            "Erro ao buscar insumo: "
+            + e.getMessage()
+        );
+    }
+
+    return lista;
+}
 
     public boolean atualizar(Insumo insumo) {
         String sql = "UPDATE insumo SET nome_insumo=?, valor_insumo=?, quantidade_insumo=?, capacidade=?, codigo_empresa=? WHERE codigo_insumo=?";

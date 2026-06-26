@@ -167,7 +167,7 @@ public class TelaCadastroServico extends JFrame {
         txtBuscar = new JTextField(20);
         painelBusca.add(txtBuscar);
         JButton btnBuscar = new JButton("🔍");
-        btnBuscar.addActionListener(e -> carregarTabela());
+        btnBuscar.addActionListener(e -> carregarTabelaFiltrada());
         painelBusca.add(btnBuscar);
         painelTabela.add(painelBusca, BorderLayout.NORTH);
 
@@ -240,6 +240,31 @@ public class TelaCadastroServico extends JFrame {
             });
         }
     }
+    private void carregarTabelaFiltrada() {
+
+    modeloTabela.setRowCount(0);
+
+    String busca =
+            txtBuscar.getText().trim();
+
+    List<Servico> lista =
+            servicoDAO.buscarPorNome(
+                    busca,
+                    colaboradorLogado.getCodigoEmpresa()
+            );
+
+    for (Servico s : lista) {
+
+        modeloTabela.addRow(new Object[]{
+            s.getCodigoServico(),
+            s.getNomeServico(),
+            s.getValorServico(),
+            s.getDuracaoAproximada(),
+            s.getCodigoInsumo(),
+            s.getQuantidadeInsumo()
+        });
+    }
+}
 
     private void cadastrar() {
         if (txtNome.getText().isEmpty() || txtValor.getText().isEmpty()) {

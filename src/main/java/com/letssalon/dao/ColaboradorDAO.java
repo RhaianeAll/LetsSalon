@@ -80,6 +80,150 @@ public class ColaboradorDAO {
         }
         return lista;
     }
+    public List<Colaborador> buscarPorNomeOuCpf(   
+        String busca,
+        int codigoEmpresa) {
+
+        System.out.println("Buscando: " + busca);
+        
+    List<Colaborador> lista = new ArrayList<>();
+
+    String sql =
+        "SELECT * FROM colaborador " +
+        "WHERE codigo_empresa = ? " +
+        "AND (" +
+        "LOWER(nome_colaborador) LIKE LOWER(?) " +
+        "OR cpf_colaborador LIKE ?" +
+        ")";
+
+    try (
+        Connection conn = Conexao.conectar();
+        PreparedStatement stmt =
+                conn.prepareStatement(sql)
+    ) {
+
+        stmt.setInt(1, codigoEmpresa);
+        stmt.setString(2, "%" + busca + "%");
+        stmt.setString(3, "%" + busca + "%");
+
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+
+            Colaborador c = new Colaborador();
+
+            c.setIdColaborador(
+                rs.getInt("id_colaborador")
+            );
+
+            c.setNomeColaborador(
+                rs.getString("nome_colaborador")
+            );
+
+            c.setCpfColaborador(
+                rs.getString("cpf_colaborador")
+            );
+
+            c.setTelefoneColaborador(
+                rs.getString("telefone_colaborador")
+            );
+
+            c.setFuncaoColaborador(
+                rs.getString("funcao_colaborador")
+            );
+
+            lista.add(c);
+        }
+
+    } catch (SQLException e) {
+
+        System.out.println(
+            "Erro ao buscar colaborador: "
+            + e.getMessage()
+        );
+    }
+    System.out.println("Encontrados: " + lista.size());
+    return lista;
+}
+    public List<Colaborador> buscarPorEmpresa(
+        String filtro,
+        int codigoEmpresa) {
+
+    List<Colaborador> lista = new ArrayList<>();
+
+    String sql =
+        "SELECT * FROM colaborador " +
+        "WHERE codigo_empresa = ? " +
+        "AND (" +
+        "LOWER(nome_colaborador) LIKE LOWER(?) " +
+        "OR cpf_colaborador LIKE ? " +
+        "OR LOWER(funcao_colaborador) LIKE LOWER(?)" +
+        ")";
+
+    try (
+        Connection conn = Conexao.conectar();
+        PreparedStatement stmt =
+                conn.prepareStatement(sql)
+    ) {
+
+        String pesquisa = "%" + filtro + "%";
+
+        stmt.setInt(1, codigoEmpresa);
+        stmt.setString(2, pesquisa);
+        stmt.setString(3, pesquisa);
+        stmt.setString(4, pesquisa);
+
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+
+            Colaborador c = new Colaborador();
+
+            c.setIdColaborador(
+                rs.getInt("id_colaborador")
+            );
+
+            c.setCpfColaborador(
+                rs.getString("cpf_colaborador")
+            );
+
+            c.setNomeColaborador(
+                rs.getString("nome_colaborador")
+            );
+
+            c.setFuncaoColaborador(
+                rs.getString("funcao_colaborador")
+            );
+
+            c.setTelefoneColaborador(
+                rs.getString("telefone_colaborador")
+            );
+
+            c.setFotoColaborador(
+                rs.getString("foto_colaborador")
+            );
+
+            c.setPerfil(
+                rs.getString("perfil")
+            );
+
+            c.setCodigoEmpresa(
+                rs.getInt("codigo_empresa")
+            );
+
+            lista.add(c);
+        }
+
+    } catch (SQLException e) {
+
+        System.out.println(
+            "Erro ao buscar colaboradores: "
+            + e.getMessage()
+        );
+    }
+
+    return lista;
+}
 
     public List<Colaborador> listar() {
         List<Colaborador> lista = new ArrayList<>();

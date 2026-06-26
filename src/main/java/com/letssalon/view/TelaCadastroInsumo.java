@@ -120,7 +120,7 @@ public class TelaCadastroInsumo extends JFrame {
         txtBuscar = new JTextField(20);
         painelBusca.add(txtBuscar);
         JButton btnBuscar = new JButton("🔍");
-        btnBuscar.addActionListener(e -> carregarTabela());
+        btnBuscar.addActionListener(e -> carregarTabelaFiltrada());
         painelBusca.add(btnBuscar);
         painelTabela.add(painelBusca, BorderLayout.NORTH);
 
@@ -152,16 +152,47 @@ public class TelaCadastroInsumo extends JFrame {
     }
 
     private void carregarTabela() {
-        modeloTabela.setRowCount(0);
-        for (Insumo i : insumoDAO.listar()) {
-            modeloTabela.addRow(new Object[]{
-                i.getCodigoInsumo(),
-                i.getNomeInsumo(),
-                "-",
-                "-"
-            });
-        }
+
+    modeloTabela.setRowCount(0);
+
+    List<Insumo> lista =
+            insumoDAO.listarPorEmpresa(
+                    colaboradorLogado.getCodigoEmpresa()
+            );
+
+    for (Insumo i : lista) {
+
+        modeloTabela.addRow(new Object[]{
+            i.getCodigoInsumo(),
+            i.getNomeInsumo(),
+            "-",
+            "-"
+        });
     }
+}
+    private void carregarTabelaFiltrada() {
+
+    modeloTabela.setRowCount(0);
+
+    String busca =
+            txtBuscar.getText().trim();
+
+    List<Insumo> lista =
+            insumoDAO.buscarPorNome(
+                    busca,
+                    colaboradorLogado.getCodigoEmpresa()
+            );
+
+    for (Insumo i : lista) {
+
+        modeloTabela.addRow(new Object[]{
+            i.getCodigoInsumo(),
+            i.getNomeInsumo(),
+            "-",
+            "-"
+        });
+    }
+}
 
    private void cadastrar() {
 

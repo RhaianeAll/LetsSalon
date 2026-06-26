@@ -44,7 +44,7 @@ public class TelaCadastroColaborador extends JFrame {
         painelTopo.setBackground(CoresUtil.ROSA_PRINCIPAL);
         painelTopo.setPreferredSize(new Dimension(850, 50));
 
-        JLabel lblTitulo = new JLabel("  Cadastro de Funcionários(as)");
+        JLabel lblTitulo = new JLabel("  Cadastro de Profissionais");
         lblTitulo.setFont(new Font("Arial", Font.BOLD, 20));
         lblTitulo.setForeground(Color.WHITE);
         painelTopo.add(lblTitulo, BorderLayout.WEST);
@@ -110,12 +110,17 @@ public class TelaCadastroColaborador extends JFrame {
         gbc.gridx = 3;
         painelForm.add(txtSenha, gbc);
 
-        // Serviços
-        gbc.gridx = 2;
-        painelForm.add(new JLabel("Serviços:"), gbc);
+       // Serviços
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        painelForm.add(new JLabel("Especialidade:"), gbc);
+
         cmbServicos = new JComboBox<>();
-        gbc.gridx = 3;
+        gbc.gridx = 1;
+        gbc.gridwidth = 3;
         painelForm.add(cmbServicos, gbc);
+
+        gbc.gridwidth = 1;
 
         // Botões
         JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
@@ -133,7 +138,7 @@ public class TelaCadastroColaborador extends JFrame {
         painelBotoes.add(btnLimpar);
         painelBotoes.add(btnVoltar);
 
-        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 4;
+        gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 4;
         painelForm.add(painelBotoes, gbc);
 
         add(painelForm, BorderLayout.NORTH);
@@ -149,11 +154,10 @@ public class TelaCadastroColaborador extends JFrame {
         txtBuscar = new JTextField(20);
         painelBusca.add(txtBuscar);
         JButton btnBuscar = new JButton("🔍");
-        btnBuscar.addActionListener(e -> carregarTabela());
         painelBusca.add(btnBuscar);
         painelTabela.add(painelBusca, BorderLayout.NORTH);
 
-        String[] colunas = {"Id", "Nome", "CPF", "Telefone", "Serviços"};
+        String[] colunas = {"Id", "Nome", "CPF", "Telefone", "Especialidade"};
         modeloTabela = new DefaultTableModel(colunas, 0);
         tabelaColaboradores = new JTable(modeloTabela);
         tabelaColaboradores.setRowHeight(28);
@@ -168,6 +172,7 @@ public class TelaCadastroColaborador extends JFrame {
         btnExcluir.addActionListener(e -> excluir());
         btnLimpar.addActionListener(e -> limparCampos());
         btnVoltar.addActionListener(e -> dispose());
+        btnBuscar.addActionListener(e -> carregarTabelaFiltrada());
 
         tabelaColaboradores.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent e) {
@@ -189,6 +194,32 @@ public class TelaCadastroColaborador extends JFrame {
             });
         }
     }
+    private void carregarTabelaFiltrada() {
+        
+    System.out.println("BUSCA ACIONADA");
+
+    modeloTabela.setRowCount(0);
+
+    String busca =
+            txtBuscar.getText().trim();
+
+    List<Colaborador> lista =
+            colaboradorDAO.buscarPorNomeOuCpf(
+                    busca,
+                    colaboradorLogado.getCodigoEmpresa()
+            );
+
+    for (Colaborador c : lista) {
+
+        modeloTabela.addRow(new Object[]{
+            c.getIdColaborador(),
+            c.getNomeColaborador(),
+            c.getCpfColaborador(),
+            c.getTelefoneColaborador(),
+            c.getFuncaoColaborador()
+        });
+    }
+}
 
     private void cadastrar() {
         if (txtNome.getText().isEmpty() || txtCpf.getText().isEmpty()) {

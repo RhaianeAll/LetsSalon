@@ -133,7 +133,6 @@ public List<Servico> listarPorEmpresa(int codigoEmpresa) {
             stmt.setInt(6, servico.getQuantidadeInsumo());
             stmt.setInt(7, servico.getCodigoEmpresa());
             stmt.setInt(8, servico.getCodigoServico());
-            stmt.executeUpdate();
             int linhas = stmt.executeUpdate();
 
         return linhas > 0;
@@ -166,5 +165,73 @@ public List<Servico> listarPorEmpresa(int codigoEmpresa) {
         return false;
         }
     }
+    public List<Servico> buscarPorNome(
+        String busca,
+        int codigoEmpresa
+) {
+
+    List<Servico> lista = new ArrayList<>();
+
+    String sql =
+        "SELECT * FROM servico " +
+        "WHERE codigo_empresa = ? " +
+        "AND LOWER(nome_servico) LIKE LOWER(?)";
+
+    try (
+        Connection conn = Conexao.conectar();
+        PreparedStatement stmt =
+                conn.prepareStatement(sql)
+    ) {
+
+        stmt.setInt(1, codigoEmpresa);
+        stmt.setString(2, "%" + busca + "%");
+
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+
+            Servico s = new Servico();
+
+            s.setCodigoServico(
+                rs.getInt("codigo_servico")
+            );
+
+            s.setNomeServico(
+                rs.getString("nome_servico")
+            );
+
+            s.setValorServico(
+                rs.getDouble("valor_servico")
+            );
+
+            s.setDuracaoAproximada(
+                rs.getString("duracao_aproximada")
+            );
+
+            s.setCodigoInsumo(
+                rs.getInt("codigo_insumo")
+            );
+
+            s.setQuantidadeInsumo(
+                rs.getInt("quantidade_insumo")
+            );
+
+            s.setCodigoEmpresa(
+                rs.getInt("codigo_empresa")
+            );
+
+            lista.add(s);
+        }
+
+    } catch (SQLException e) {
+
+        System.out.println(
+            "Erro ao buscar serviço: "
+            + e.getMessage()
+        );
+    }
+
+    return lista;
+}
 }
         

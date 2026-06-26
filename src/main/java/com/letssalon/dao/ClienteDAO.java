@@ -225,4 +225,73 @@ public Cliente buscarPorLogin(String email, String senha) {
         return false;
     }
 }
+    public List<Cliente> buscar(String filtro) {
+
+    List<Cliente> lista = new ArrayList<>();
+
+    String sql =
+        "SELECT * FROM cliente " +
+        "WHERE nome_cliente ILIKE ? " +
+        "OR cpf_cliente ILIKE ? " +
+        "OR email_cliente ILIKE ?";
+
+    try (
+        Connection conn = Conexao.conectar();
+        PreparedStatement stmt =
+            conn.prepareStatement(sql)
+    ) {
+
+        String pesquisa = "%" + filtro + "%";
+
+        stmt.setString(1, pesquisa);
+        stmt.setString(2, pesquisa);
+        stmt.setString(3, pesquisa);
+
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+
+            Cliente c = new Cliente();
+
+            c.setCpfCliente(
+                rs.getString("cpf_cliente")
+            );
+
+            c.setNomeCliente(
+                rs.getString("nome_cliente")
+            );
+
+            c.setEnderecoCliente(
+                rs.getString("endereco_cliente")
+            );
+
+            c.setTelefoneCliente(
+                rs.getString("telefone_cliente")
+            );
+
+            c.setEmailCliente(
+                rs.getString("email_cliente")
+            );
+
+            c.setDataNascimento(
+                rs.getString("data_nascimento")
+            );
+
+            c.setPerfil(
+                rs.getString("perfil")
+            );
+
+            lista.add(c);
+        }
+
+    } catch (SQLException e) {
+
+        System.out.println(
+            "Erro ao buscar clientes: "
+            + e.getMessage()
+        );
+    }
+
+    return lista;
+}
 }

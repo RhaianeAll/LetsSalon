@@ -106,7 +106,7 @@ public class TelaAgendamentos extends JFrame {
         // Colaborador
         gbc.gridwidth = 1;
         gbc.gridx = 0; gbc.gridy = 2;
-        painelForm.add(new JLabel("Funcionário(a):"), gbc);
+        painelForm.add(new JLabel("Profissional:"), gbc);
         cmbColaborador = new JComboBox<>();
         gbc.gridx = 1;
         painelForm.add(cmbColaborador, gbc);
@@ -222,6 +222,7 @@ public class TelaAgendamentos extends JFrame {
     
         // Ações
         btnCadastrar.addActionListener(e -> cadastrarAgendamento());
+        btnAtualizar.addActionListener(e -> carregarDados());
         btnExcluir.addActionListener(e -> excluirAgendamento());
         btnLimpar.addActionListener(e -> limparCampos());
         btnVoltar.addActionListener(e -> dispose());
