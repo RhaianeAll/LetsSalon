@@ -18,7 +18,7 @@ public class UsuarioDAO {
             stmt.setString(3, usuario.getTelefone());
             stmt.setString(4, usuario.getUsuarioLogin());
             stmt.setString(5, usuario.getSenha());
-            stmt.setBytes(6, usuario.getFoto()); // Upload da imagem em bytes
+            //stmt.setBytes(6, usuario.getFoto()); // Upload da imagem em bytes
             stmt.setString(7, usuario.getTipoUsuario());
             
             stmt.executeUpdate();

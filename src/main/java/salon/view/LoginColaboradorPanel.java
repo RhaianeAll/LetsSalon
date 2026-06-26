@@ -87,8 +87,10 @@ public class LoginColaboradorPanel extends JPanel {
         btnEntrar.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         btnEntrar.addActionListener(e -> {
-            // Em breve conectaremos ao LoginController
-            JOptionPane.showMessageDialog(this, "Funcionalidade de login de colaborador em construção!");
+    // Aqui no futuro ficará o código de autenticação: if (loginController.fazerLogin(...))
+    // Fecha a janela de Auth (Login) e abre o Dashboard
+        parentFrame.dispose(); 
+        new MainColaboradorView().setVisible(true);
         });
 
         RoundedButton btnInscrever = new RoundedButton("INSCREVA-SE");

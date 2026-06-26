@@ -10,7 +10,7 @@ public class Conexao {
     // Altere com os dados do seu pgAdmin local
     private static final String URL = "jdbc:postgresql://localhost:5432/lets_salon";
     private static final String USER = "postgres";
-    private static final String PASSWORD = "admin"; // Coloque a senha do seu banco
+    private static final String PASSWORD = "postgres"; // Coloque a senha do seu banco
 
     /**
      * Estabelece e retorna a conexão com o banco de dados PostgreSQL.

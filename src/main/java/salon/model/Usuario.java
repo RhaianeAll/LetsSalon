@@ -79,7 +79,7 @@ public class Usuario {
     }
     // ... implementar demais getters e setters
 
-    public byte[] getFoto() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public String getFoto() {
+        return null; // Retorna vazio para não quebrar o DAO
     }
 }
