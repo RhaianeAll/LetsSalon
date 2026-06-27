@@ -185,7 +185,7 @@ public class TelaAgendamentos extends JFrame {
         txtBuscar = new JTextField(20);
         painelBusca.add(txtBuscar);
         JButton btnBuscar = new JButton("🔍");
-        btnBuscar.addActionListener(e -> carregarDados());
+        btnBuscar.addActionListener(e -> carregarDadosFiltrados());
         painelBusca.add(btnBuscar);
         painelPrincipal.add(painelBusca, BorderLayout.NORTH);
 
@@ -261,7 +261,10 @@ public class TelaAgendamentos extends JFrame {
 
         // Carrega serviços no combo
         cmbServico.removeAllItems();
-        List<Servico> servicos = servicoDAO.listar();
+       List<Servico> servicos =
+        servicoDAO.listarPorEmpresa(
+            colaboradorLogado.getCodigoEmpresa()
+    );
         for (Servico s : servicos) {
             cmbServico.addItem(s.getCodigoServico() + " - " + s.getNomeServico());
         }
@@ -270,7 +273,9 @@ public class TelaAgendamentos extends JFrame {
         modeloAgendamentos.setRowCount(0);
 
 List<Object[]> agendamentos =
-        agendaDAO.listarComNomes();
+       agendaDAO.listarComNomes(
+    colaboradorLogado.getCodigoEmpresa()
+       );
 
 for (Object[] linha : agendamentos) {
 
@@ -281,14 +286,33 @@ for (Object[] linha : agendamentos) {
 modeloPendentes.setRowCount(0);
 
 List<Object[]> pendentes =
-        agendaDAO.listarPendentesComNomes();
+        agendaDAO.listarPendentesComNomes(
+    colaboradorLogado.getCodigoEmpresa()
+);
 
 for (Object[] linha : pendentes) {
 
     modeloPendentes.addRow(linha);
 }
     }
+private void carregarDadosFiltrados() {
 
+    modeloAgendamentos.setRowCount(0);
+
+    String busca =
+            txtBuscar.getText().trim();
+
+    List<Object[]> lista =
+            agendaDAO.buscarAgendamentos(
+                    busca,
+                    colaboradorLogado.getCodigoEmpresa()
+            );
+
+    for (Object[] linha : lista) {
+
+        modeloAgendamentos.addRow(linha);
+    }
+}
     private void cadastrarAgendamento() {
         if (txtData.getText().isEmpty()
         || txtHora.getText().isEmpty()

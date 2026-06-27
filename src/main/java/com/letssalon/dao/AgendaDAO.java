@@ -86,7 +86,7 @@ public class AgendaDAO {
         return lista;
     }
     
-    public List<Object[]> listarComNomes() {
+    public List<Object[]> listarComNomes(int codigoEmpresa) {
 
     List<Object[]> lista = new ArrayList<>();
 
@@ -105,15 +105,19 @@ public class AgendaDAO {
         "ON a.id_colaborador = col.id_colaborador " +
         "INNER JOIN servico s " +
         "ON a.codigo_servico = s.codigo_servico " +
-        "WHERE a.status NOT IN ('CANCELADO', 'FINALIZADO')";
+        "WHERE a.status NOT IN ('CANCELADO', 'FINALIZADO') " +
+        "AND a.codigo_empresa = ? ";
 
     try (
-        Connection conn = Conexao.conectar();
-        PreparedStatement stmt =
-                conn.prepareStatement(sql);
-        ResultSet rs =
-                stmt.executeQuery()
-    ) {
+    Connection conn = Conexao.conectar();
+    PreparedStatement stmt =
+            conn.prepareStatement(sql)
+) {
+
+    stmt.setInt(1, codigoEmpresa);
+
+    ResultSet rs = stmt.executeQuery();
+   
     DateTimeFormatter formatoData =
         DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
@@ -151,20 +155,30 @@ public class AgendaDAO {
     return lista;
 }
 
-    public boolean confirmar(int idAgendamento) {
-        String sql = "UPDATE agenda SET status='CONFIRMADO' WHERE id_agendamento=?";
-        try (Connection conn = Conexao.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, idAgendamento);
-            int linhas = stmt.executeUpdate();
-            return linhas > 0;
-        } catch (SQLException e) {
-            System.out.println(
-                    "Erro ao confirmar agendamento: " + e.getMessage()
-            ); 
-            return false;
-        }
+public boolean confirmar(int idAgendamento) {
+    String sql = "UPDATE agenda SET status='CONFIRMADO' WHERE id_agendamento=?";
+
+    try (
+        Connection conn = Conexao.conectar();
+        PreparedStatement stmt = conn.prepareStatement(sql)
+    ) {
+
+        stmt.setInt(1, idAgendamento);
+
+        int linhas = stmt.executeUpdate();
+
+        return linhas > 0;
+
+    } catch (SQLException e) {
+
+        System.out.println(
+            "Erro ao confirmar agendamento: "
+            + e.getMessage()
+        );
+
+        return false;
     }
+}
 
     public boolean excluir(int idAgendamento) {
 
@@ -304,7 +318,7 @@ public class AgendaDAO {
         return false;
     }
 }
-    public List<Object[]> listarPendentesComNomes() {
+    public List<Object[]> listarPendentesComNomes(int codigoEmpresa) {
 
     List<Object[]> lista = new ArrayList<>();
 
@@ -324,13 +338,17 @@ public class AgendaDAO {
         "ON a.id_colaborador = col.id_colaborador " +
         "INNER JOIN servico s " +
         "ON a.codigo_servico = s.codigo_servico " +
-        "WHERE a.status = 'PENDENTE'";
+        "WHERE a.status = 'PENDENTE' " +
+        "AND a.codigo_empresa = ? ";
     
     try (
-        Connection conn = Conexao.conectar();
-        PreparedStatement stmt = conn.prepareStatement(sql);
-        ResultSet rs = stmt.executeQuery()
-    ) {
+    Connection conn = Conexao.conectar();
+    PreparedStatement stmt = conn.prepareStatement(sql)
+) {
+
+    stmt.setInt(1, codigoEmpresa);
+
+    ResultSet rs = stmt.executeQuery();
         
     DateTimeFormatter formatoData =
         DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -368,5 +386,137 @@ public class AgendaDAO {
     }
         return lista;
     }
+    public List<Object[]> buscarAgendamentos(
+        String busca,
+        int codigoEmpresa
+) {
+
+    List<Object[]> lista = new ArrayList<>();
+
+    String sql =
+        "SELECT " +
+        "a.id_agendamento, " +
+        "a.data, " +
+        "a.horario, " +
+        "c.nome_cliente, " +
+        "col.nome_colaborador, " +
+        "s.nome_servico " +
+        "FROM agenda a " +
+        "INNER JOIN cliente c ON a.cpf_cliente = c.cpf_cliente " +
+        "INNER JOIN colaborador col ON a.id_colaborador = col.id_colaborador " +
+        "INNER JOIN servico s ON a.codigo_servico = s.codigo_servico " +
+        "WHERE a.codigo_empresa = ? " +
+        "AND (" +
+        "LOWER(c.nome_cliente) LIKE LOWER(?) " +
+        "OR LOWER(col.nome_colaborador) LIKE LOWER(?) " +
+        "OR LOWER(s.nome_servico) LIKE LOWER(?)" +
+        ")";
+
+    try (
+        Connection conn = Conexao.conectar();
+        PreparedStatement stmt =
+                conn.prepareStatement(sql)
+    ) {
+
+        stmt.setInt(1, codigoEmpresa);
+
+        String filtro = "%" + busca + "%";
+
+        stmt.setString(2, filtro);
+        stmt.setString(3, filtro);
+        stmt.setString(4, filtro);
+
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+
+            lista.add(new Object[]{
+                rs.getInt("id_agendamento"),
+                rs.getDate("data"),
+                rs.getTime("horario"),
+                rs.getString("nome_cliente"),
+                rs.getString("nome_colaborador"),
+                rs.getString("nome_servico")
+            });
+        }
+
+    } catch (SQLException e) {
+
+        System.out.println(
+            "Erro na busca de agendamentos: "
+            + e.getMessage()
+        );
+    }
+
+    return lista;
+}
+    // Lista os agendamentos do cliente com nomes
+public List<Object[]> listarPorCliente(String cpfCliente) {
+
+    List<Object[]> lista = new ArrayList<>();
+
+    String sql =
+        "SELECT " +
+        "a.id_agendamento, " +
+        "a.data, " +
+        "a.horario, " +
+        "col.nome_colaborador, " +
+        "s.nome_servico, " +
+        "a.status " +
+        "FROM agenda a " +
+        "INNER JOIN colaborador col " +
+        "ON a.id_colaborador = col.id_colaborador " +
+        "INNER JOIN servico s " +
+        "ON a.codigo_servico = s.codigo_servico " +
+        "WHERE a.cpf_cliente = ? " +
+        "ORDER BY a.data, a.horario";
+
+    try (
+        Connection conn = Conexao.conectar();
+        PreparedStatement stmt = conn.prepareStatement(sql)
+    ) {
+
+        stmt.setString(1, cpfCliente);
+
+        ResultSet rs = stmt.executeQuery();
+
+        DateTimeFormatter formatoData =
+            DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        DateTimeFormatter formatoHora =
+            DateTimeFormatter.ofPattern("HH:mm");
+
+        while (rs.next()) {
+
+            String dataFormatada =
+                rs.getDate("data")
+                  .toLocalDate()
+                  .format(formatoData);
+
+            String horaFormatada =
+                rs.getTime("horario")
+                  .toLocalTime()
+                  .format(formatoHora);
+
+            lista.add(new Object[]{
+                rs.getInt("id_agendamento"),
+                dataFormatada,
+                horaFormatada,
+                rs.getString("nome_colaborador"),
+                rs.getString("nome_servico"),
+                rs.getString("status")
+            });
+        }
+
+    } catch (SQLException e) {
+
+        System.out.println(
+            "Erro ao listar agendamentos do cliente: "
+            + e.getMessage()
+        );
+    }
+
+    return lista;
+}
 }
    

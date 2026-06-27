@@ -151,7 +151,7 @@ public class TelaCadastroInsumo extends JFrame {
         }
     }
 
-    private void carregarTabela() {
+private void carregarTabela() {
 
     modeloTabela.setRowCount(0);
 

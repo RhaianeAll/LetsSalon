@@ -128,9 +128,21 @@ public class TelaAgendaCliente extends JFrame {
             new Color(201, 72, 105)
         ));
 
-        String[] colunas = {"Data", "Hora", "Profissional", "Serviço", "Confirmado"};
+        String[] colunas = {"ID", "Data", "Hora", "Profissional", "Serviço", "Status"};
         modeloTabela = new DefaultTableModel(colunas, 0);
         tabelaMeusAgendamentos = new JTable(modeloTabela);
+        // Esconde ID da tabela
+tabelaMeusAgendamentos.getColumnModel()
+        .getColumn(0)
+        .setMinWidth(0);
+
+tabelaMeusAgendamentos.getColumnModel()
+        .getColumn(0)
+        .setMaxWidth(0);
+
+tabelaMeusAgendamentos.getColumnModel()
+        .getColumn(0)
+        .setWidth(0);
         tabelaMeusAgendamentos.setRowHeight(28);
         tabelaMeusAgendamentos.getTableHeader().setBackground(new Color(201, 72, 105));
         tabelaMeusAgendamentos.getTableHeader().setForeground(Color.WHITE);
@@ -167,18 +179,16 @@ public class TelaAgendaCliente extends JFrame {
 
         // Carrega agendamentos do cliente logado
         modeloTabela.setRowCount(0);
-        List<Agenda> agendamentos = agendaDAO.listar();
-        for (Agenda a : agendamentos) {
-            if (a.getCpfCliente().equals(clienteLogado.getCpfCliente())) {
-                modeloTabela.addRow(new Object[]{
-                    a.getData(),
-                    a.getHorario(),
-                    a.getIdColaborador(),
-                    a.getCodigoServico(),
-                    a.getStatus()
-                });
-            }
-        }
+
+List<Object[]> agendamentos =
+        agendaDAO.listarPorCliente(
+                clienteLogado.getCpfCliente()
+        );
+
+for (Object[] linha : agendamentos) {
+
+    modeloTabela.addRow(linha);
+}
     }
 
     private void realizarAgendamento() {
@@ -249,20 +259,24 @@ public class TelaAgendaCliente extends JFrame {
             "Confirmar",
             JOptionPane.YES_NO_OPTION);
 
-        if (confirmacao == JOptionPane.YES_OPTION) {
-            String data = modeloTabela.getValueAt(linha, 0).toString();
-            String hora = modeloTabela.getValueAt(linha, 1).toString();
-            for (Agenda a : agendaDAO.listar()) {
-                if (a.getCpfCliente().equals(clienteLogado.getCpfCliente())
-                        && a.getData().equals(data)
-                        && a.getHorario().equals(hora)) {
-                    agendaDAO.cancelar(a.getIdAgendamento());
-                    break;
-                }
-            }
-            JOptionPane.showMessageDialog(this, "Agendamento cancelado!");
-            carregarDados();
-        }
+if (confirmacao == JOptionPane.YES_OPTION) {
+
+    int idAgendamento =
+        Integer.parseInt(
+            modeloTabela
+                .getValueAt(linha, 0)
+                .toString()
+        );
+
+    agendaDAO.cancelar(idAgendamento);
+
+    JOptionPane.showMessageDialog(
+        this,
+        "Agendamento cancelado!"
+    );
+
+    carregarDados();
+}
     }
  
     private void limparCampos() {
