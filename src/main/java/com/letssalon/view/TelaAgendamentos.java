@@ -16,6 +16,7 @@ import com.letssalon.util.CoresUtil;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import javax.xml.crypto.Data;
+import com.letssalon.util.BotaoUtil;
 
 public class TelaAgendamentos extends JFrame {
 
@@ -122,13 +123,12 @@ public class TelaAgendamentos extends JFrame {
         JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
         painelBotoes.setBackground(CoresUtil.ROSA_FUNDO);
 
-        btnCadastrar = criarBotao("Cadastrar", new Color(201, 72, 105));
-        btnAtualizar = criarBotao("Atualizar", new Color(201, 72, 105));
-        btnExcluir   = criarBotao("Excluir", CoresUtil.VERMELHO_EXCLUIR);
-        btnLimpar    = criarBotao("Limpar", CoresUtil.ROSA_SECUNDARIO);
-        btnVoltar    = criarBotao("Voltar", CoresUtil.CINZA_VOLTAR);
-        btnFinalizar = criarBotao("Finalizar", new Color(120, 180, 120)
-);
+        btnCadastrar = BotaoUtil.criarBotao("Cadastrar", CoresUtil.ROSA_PRINCIPAL);
+        btnAtualizar = BotaoUtil.criarBotao("Atualizar", CoresUtil.ROSA_PRINCIPAL);
+        btnExcluir   = BotaoUtil.criarBotao("Excluir", CoresUtil.VERMELHO_EXCLUIR);
+        btnLimpar    = BotaoUtil.criarBotao("Limpar", CoresUtil.ROSA_SECUNDARIO);
+        btnVoltar    = BotaoUtil.criarBotao("Voltar", CoresUtil.CINZA_VOLTAR);
+        btnFinalizar = BotaoUtil.criarBotao("Finalizar", CoresUtil.VERDE_CONFIRMAR);
 
         painelBotoes.add(btnCadastrar);
         painelBotoes.add(btnAtualizar);
@@ -169,7 +169,7 @@ public class TelaAgendamentos extends JFrame {
         tabelaPendentes.getColumnModel().getColumn(0).setMaxWidth(0);
         tabelaPendentes.getColumnModel().getColumn(0).setWidth(0);
 
-        JButton btnConfirmarPendente = criarBotao("✔ Confirmar Selecionado", CoresUtil.VERDE_CONFIRMAR);
+        JButton btnConfirmarPendente = BotaoUtil.criarBotao("✔ Confirmar Selecionado", CoresUtil.VERDE_CONFIRMAR);
         painelPendentes.add(btnConfirmarPendente, BorderLayout.SOUTH);
         btnConfirmarPendente.addActionListener(e -> confirmarAgendamentoPendente());
 
@@ -542,21 +542,6 @@ if (sucesso) {
         cmbColaborador.setSelectedIndex(0);
         cmbServico.setSelectedIndex(0);
     }
-
-    private JButton criarBotao(String texto, Color cor) {
-    JButton btn = new JButton(texto);
-    btn.setBackground(cor);
-
-    if (cor.equals(CoresUtil.CINZA_VOLTAR) || cor.equals(CoresUtil.VERDE_CONFIRMAR)) {
-        btn.setForeground(new Color(60, 60, 60));
-    } else {
-        btn.setForeground(Color.WHITE);
-    }
-
-    btn.setFont(new Font("Arial", Font.BOLD, 12));
-    btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-    return btn;
-}
 
     private void estilizarTabela(JTable tabela) {
         tabela.getTableHeader().setBackground(new Color(201, 72, 105));

@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.Font;
 import java.util.List;
 import com.letssalon.util.CoresUtil;
+import com.letssalon.util.BotaoUtil;
 
 public class TelaPrincipal extends JFrame {
 
@@ -106,11 +107,7 @@ public class TelaPrincipal extends JFrame {
     // BOTÃO SAIR
 
     btnSair.setBackground(CoresUtil.CINZA_VOLTAR);
-    btnSair.setForeground(new Color(60, 60, 60));
-    btnSair.setFont(new Font("Arial", Font.BOLD, 12));
-    btnSair.setFont(new Font("Arial", Font.BOLD, 14));
-    btnSair.setFocusPainted(false);
-    btnSair.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    btnSair.setForeground(CoresUtil.CINZA_VOLTAR_TEXTO);
 
     painelMenu.add(btnSair);
 
@@ -214,23 +211,13 @@ public class TelaPrincipal extends JFrame {
 
     private JButton criarBotao(String texto) {
 
-    JButton btn = new JButton(texto);
+        JButton btn = BotaoUtil.criarBotao(texto, CoresUtil.ROSA_PRINCIPAL);
 
-    btn.setMaximumSize(new Dimension(220, 45));
-    btn.setMinimumSize(new Dimension(220, 45));
-    btn.setPreferredSize(new Dimension(220, 45));
+        btn.setMaximumSize(new Dimension(220, 45));
+        btn.setMinimumSize(new Dimension(220, 45));
+        btn.setPreferredSize(new Dimension(220, 45));
 
-    btn.setBackground(new Color(201, 72, 105));
-    btn.setForeground(Color.WHITE);
-
-    btn.setFont(new Font("Arial", Font.BOLD, 14));
-
-    btn.setFocusPainted(false);
-    btn.setBorderPainted(false);
-
-    btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-    return btn;
+        return btn;
 }
 
     private void preencherDados() {

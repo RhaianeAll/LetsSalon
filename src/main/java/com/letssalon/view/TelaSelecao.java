@@ -3,6 +3,7 @@ package com.letssalon.view;
 import javax.swing.*;
 import java.awt.*;
 import com.letssalon.util.CoresUtil;
+import com.letssalon.util.BotaoUtil;
 
 public class TelaSelecao extends JFrame {
 
@@ -112,16 +113,12 @@ public class TelaSelecao extends JFrame {
         });
     }
 
-    // Método auxiliar para criar botões padronizados
-    private JButton criarBotao(String texto) {
-        JButton btn = new JButton(texto);
-        btn.setBackground(CoresUtil.ROSA_SECUNDARIO);
-        btn.setForeground(Color.WHITE);
-        btn.setFont(new Font("Arial", Font.BOLD, 14));
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        private JButton criarBotao(String texto) {
+
+        JButton btn = BotaoUtil.criarBotao(texto, CoresUtil.ROSA_SECUNDARIO);
+
         btn.setPreferredSize(new Dimension(280, 45));
-        btn.setBorderPainted(false);
-        btn.setFocusPainted(false);
+
         return btn;
-    }
+}
 }

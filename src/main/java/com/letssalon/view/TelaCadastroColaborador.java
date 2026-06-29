@@ -10,6 +10,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 import com.letssalon.util.CoresUtil;
+import com.letssalon.util.BotaoUtil;
 
 public class TelaCadastroColaborador extends JFrame {
 
@@ -126,11 +127,11 @@ public class TelaCadastroColaborador extends JFrame {
         JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
         painelBotoes.setBackground(CoresUtil.ROSA_FUNDO);
 
-        btnCadastrar = criarBotao("Cadastrar", CoresUtil.ROSA_PRINCIPAL);
-        btnAtualizar = criarBotao("Atualizar", CoresUtil.ROSA_PRINCIPAL);
-        btnExcluir   = criarBotao("Excluir", CoresUtil.VERMELHO_EXCLUIR);
-        btnLimpar    = criarBotao("Limpar", CoresUtil.ROSA_SECUNDARIO);
-        btnVoltar    = criarBotao("Voltar", CoresUtil.CINZA_VOLTAR);
+        btnCadastrar = BotaoUtil.criarBotao("Cadastrar", CoresUtil.ROSA_PRINCIPAL);
+        btnAtualizar = BotaoUtil.criarBotao("Atualizar", CoresUtil.ROSA_PRINCIPAL);
+        btnExcluir   = BotaoUtil.criarBotao("Excluir", CoresUtil.VERMELHO_EXCLUIR);
+        btnLimpar    = BotaoUtil.criarBotao("Limpar", CoresUtil.ROSA_SECUNDARIO);
+        btnVoltar    = BotaoUtil.criarBotao("Voltar", CoresUtil.CINZA_VOLTAR);
 
         painelBotoes.add(btnCadastrar);
         painelBotoes.add(btnAtualizar);
@@ -323,23 +324,7 @@ if (sucesso) {
         txtTelefone.setText("");
         txtEmailColaborador.setText("");
         txtSenha.setText("");
-    }
-
-    private JButton criarBotao(String texto, Color cor) {
-    JButton btn = new JButton(texto);
-    btn.setBackground(cor);
-
-    if (cor.equals(CoresUtil.CINZA_VOLTAR) || cor.equals(CoresUtil.VERDE_CONFIRMAR)) {
-        btn.setForeground(new Color(60, 60, 60));
-    } else {
-        btn.setForeground(Color.WHITE);
-    }
-
-    btn.setFont(new Font("Arial", Font.BOLD, 12));
-    btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-    return btn;
-}
-
+    }  
     private void estilizarTabela(JTable tabela) {
         tabela.getTableHeader().setBackground(CoresUtil.ROSA_PRINCIPAL);
         tabela.getTableHeader().setForeground(Color.WHITE);

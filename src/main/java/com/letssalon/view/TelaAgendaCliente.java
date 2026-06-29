@@ -7,11 +7,14 @@ import com.letssalon.model.Agenda;
 import com.letssalon.model.Cliente;
 import com.letssalon.model.Colaborador;
 import com.letssalon.model.Servico;
+import com.letssalon.util.BotaoUtil;
+import static com.letssalon.util.BotaoUtil.criarBotao;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 import com.letssalon.util.CoresUtil;
+import javax.swing.table.DefaultTableCellRenderer;
 
 public class TelaAgendaCliente extends JFrame {
 
@@ -26,6 +29,14 @@ public class TelaAgendaCliente extends JFrame {
     private ColaboradorDAO colaboradorDAO = new ColaboradorDAO();
     private ServicoDAO servicoDAO = new ServicoDAO();
 
+    // Guarda os objetos completos dos profissionais carregados.
+    // Assim mostramos apenas o nome no ComboBox,
+    // mas continuamos tendo acesso ao ID.
+    private List<Colaborador> listaColaboradores;
+
+    // Guarda os objetos completos dos serviços.
+    private List<Servico> listaServicos;
+    
     public TelaAgendaCliente(Cliente cliente) {
         this.clienteLogado = cliente;
         initComponents();
@@ -34,7 +45,7 @@ public class TelaAgendaCliente extends JFrame {
 
     private void initComponents() {
         setTitle("Let's Salon - Meus Agendamentos");
-        setSize(750, 600);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
@@ -73,7 +84,7 @@ public class TelaAgendaCliente extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         // Data
-        gbc.gridx = 0; gbc.gridy = 0;
+        gbc.gridx = 0;
         painelForm.add(new JLabel("Data:"), gbc);
         txtData = new JTextField("Ex: 12/06/2026", 12);
         gbc.gridx = 1;
@@ -86,7 +97,7 @@ public class TelaAgendaCliente extends JFrame {
         gbc.gridx = 3;
         painelForm.add(txtHora, gbc);
 
-        // Colaborador
+        // profissional
         gbc.gridx = 0; gbc.gridy = 1;
         painelForm.add(new JLabel("Profissional:"), gbc);
         cmbColaborador = new JComboBox<>();
@@ -104,18 +115,13 @@ public class TelaAgendaCliente extends JFrame {
         JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 5));
         painelBotoes.setBackground(CoresUtil.ROSA_FUNDO);
 
-        btnAgendar  = criarBotao("Agendar", new Color(201, 72, 105));
-        btnCancelar = criarBotao("Cancelar Agendamento", CoresUtil.VERMELHO_EXCLUIR);
-        btnSair     = criarBotao("Sair", CoresUtil.CINZA_VOLTAR);
+        btnAgendar = criarBotao("Agendar", new Color(201, 72, 105));
 
         painelBotoes.add(btnAgendar);
-        painelBotoes.add(btnCancelar);
-        painelBotoes.add(btnSair);
 
         gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 4;
         painelForm.add(painelBotoes, gbc);
 
-        add(painelForm, BorderLayout.CENTER);
 
         // ── TABELA: Meus agendamentos ──
         JPanel painelTabela = new JPanel(new BorderLayout());
@@ -128,19 +134,50 @@ public class TelaAgendaCliente extends JFrame {
             new Color(201, 72, 105)
         ));
 
-        String[] colunas = {"ID", "Data", "Hora", "Profissional", "Serviço", "Status"};
+        String[] colunas = {"Data", "Hora", "Profissional", "Serviço", "Status"};
         modeloTabela = new DefaultTableModel(colunas, 0);
         tabelaMeusAgendamentos = new JTable(modeloTabela);
-        // Esconde ID da tabela
-tabelaMeusAgendamentos.getColumnModel()
-        .getColumn(0)
-        .setMinWidth(0);
+        
+        // Define uma largura inicial para cada coluna
+        tabelaMeusAgendamentos.getColumnModel().getColumn(0).setPreferredWidth(80);   // Data
 
-tabelaMeusAgendamentos.getColumnModel()
+        tabelaMeusAgendamentos.getColumnModel().getColumn(1).setPreferredWidth(60);   // Hora
+
+        tabelaMeusAgendamentos.getColumnModel().getColumn(2).setPreferredWidth(180);  // Profissional
+
+        tabelaMeusAgendamentos.getColumnModel().getColumn(3).setPreferredWidth(220);  // Serviço
+
+        tabelaMeusAgendamentos.getColumnModel().getColumn(4).setPreferredWidth(110);  // Status
+        
+        // Renderizador para centralizar o texto
+        DefaultTableCellRenderer centralizado =
+            new DefaultTableCellRenderer();
+
+        centralizado.setHorizontalAlignment(SwingConstants.CENTER);
+        
+        // Centraliza Data
+        tabelaMeusAgendamentos
+        .getColumnModel()
+        .getColumn(0)
+        .setCellRenderer(centralizado);
+
+        // Centraliza Hora
+        tabelaMeusAgendamentos
+        .getColumnModel()
+        .getColumn(1)
+        .setCellRenderer(centralizado);
+
+        // Centraliza Status
+        tabelaMeusAgendamentos
+        .getColumnModel()
+        .getColumn(4)
+        .setCellRenderer(centralizado);
+
+        tabelaMeusAgendamentos.getColumnModel()
         .getColumn(0)
         .setMaxWidth(0);
 
-tabelaMeusAgendamentos.getColumnModel()
+        tabelaMeusAgendamentos.getColumnModel()
         .getColumn(0)
         .setWidth(0);
         tabelaMeusAgendamentos.setRowHeight(28);
@@ -151,7 +188,38 @@ tabelaMeusAgendamentos.getColumnModel()
         tabelaMeusAgendamentos.setGridColor(CoresUtil.ROSA_SECUNDARIO);
 
         painelTabela.add(new JScrollPane(tabelaMeusAgendamentos));
-        add(painelTabela, BorderLayout.SOUTH);
+        
+        // Painel de botões da tabela
+        JPanel painelBotoesTabela = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        painelBotoesTabela.setBackground(CoresUtil.ROSA_FUNDO);
+
+        btnCancelar = criarBotao(
+            "Cancelar Agendamento",
+            CoresUtil.VERMELHO_EXCLUIR);
+
+        btnSair = criarBotao(
+            "Sair",
+            CoresUtil.CINZA_VOLTAR);
+
+        painelBotoesTabela.add(btnCancelar);
+        painelBotoesTabela.add(btnSair);
+
+        painelTabela.add(
+            painelBotoesTabela,
+            BorderLayout.SOUTH);
+        
+        // Painel principal que organiza formulário e tabela
+        JPanel painelConteudo = new JPanel(new BorderLayout());
+        painelConteudo.setBackground(CoresUtil.ROSA_FUNDO);
+
+        // Formulário fica no topo
+        painelConteudo.add(painelForm, BorderLayout.NORTH);
+
+        // Tabela ocupa todo o restante da tela
+        painelConteudo.add(painelTabela, BorderLayout.CENTER);
+
+        // Adiciona o painel na janela
+        add(painelConteudo, BorderLayout.CENTER);
 
         // Ações
         btnAgendar.addActionListener(e -> realizarAgendamento());
@@ -163,19 +231,31 @@ tabelaMeusAgendamentos.getColumnModel()
     }
 
     private void carregarDados() {
-        // Carrega colaboradores
+        // Limpa o ComboBox antes de carregar novamente
         cmbColaborador.removeAllItems();
-        List<Colaborador> colaboradores = colaboradorDAO.listar();
-        for (Colaborador c : colaboradores) {
-            cmbColaborador.addItem(c.getIdColaborador() + " - " + c.getNomeColaborador());
-        }
 
-        // Carrega serviços
+        // Busca todos os profissionais
+        listaColaboradores = colaboradorDAO.listar();
+
+        // Adiciona somente o nome de cada profissional
+        for (Colaborador c : listaColaboradores) {
+
+        cmbColaborador.addItem(
+            c.getNomeColaborador());
+}
+
+        // Limpa o ComboBox
         cmbServico.removeAllItems();
-        List<Servico> servicos = servicoDAO.listar();
-        for (Servico s : servicos) {
-            cmbServico.addItem(s.getCodigoServico() + " - " + s.getNomeServico());
-        }
+
+        // Busca os serviços
+        listaServicos = servicoDAO.listar();
+
+        // Mostra apenas o nome
+        for (Servico s : listaServicos) {
+
+        cmbServico.addItem(
+            s.getNomeServico());
+}
 
         // Carrega agendamentos do cliente logado
         modeloTabela.setRowCount(0);
@@ -204,40 +284,39 @@ for (Object[] linha : agendamentos) {
         agenda.setCpfCliente(clienteLogado.getCpfCliente());
         agenda.setData(txtData.getText().trim());
         agenda.setHorario(txtHora.getText().trim());
-        agenda.setStatus("AGENDADO");
+        agenda.setStatus("PENDENTE");
 
         if (cmbColaborador.getSelectedItem() != null) {
-            String idStr = cmbColaborador.getSelectedItem().toString().split(" - ")[0];
-            agenda.setIdColaborador(Integer.parseInt(idStr));
+        // Descobre qual profissional foi escolhido
+        Colaborador colaboradorSelecionado =
+        listaColaboradores.get(
+                cmbColaborador.getSelectedIndex());
+
+        // Salva o ID verdadeiro no agendamento
+        agenda.setIdColaborador(
+        colaboradorSelecionado.getIdColaborador());
         }
         if (cmbServico.getSelectedItem() != null) {
 
-    String codStr =
-        cmbServico.getSelectedItem()
-                  .toString()
-                  .split(" - ")[0];
+        Servico servicoSelecionado =
+            listaServicos.get(
+                cmbServico.getSelectedIndex());
 
-    int codigoServico =
-        Integer.parseInt(codStr);
+        // Salva o código do serviço
+        agenda.setCodigoServico(
+            servicoSelecionado.getCodigoServico());
 
-    agenda.setCodigoServico(codigoServico);
+        // Salva automaticamente a empresa do serviço
+        agenda.setCodigoEmpresa(
+            servicoSelecionado.getCodigoEmpresa());
 
-    for (Servico s : servicoDAO.listar()) {
-
-        if (s.getCodigoServico() == codigoServico) {
-
-            agenda.setCodigoEmpresa(
-                s.getCodigoEmpresa()
-            );
-
-            break;
-        }
-    }
 }
         agendaDAO.cadastrar(agenda);
         JOptionPane.showMessageDialog(this,
-            "Agendamento realizado!\nAguarde a confirmação do salão.",
-            "Sucesso",
+            "Solicitação de agendamento enviada!\n\n"
+            + "O salão irá analisar a disponibilidade do horário.\n"
+            + "Você será atendido assim que o agendamento for confirmado.",
+            "Solicitação enviada",
             JOptionPane.INFORMATION_MESSAGE);
 
         limparCampos();
@@ -286,18 +365,4 @@ if (confirmacao == JOptionPane.YES_OPTION) {
         cmbServico.setSelectedIndex(0);
     }
 
-    private JButton criarBotao(String texto, Color cor) {
-    JButton btn = new JButton(texto);
-    btn.setBackground(cor);
-
-    if (cor.equals(CoresUtil.CINZA_VOLTAR) || cor.equals(CoresUtil.VERDE_CONFIRMAR)) {
-        btn.setForeground(new Color(60, 60, 60));
-    } else {
-        btn.setForeground(Color.WHITE);
-    }
-
-    btn.setFont(new Font("Arial", Font.BOLD, 12));
-    btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-    return btn;
-}
-}
+   }

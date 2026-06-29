@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import com.letssalon.util.CoresUtil;
+import com.letssalon.util.BotaoUtil;
 
 public class TelaLoginCliente extends JFrame {
 
@@ -140,7 +141,7 @@ public class TelaLoginCliente extends JFrame {
 });
 
         // Botão Entrar
-        btnEntrar = criarBotao("ENTRAR", new Color(201, 72, 105));
+        btnEntrar = BotaoUtil.criarBotao("ENTRAR", new Color(201, 72, 105));
         gbc.gridy = 6;
         painelDireito.add(btnEntrar, gbc);
 
@@ -150,11 +151,11 @@ public class TelaLoginCliente extends JFrame {
         gbc.gridy = 7;
         painelDireito.add(lblConta, gbc);
 
-        btnInscrever = criarBotao("INSCREVA-SE", CoresUtil.ROSA_PAINEL_FORM);
+        btnInscrever = BotaoUtil.criarBotao("INSCREVA-SE", CoresUtil.ROSA_PAINEL_FORM);
         gbc.gridy = 8;
         painelDireito.add(btnInscrever, gbc);
 
-        btnVoltar = criarBotao("VOLTAR", CoresUtil.CINZA_VOLTAR);
+        btnVoltar = BotaoUtil.criarBotao("VOLTAR", CoresUtil.CINZA_VOLTAR);
         gbc.gridy = 9;
         painelDireito.add(btnVoltar, gbc);
 
@@ -202,16 +203,5 @@ public class TelaLoginCliente extends JFrame {
                 "Erro de Login",
                 JOptionPane.ERROR_MESSAGE);
         }
-    }
-
-    private JButton criarBotao(String texto, Color cor) {
-        JButton btn = new JButton(texto);
-        btn.setBackground(cor);
-        btn.setForeground(Color.WHITE);
-        btn.setFont(new Font("Arial", Font.BOLD, 13));
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.setBorderPainted(false);
-        btn.setFocusPainted(false);
-        return btn;
     }
 }

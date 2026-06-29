@@ -11,6 +11,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 import com.letssalon.util.CoresUtil;
+import com.letssalon.util.BotaoUtil;
 
 public class TelaInscricao extends JFrame {
 
@@ -102,12 +103,12 @@ public class TelaInscricao extends JFrame {
         add(txtConfirmarSenha, gbc);
 
         // ── Linha 9: Botão INSCREVER-SE ──
-        btnInscrever = criarBotao("INSCREVER-SE", new Color(201, 72, 105));
+        btnInscrever = BotaoUtil.criarBotao("INSCREVER-SE", new Color(201, 72, 105));
         gbc.gridx = 0; gbc.gridy = 9; gbc.gridwidth = 2;
         add(btnInscrever, gbc);
 
         // ── Linha 10: Botão VOLTAR ──
-        btnVoltar = criarBotao("VOLTAR", CoresUtil.CINZA_VOLTAR);
+        btnVoltar = BotaoUtil.criarBotao("VOLTAR", CoresUtil.CINZA_VOLTAR);
         gbc.gridy = 10;
         add(btnVoltar, gbc);
 
@@ -118,21 +119,6 @@ public class TelaInscricao extends JFrame {
             dispose();
         });
     }
-
-    private JButton criarBotao(String texto, Color cor) {
-    JButton btn = new JButton(texto);
-    btn.setBackground(cor);
-
-    if (cor.equals(CoresUtil.CINZA_VOLTAR) || cor.equals(CoresUtil.VERDE_CONFIRMAR)) {
-        btn.setForeground(new Color(60, 60, 60));
-    } else {
-        btn.setForeground(Color.WHITE);
-    }
-
-    btn.setFont(new Font("Arial", Font.BOLD, 12));
-    btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-    return btn;
-}
 
     private void realizarInscricao() {
         String senha     = new String(txtSenha.getPassword());

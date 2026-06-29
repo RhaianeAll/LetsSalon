@@ -10,6 +10,7 @@ import com.letssalon.util.CPFUtil;
 import com.letssalon.util.SenhaUtil;
 import com.letssalon.util.MascaraUtil;
 import com.letssalon.util.CoresUtil;
+import com.letssalon.util.BotaoUtil;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -78,10 +79,10 @@ public class TelaCRUDInsumo extends JFrame {
 
         JPanel botoes = new JPanel();
 
-        btnCadastrar = new JButton("Cadastrar");
-        btnAtualizar = new JButton("Atualizar");
-        btnExcluir = new JButton("Excluir");
-        btnLimpar = new JButton("Limpar");
+        btnCadastrar = BotaoUtil.criarBotao("Cadastrar", CoresUtil.ROSA_PRINCIPAL);
+        btnAtualizar = BotaoUtil.criarBotao("Atualizar", CoresUtil.VERDE_CONFIRMAR);
+        btnExcluir   = BotaoUtil.criarBotao("Excluir", CoresUtil.VERMELHO_EXCLUIR);
+        btnLimpar    = BotaoUtil.criarBotao("Limpar", CoresUtil.ROSA_SECUNDARIO);
 
         botoes.add(btnCadastrar);
         botoes.add(btnAtualizar);

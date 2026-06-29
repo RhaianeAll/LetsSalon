@@ -11,6 +11,7 @@ import java.awt.*;
 import java.util.List;
 import com.letssalon.util.CoresUtil;
 import com.letssalon.dao.ColaboradorDAO;
+import com.letssalon.util.BotaoUtil;
 
 public class TelaCadastroServico extends JFrame {
 
@@ -139,11 +140,11 @@ public class TelaCadastroServico extends JFrame {
         JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
         painelBotoes.setBackground(CoresUtil.ROSA_FUNDO);
 
-        btnCadastrar = criarBotao("Cadastrar", new Color(201, 72, 105));
-        btnAtualizar = criarBotao("Atualizar", new Color(201, 72, 105));
-        btnExcluir   = criarBotao("Excluir", CoresUtil.VERMELHO_EXCLUIR);
-        btnLimpar    = criarBotao("Limpar", CoresUtil.ROSA_SECUNDARIO);
-        btnVoltar    = criarBotao("Voltar", CoresUtil.CINZA_VOLTAR);
+        btnCadastrar = BotaoUtil.criarBotao("Cadastrar", new Color(201, 72, 105));
+        btnAtualizar = BotaoUtil.criarBotao("Atualizar", new Color(201, 72, 105));
+        btnExcluir   = BotaoUtil.criarBotao("Excluir", CoresUtil.VERMELHO_EXCLUIR);
+        btnLimpar    = BotaoUtil.criarBotao("Limpar", CoresUtil.ROSA_SECUNDARIO);
+        btnVoltar    = BotaoUtil.criarBotao("Voltar", CoresUtil.CINZA_VOLTAR);
 
         painelBotoes.add(btnCadastrar);
         painelBotoes.add(btnAtualizar);
@@ -383,21 +384,6 @@ if (sucesso) {
         txtQuantidade.setText("");
         cmbInsumos.setSelectedIndex(0);
     }
-
-    private JButton criarBotao(String texto, Color cor) {
-    JButton btn = new JButton(texto);
-    btn.setBackground(cor);
-
-    if (cor.equals(CoresUtil.CINZA_VOLTAR) || cor.equals(CoresUtil.VERDE_CONFIRMAR)) {
-        btn.setForeground(new Color(60, 60, 60));
-    } else {
-        btn.setForeground(Color.WHITE);
-    }
-
-    btn.setFont(new Font("Arial", Font.BOLD, 12));
-    btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-    return btn;
-}
 
     private void estilizarTabela(JTable tabela) {
         tabela.getTableHeader().setBackground(new Color(201, 72, 105));

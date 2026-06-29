@@ -8,6 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 import javax.swing.text.MaskFormatter;
 import com.letssalon.util.CoresUtil;
+import com.letssalon.util.BotaoUtil;
 
 public class TelaInscricaoCliente extends JFrame {
 
@@ -171,18 +172,18 @@ private JButton btnInscrever, btnLimpar, btnVoltar;
         gbc);
 
         // Botões
-        btnInscrever = criarBotao("INSCREVER-SE", new Color(201, 72, 105));
+        btnInscrever = BotaoUtil.criarBotao("INSCREVER-SE", new Color(201, 72, 105));
         gbc.gridy = 15;
         painelDireito.add(btnInscrever, gbc);
         
-        btnLimpar = criarBotao(
+        btnLimpar = BotaoUtil.criarBotao(
         "LIMPAR",
         CoresUtil.ROSA_PAINEL_FORM);
 
         gbc.gridy = 16;
         painelDireito.add(btnLimpar, gbc);
 
-        btnVoltar = criarBotao("VOLTAR", CoresUtil.CINZA_VOLTAR);
+        btnVoltar = BotaoUtil.criarBotao("VOLTAR", CoresUtil.CINZA_VOLTAR);
         gbc.gridy = 17;
         painelDireito.add(btnVoltar, gbc);
 
@@ -366,19 +367,5 @@ if (sucesso) {
 
         txtNome.requestFocus();
 }
-    
-    private JButton criarBotao(String texto, Color cor) {
-    JButton btn = new JButton(texto);
-    btn.setBackground(cor);
-
-    if (cor.equals(CoresUtil.CINZA_VOLTAR) || cor.equals(CoresUtil.VERDE_CONFIRMAR)) {
-        btn.setForeground(new Color(60, 60, 60));
-    } else {
-        btn.setForeground(Color.WHITE);
-    }
-
-    btn.setFont(new Font("Arial", Font.BOLD, 12));
-    btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-    return btn;
-}
+ 
 }
