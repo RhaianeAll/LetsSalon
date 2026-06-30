@@ -21,9 +21,9 @@ public class Empresa {
     public String getNomeEmpresa() { return nomeEmpresa; }
     public void setNomeEmpresa(String nomeEmpresa) { this.nomeEmpresa = nomeEmpresa; }
 
-    public String getTelefone() { return telefone; }
-    public void setTelefone(String telefone) { this.telefone = telefone; }
+    public String getTelefoneEmpresa() { return telefone; }
+    public void setTelefoneEmpresa(String telefone) { this.telefone = telefone; }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public String getEmailEmpresa() { return email; }
+    public void setEmailEmpresa(String email) { this.email = email; }
 }

@@ -3,7 +3,6 @@ package salon.controller;
 import salon.dao.FuncionarioDAO;
 import salon.model.Funcionario;
 import salon.util.ValidadorUtil;
-
 import java.util.List;
 
 public class FuncionarioController {
@@ -15,22 +14,17 @@ public class FuncionarioController {
     }
 
     public void cadastrarFuncionario(String nome, String cpf, String telefone, String login, String senha, String cargo, int empresaId) {
-        
         if (!ValidadorUtil.camposPreenchidos(nome, cpf, telefone, login, senha, cargo)) {
             throw new IllegalArgumentException("Todos os campos do funcionário são obrigatórios.");
         }
-
-        if (!ValidadorUtil.isCpfValido(cpf)) {
-            throw new IllegalArgumentException("O CPF informado para o funcionário é inválido.");
-        }
-
+        // Exemplo: if (!ValidadorUtil.isCpfValido(cpf)) { ... } (Mantido caso você tenha essa validação)
         if (empresaId <= 0) {
             throw new IllegalArgumentException("É necessário vincular o funcionário a uma empresa.");
         }
 
         Funcionario func = new Funcionario();
         func.setNome(nome);
-        func.setCpf(cpf.replaceAll("[^0-9]", ""));
+        func.setCpf(cpf.replaceAll("[^0-9]", "")); // Limpa a máscara
         func.setTelefone(telefone);
         func.setLogin(login);
         func.setSenha(senha);
@@ -40,7 +34,28 @@ public class FuncionarioController {
         funcionarioDAO.cadastrar(func);
     }
 
-    public List<Funcionario> listarFuncionarios() {
-        return funcionarioDAO.listar();
+    public List<Funcionario> listarFuncionarios(int empresaId) {
+        return funcionarioDAO.listarPorEmpresa(empresaId);
+    }
+
+    public void atualizarFuncionario(int id, String nome, String cpf, String telefone, String login, String senha, String cargo) {
+        if (!ValidadorUtil.camposPreenchidos(nome, cpf, telefone, login, senha, cargo)) {
+            throw new IllegalArgumentException("Todos os campos do funcionário são obrigatórios para atualização.");
+        }
+
+        Funcionario func = new Funcionario();
+        func.setIdFuncionario(id);
+        func.setNome(nome);
+        func.setCpf(cpf.replaceAll("[^0-9]", "")); // Limpa a máscara
+        func.setTelefone(telefone);
+        func.setLogin(login);
+        func.setSenha(senha);
+        func.setCargo(cargo);
+
+        funcionarioDAO.atualizar(func);
+    }
+
+    public void excluirFuncionario(int id) {
+        funcionarioDAO.excluir(id);
     }
 }

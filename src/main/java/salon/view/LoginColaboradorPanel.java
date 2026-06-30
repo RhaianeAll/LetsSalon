@@ -87,10 +87,11 @@ public class LoginColaboradorPanel extends JPanel {
         btnEntrar.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         btnEntrar.addActionListener(e -> {
-    // Aqui no futuro ficará o código de autenticação: if (loginController.fazerLogin(...))
-    // Fecha a janela de Auth (Login) e abre o Dashboard
-        parentFrame.dispose(); 
-        new MainColaboradorView().setVisible(true);
+            String nomeDigitado = txtUsuario.getText(); // Puxa o nome que o usuário digitou no login
+
+            parentFrame.dispose(); 
+            // Passa o nome dinamicamente para a tela de seleção
+            new SelecaoEmpresaView(nomeDigitado).setVisible(true); 
         });
 
         RoundedButton btnInscrever = new RoundedButton("INSCREVA-SE");

@@ -12,11 +12,9 @@ public class ServicoInsumoDAO {
         String sql = "INSERT INTO servico_insumo (servico_id, insumo_id, quantidade_necessaria) VALUES (?, ?, ?)";
         try (Connection conn = Conexao.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
             stmt.setInt(1, si.getServicoId());
             stmt.setInt(2, si.getInsumoId());
             stmt.setInt(3, si.getQuantidadeNecessaria());
-            
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -28,7 +26,6 @@ public class ServicoInsumoDAO {
         String sql = "SELECT * FROM servico_insumo WHERE servico_id = ?";
         try (Connection conn = Conexao.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
             stmt.setInt(1, idServico);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -44,5 +41,17 @@ public class ServicoInsumoDAO {
             e.printStackTrace();
         }
         return lista;
+    }
+
+    // NOVA FUNÇÃO
+    public void excluirPorServico(int idServico) {
+        String sql = "DELETE FROM servico_insumo WHERE servico_id = ?";
+        try (Connection conn = Conexao.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, idServico);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

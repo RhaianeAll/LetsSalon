@@ -17,6 +17,7 @@ public class CadastroInsumoDAO {
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException("Erro ao salvar rendimento na tabela. A tabela cadastro_insumos existe?", e);
         }
     }
 
@@ -37,7 +38,33 @@ public class CadastroInsumoDAO {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException("Erro ao buscar rendimento no banco de dados.", e);
         }
-        return null;
+        return null; // Retorna nulo apenas se a busca der certo, mas não existir dado.
+    }
+
+    public void atualizarRendimento(CadastroInsumo ci) {
+        String sql = "UPDATE cadastro_insumos SET rende_aplicacoes = ? WHERE insumo_id = ?";
+        try (Connection conn = Conexao.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, ci.getRendeAplicacoes());
+            stmt.setInt(2, ci.getInsumoId());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Erro ao atualizar rendimento.", e);
+        }
+    }
+
+    public void excluirPorInsumo(int insumoId) {
+        String sql = "DELETE FROM cadastro_insumos WHERE insumo_id = ?";
+        try (Connection conn = Conexao.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, insumoId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Erro ao excluir rendimento.", e);
+        }
     }
 }
