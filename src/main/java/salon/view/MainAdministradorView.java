@@ -189,7 +189,7 @@ public class MainAdministradorView extends JFrame {
                     this.dispose(); 
                     new CadastroServicoView(nomeUsuario, nomeEmpresa).setVisible(true);
                 }
-                else if (texto.equals("Cadastro de Insumos")) { // <-- A NOVA CONEXÃO AQUI!
+                else if (texto.equals("Cadastro de Insumos")) { 
                     this.dispose(); 
                     new CadastroInsumoView(nomeUsuario, nomeEmpresa).setVisible(true);
                 }
@@ -197,8 +197,12 @@ public class MainAdministradorView extends JFrame {
                     this.dispose(); 
                     new EstoqueView(nomeUsuario, nomeEmpresa).setVisible(true);
                 }
+                else if (texto.equals("Agendamentos")) { // <-- NOVA CONEXÃO AQUI!
+                    this.dispose(); 
+                    new AgendamentosView(nomeUsuario, nomeEmpresa).setVisible(true);
+                }
                 else {
-                    // Mantém o aviso de "Em construção" para os botões que ainda faltam
+                    // Mantém o aviso para o botão "Relatórios" que ainda falta
                     JOptionPane.showMessageDialog(this, "Navegando para: " + texto + "\n(Em construção)");
                 }
             });

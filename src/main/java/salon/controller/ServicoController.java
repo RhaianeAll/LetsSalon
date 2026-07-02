@@ -12,6 +12,11 @@ public class ServicoController {
     public ServicoController() {
         this.servicoDAO = new ServicoDAO();
     }
+    
+    // Método que a View está tentando chamar!
+    public List<Servico> listarServicos() {
+        return servicoDAO.listar();
+    }
 
     // Agora retorna int!
     public int cadastrarServico(String nome, String valorStr, String duracao, int empresaId) {

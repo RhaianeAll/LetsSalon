@@ -47,4 +47,9 @@ public class Funcionario {
 
     public int getEmpresaId() { return empresaId; }
     public void setEmpresaId(int empresaId) { this.empresaId = empresaId; }
+    
+    @Override
+    public String toString() {
+        return this.nome; // É isto que vai aparecer escrito na ComboBox!
+    }
 }

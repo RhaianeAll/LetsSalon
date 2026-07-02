@@ -4,28 +4,25 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class Agendamento {
+    // Colunas reais da sua tabela
     private int idAgendamento;
     private int clienteId;
     private int funcionarioId;
     private int servicoId;
-    private LocalDate data;
+    private LocalDate dataAgendamento;
     private LocalTime hora;
     private String status;
     private String observacoes;
 
+    // Campos auxiliares para exibir na Interface Visual (View)
+    private String nomeCliente;
+    private String telefoneCliente;
+    private String nomeFuncionario;
+    private String nomeServico;
+
     public Agendamento() {}
 
-    public Agendamento(int idAgendamento, int clienteId, int funcionarioId, int servicoId, LocalDate data, LocalTime hora, String status, String observacoes) {
-        this.idAgendamento = idAgendamento;
-        this.clienteId = clienteId;
-        this.funcionarioId = funcionarioId;
-        this.servicoId = servicoId;
-        this.data = data;
-        this.hora = hora;
-        this.status = status;
-        this.observacoes = observacoes;
-    }
-
+    // --- GETTERS E SETTERS DAS COLUNAS REAIS ---
     public int getIdAgendamento() { return idAgendamento; }
     public void setIdAgendamento(int idAgendamento) { this.idAgendamento = idAgendamento; }
 
@@ -38,8 +35,8 @@ public class Agendamento {
     public int getServicoId() { return servicoId; }
     public void setServicoId(int servicoId) { this.servicoId = servicoId; }
 
-    public LocalDate getData() { return data; }
-    public void setData(LocalDate data) { this.data = data; }
+    public LocalDate getDataAgendamento() { return dataAgendamento; }
+    public void setDataAgendamento(LocalDate dataAgendamento) { this.dataAgendamento = dataAgendamento; }
 
     public LocalTime getHora() { return hora; }
     public void setHora(LocalTime hora) { this.hora = hora; }
@@ -49,4 +46,17 @@ public class Agendamento {
 
     public String getObservacoes() { return observacoes; }
     public void setObservacoes(String observacoes) { this.observacoes = observacoes; }
+
+    // --- GETTERS E SETTERS AUXILIARES ---
+    public String getNomeCliente() { return nomeCliente; }
+    public void setNomeCliente(String nomeCliente) { this.nomeCliente = nomeCliente; }
+
+    public String getTelefoneCliente() { return telefoneCliente; }
+    public void setTelefoneCliente(String telefoneCliente) { this.telefoneCliente = telefoneCliente; }
+
+    public String getNomeFuncionario() { return nomeFuncionario; }
+    public void setNomeFuncionario(String nomeFuncionario) { this.nomeFuncionario = nomeFuncionario; }
+
+    public String getNomeServico() { return nomeServico; }
+    public void setNomeServico(String nomeServico) { this.nomeServico = nomeServico; }
 }

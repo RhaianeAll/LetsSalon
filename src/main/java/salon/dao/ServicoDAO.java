@@ -55,6 +55,28 @@ public class ServicoDAO {
         }
         return lista;
     }
+    
+    // Método para buscar todos os serviços do banco
+    public List<Servico> listar() {
+        List<Servico> lista = new ArrayList<>();
+        String sql = "SELECT * FROM servicos";
+        try (Connection conn = Conexao.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            
+            while (rs.next()) {
+                Servico s = new Servico();
+                s.setIdServico(rs.getInt("id_servico"));
+                s.setNome(rs.getString("nome"));
+                s.setValor(rs.getDouble("valor"));
+                s.setDuracao(rs.getString("duracao"));
+                lista.add(s);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return lista;
+    }
 
     public void atualizar(Servico servico) {
         String sql = "UPDATE servicos SET nome = ?, valor = ?, duracao = ? WHERE id_servico = ?";

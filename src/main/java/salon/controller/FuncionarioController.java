@@ -12,6 +12,11 @@ public class FuncionarioController {
     public FuncionarioController() {
         this.funcionarioDAO = new FuncionarioDAO();
     }
+    
+    // Método que a View está tentando chamar!
+    public List<Funcionario> listarFuncionarios() {
+        return funcionarioDAO.listar();
+    }
 
     public void cadastrarFuncionario(String nome, String cpf, String telefone, String login, String senha, String cargo, int empresaId) {
         if (!ValidadorUtil.camposPreenchidos(nome, cpf, telefone, login, senha, cargo)) {

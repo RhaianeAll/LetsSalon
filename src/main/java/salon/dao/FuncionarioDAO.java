@@ -58,6 +58,28 @@ public class FuncionarioDAO {
         }
         return lista;
     }
+    // Método para buscar todos os funcionários do banco
+    public List<Funcionario> listar() {
+        List<Funcionario> lista = new ArrayList<>();
+        String sql = "SELECT * FROM funcionarios";
+        try (Connection conn = Conexao.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            
+            while (rs.next()) {
+                Funcionario f = new Funcionario();
+                f.setIdFuncionario(rs.getInt("id_funcionario"));
+                f.setNome(rs.getString("nome"));
+                f.setCpf(rs.getString("cpf"));
+                f.setTelefone(rs.getString("telefone"));
+                f.setCargo(rs.getString("cargo"));
+                lista.add(f);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return lista;
+    }
 
     // UPDATE
     public void atualizar(Funcionario func) {

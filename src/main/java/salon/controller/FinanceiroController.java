@@ -61,6 +61,8 @@ public class FinanceiroController {
             throw new IllegalArgumentException("Formato de data inválido. Use DD/MM/AAAA.");
         }
     }
+    
+    
 
     public List<Financeiro> obterRelatorioGeral() {
         return financeiroDAO.listarRelatorio();
