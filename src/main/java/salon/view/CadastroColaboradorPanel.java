@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.text.MaskFormatter;
 import java.awt.*;
 import salon.controller.FuncionarioController;
+import salon.controller.UsuarioController;
 import salon.view.components.RoundedButton;
 import salon.view.components.RoundedPanel;
 
@@ -78,14 +79,14 @@ public class CadastroColaboradorPanel extends JPanel {
         row1.setMaximumSize(fieldSize);
         row1.setMinimumSize(fieldSize); 
         
-        JTextField txtNome = new JTextField();
-        txtNome.setBorder(BorderFactory.createTitledBorder("Nome Completo:"));
+        JTextField txtNomeCompleto = new JTextField();
+        txtNomeCompleto.setBorder(BorderFactory.createTitledBorder("Nome Completo:"));
         
         // APLICANDO MÁSCARA NO CPF
         JFormattedTextField txtCpf = new JFormattedTextField(criarMascara("###.###.###-##"));
         txtCpf.setBorder(BorderFactory.createTitledBorder("CPF:"));
         
-        row1.add(txtNome);
+        row1.add(txtNomeCompleto);
         row1.add(txtCpf);
 
         // --- DEMAIS CAMPOS ---
@@ -129,9 +130,37 @@ public class CadastroColaboradorPanel extends JPanel {
         btnInscrever.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         btnInscrever.addActionListener(e -> {
-            // O getText() do JFormattedTextField já vem com a máscara (ex: 123.456.789-00)
-            JOptionPane.showMessageDialog(this, "Cadastro finalizado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-            parentFrame.trocarTela("LoginColaborador");
+            try {
+                String nome = txtNomeCompleto.getText();
+                String cpf = txtCpf.getText();
+                String telefone = txtTelefone.getText();
+                String usuario = txtUsuario.getText();
+                String senha = new String(txtSenha.getPassword());
+                String confirma = new String(txtConfirmaSenha.getPassword());
+
+                UsuarioController controller = new UsuarioController();
+
+                // Agora capturamos o código que o Controller devolveu!
+                String codigoGerado = controller.cadastrarColaborador(nome, cpf, telefone, usuario, senha, confirma);
+
+                // MENSAGEM DE SUCESSO COM ÊNFASE NO CÓDIGO!
+                String mensagem = "Colaborador cadastrado com sucesso no sistema!\n\n"
+                                + "⚠️ ATENÇÃO MUITO IMPORTANTE ⚠️\n"
+                                + "O sistema gerou o seu Código de Empresa automático:\n\n"
+                                + "CÓDIGO: [ " + codigoGerado + " ]\n\n"
+                                + "ANOTE E GUARDE ESTE CÓDIGO! Você precisará dele \n"
+                                + "obrigatoriamente toda vez que for fazer o login.";
+
+                JOptionPane.showMessageDialog(this, mensagem, "Cadastro Concluído - GUARDE SEU CÓDIGO", JOptionPane.WARNING_MESSAGE);
+
+                // Limpar os campos ou voltar para a tela de login aqui
+                // this.dispose(); 
+
+            } catch (IllegalArgumentException ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "Atenção", JOptionPane.WARNING_MESSAGE);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Erro ao cadastrar: " + ex.getMessage(), "Erro no Banco", JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         cardPanel.add(Box.createRigidArea(new Dimension(0, 5)));

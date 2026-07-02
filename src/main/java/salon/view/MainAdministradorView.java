@@ -42,12 +42,13 @@ public class MainAdministradorView extends JFrame {
         RoundedPanel pillUser = new RoundedPanel(30, Color.decode("#FF6090"));
         pillUser.setLayout(new FlowLayout(FlowLayout.CENTER, 30, 5));
         
-        pillUser.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Muda o mouse para a "mãozinha"
+        // --- ADICIONE ESTE BLOCO AQUI ---
+        pillUser.setCursor(new Cursor(Cursor.HAND_CURSOR)); 
         pillUser.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                dispose(); // Fecha o menu
-                //new EditarDadosAdminView(nomeUsuario, nomeEmpresa).setVisible(true); // Abre a tela de edição
+                dispose(); 
+                new EditarDadosAdminView(nomeUsuario, nomeEmpresa).setVisible(true); 
             }
         });
         

@@ -2,6 +2,8 @@ package salon.view;
 
 import javax.swing.*;
 import java.awt.*;
+import salon.controller.UsuarioController;
+import salon.model.Usuario;
 import salon.view.components.RoundedButton;
 import salon.view.components.RoundedPanel;
 
@@ -87,11 +89,36 @@ public class LoginColaboradorPanel extends JPanel {
         btnEntrar.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         btnEntrar.addActionListener(e -> {
-            String nomeDigitado = txtUsuario.getText(); // Puxa o nome que o usuário digitou no login
+            
+            try {
+                // 1. Pega o que o utilizador digitou na tela
+                String usuarioDigitado = txtUsuario.getText(); 
+                String senhaDigitada = new String(txtSenha.getPassword()); 
 
-            parentFrame.dispose(); 
-            // Passa o nome dinamicamente para a tela de seleção
-            new SelecaoEmpresaView(nomeDigitado).setVisible(true); 
+                // 2. TENTA autenticar com senha obrigatória
+                UsuarioController controller = new UsuarioController();
+                Usuario userLogado = controller.fazerLogin(usuarioDigitado, senhaDigitada);
+
+                // 3. Verifica se é administrador ou colaborador
+                if (userLogado.getTipoUsuario().equals("administrador") || userLogado.getTipoUsuario().equals("colaborador")) {
+
+                    // Fecha a tela de login
+                    SwingUtilities.getWindowAncestor(this).dispose(); 
+
+                    // --- AQUI ESTÁ A CORREÇÃO ---
+                    // Em vez de ir para o MainAdministradorView, enviamos para a Seleção de Empresa!
+                    new SelecaoEmpresaView(userLogado.getUsuario()).setVisible(true);
+
+                } else {
+                    JOptionPane.showMessageDialog(this, "Acesso negado. Esta área é restrita a colaboradores.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                }
+
+            } catch (IllegalArgumentException ex) {
+                // A senha errada cai aqui
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "Erro de Autenticação", JOptionPane.ERROR_MESSAGE);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Erro interno no sistema: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+}
         });
 
         RoundedButton btnInscrever = new RoundedButton("INSCREVA-SE");
