@@ -113,4 +113,74 @@ public class AgendamentoDAO {
             throw new RuntimeException("Erro ao atualizar status do agendamento.", e);
         }
     }
+    
+    // Adicione no final do seu AgendamentoDAO.java
+    public List<Agendamento> listarAgendamentosGerais() {
+        List<Agendamento> lista = new ArrayList<>();
+        // MUDANÇA AQUI: ORDER BY a.data_agendamento ASC, a.hora ASC
+        String sql = "SELECT a.*, u.nome_completo AS nome_cliente, u.telefone AS telefone_cliente, " +
+                     "f.nome AS nome_funcionario, s.nome AS nome_servico " +
+                     "FROM agendamentos a " +
+                     "LEFT JOIN usuarios u ON a.cliente_id = u.id_usuario " +
+                     "LEFT JOIN funcionarios f ON a.funcionario_id = f.id_funcionario " +
+                     "LEFT JOIN servicos s ON a.servico_id = s.id_servico " +
+                     "WHERE a.status != 'Pendente' ORDER BY a.data_agendamento ASC, a.hora ASC";
+                     
+        try (Connection conn = Conexao.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            
+            while (rs.next()) {
+                Agendamento a = new Agendamento();
+                a.setIdAgendamento(rs.getInt("id_agendamento"));
+                a.setClienteId(rs.getInt("cliente_id"));
+                a.setFuncionarioId(rs.getInt("funcionario_id"));
+                a.setServicoId(rs.getInt("servico_id"));
+                if (rs.getDate("data_agendamento") != null) a.setDataAgendamento(rs.getDate("data_agendamento").toLocalDate());
+                if (rs.getTime("hora") != null) a.setHora(rs.getTime("hora").toLocalTime());
+                
+                a.setStatus(rs.getString("status"));
+                a.setNomeCliente(rs.getString("nome_cliente"));
+                a.setTelefoneCliente(rs.getString("telefone_cliente"));
+                a.setNomeFuncionario(rs.getString("nome_funcionario"));
+                a.setNomeServico(rs.getString("nome_servico"));
+                
+                lista.add(a);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return lista;
+    }
+    
+    // Função para atualizar os dados de um agendamento
+    public void atualizar(Agendamento a) {
+        String sql = "UPDATE agendamentos SET cliente_id = ?, funcionario_id = ?, servico_id = ?, data_agendamento = ?, hora = ? WHERE id_agendamento = ?";
+        try (Connection conn = Conexao.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, a.getClienteId());
+            stmt.setInt(2, a.getFuncionarioId());
+            stmt.setInt(3, a.getServicoId());
+            stmt.setDate(4, Date.valueOf(a.getDataAgendamento()));
+            stmt.setTime(5, Time.valueOf(a.getHora()));
+            stmt.setInt(6, a.getIdAgendamento());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Erro ao atualizar agendamento.", e);
+        }
+    }
+
+    // Função para excluir um agendamento
+    public void excluir(int idAgendamento) {
+        String sql = "DELETE FROM agendamentos WHERE id_agendamento = ?";
+        try (Connection conn = Conexao.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, idAgendamento);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Erro ao excluir agendamento.", e);
+        }
+    }
 }

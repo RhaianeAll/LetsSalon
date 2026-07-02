@@ -1,5 +1,6 @@
 package salon.controller;
 
+import java.util.List;
 import salon.dao.UsuarioDAO;
 import salon.model.Usuario;
 import salon.util.ValidadorUtil;
@@ -11,33 +12,51 @@ public class UsuarioController {
     public UsuarioController() {
         this.usuarioDAO = new UsuarioDAO();
     }
+    
+    public List<Usuario> listarUsuarios() {
+        return usuarioDAO.listarTodos();
+    }
 
-    public void cadastrarCliente(String nome, String cpf, String telefone, String login, String senha, String confirmacaoSenha) {
+    public void cadastrarCliente(String nomeCompleto, String cpf, String telefone, String nomeUsuario, String senha, String confirmacaoSenha) {
         
-        // 1. Validação de campos vazios
-        if (!ValidadorUtil.camposPreenchidos(nome, cpf, telefone, login, senha, confirmacaoSenha)) {
-            throw new IllegalArgumentException("Todos os campos são obrigatórios.");
+        // 1. Validações básicas
+        if (nomeCompleto.isEmpty() || cpf.isEmpty() || telefone.isEmpty() || nomeUsuario.isEmpty() || senha.isEmpty()) {
+            throw new IllegalArgumentException("Por favor, preencha todos os campos.");
         }
-
-        // 2. Validação de CPF
-        if (!ValidadorUtil.isCpfValido(cpf)) {
-            throw new IllegalArgumentException("O CPF informado é inválido.");
-        }
-
-        // 3. Validação de Senha
+        
         if (!senha.equals(confirmacaoSenha)) {
-            throw new IllegalArgumentException("As senhas não coincidem.");
+            throw new IllegalArgumentException("As senhas não coincidem. Digite novamente.");
         }
 
-        // 4. Monta o objeto e manda pro DAO
-        Usuario novoCliente = new Usuario();
-        novoCliente.setNomeCompleto(nome);
-        novoCliente.setCpf(cpf.replaceAll("[^0-9]", "")); // Limpa a formatação
-        novoCliente.setTelefone(telefone);
-        novoCliente.setUsuarioLogin(login);
-        novoCliente.setSenha(senha);
-        novoCliente.setTipoUsuario("cliente"); // Força o tipo para evitar falhas de segurança
+        // 2. Monta o objeto
+        Usuario u = new Usuario();
+        u.setNomeCompleto(nomeCompleto);
+        u.setCpf(cpf);
+        u.setTelefone(telefone);
+        u.setUsuario(nomeUsuario); 
+        u.setSenha(senha); // Num sistema real, usaríamos criptografia aqui (ex: BCrypt)
+        u.setTipoUsuario("cliente"); // Força o tipo para 'cliente'
         
-        usuarioDAO.cadastrar(novoCliente);
+        // 3. Salva no banco
+        usuarioDAO.cadastrar(u);
+    }
+    
+    public Usuario buscarAdmin(String login) {
+        return usuarioDAO.buscarPorUsuario(login);
+    }
+
+    public void atualizarAdmin(Usuario u, String novaSenha, String confirmacao) {
+        boolean atualizarSenha = false;
+        
+        // Se ele digitou algo na senha, vamos validar e atualizar
+        if (novaSenha != null && !novaSenha.trim().isEmpty()) {
+            if (!novaSenha.equals(confirmacao)) {
+                throw new IllegalArgumentException("As senhas não coincidem!");
+            }
+            u.setSenha(novaSenha);
+            atualizarSenha = true;
+        }
+        
+        usuarioDAO.atualizarAdmin(u, atualizarSenha);
     }
 }

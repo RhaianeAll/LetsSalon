@@ -41,10 +41,36 @@ public class AgendamentoController {
         return agendamentoDAO.listarPendentes();
     }
 
+    // Substitua o seu aprovarAgendamento por este:
     public void aprovarAgendamento(int idAgendamento) {
-        agendamentoDAO.atualizarStatus(idAgendamento, "Confirmado");
+        // Quando aprova, o status muda para "Agendado"
+        agendamentoDAO.atualizarStatus(idAgendamento, "Agendado");
+    }
+    
+    public void atualizarAgendamento(int id, int clienteId, int funcionarioId, int servicoId, LocalDate data, LocalTime hora) {
+        Agendamento a = new Agendamento();
+        a.setIdAgendamento(id);
+        a.setClienteId(clienteId);
+        a.setFuncionarioId(funcionarioId);
+        a.setServicoId(servicoId);
+        a.setDataAgendamento(data);
+        a.setHora(hora);
+        agendamentoDAO.atualizar(a);
     }
 
+    public void excluirAgendamento(int idAgendamento) {
+        agendamentoDAO.excluir(idAgendamento);
+    }
+
+    // Adicione estes dois novos métodos:
+    public List<Agendamento> listarAgendamentosGerais() {
+        return agendamentoDAO.listarAgendamentosGerais();
+    }
+
+    public void alterarStatus(int idAgendamento, String novoStatus) {
+        agendamentoDAO.atualizarStatus(idAgendamento, novoStatus);
+    }
+    
     public void recusarOuCancelarAgendamento(int idAgendamento) {
         agendamentoDAO.atualizarStatus(idAgendamento, "Cancelado");
     }

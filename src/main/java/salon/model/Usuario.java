@@ -5,81 +5,48 @@ public class Usuario {
     private String nomeCompleto;
     private String cpf;
     private String telefone;
-    private String usuarioLogin;
+    private String usuario; // Este é o "login"
     private String senha;
     private String tipoUsuario;
+    private String email;
+    private String cargo;
+    private byte[] foto; // O Java guarda arquivos BYTEA do Postgres como array de bytes
 
-    public Usuario(int idUsuario, String nomeCompleto, String cpf, String telefone, String usuarioLogin, String senha, String tipoUsuario) {
-        this.idUsuario = idUsuario;
-        this.nomeCompleto = nomeCompleto;
-        this.cpf = cpf;
-        this.telefone = telefone;
-        this.usuarioLogin = usuarioLogin;
-        this.senha = senha;
-        this.tipoUsuario = tipoUsuario;
-    }
-
-    public int getIdUsuario() {
-        return idUsuario;
-    }
-
-    public void setIdUsuario(int idUsuario) {
-        this.idUsuario = idUsuario;
-    }
-
-    public String getNomeCompleto() {
-        return nomeCompleto;
-    }
-
-    public void setNomeCompleto(String nomeCompleto) {
-        this.nomeCompleto = nomeCompleto;
-    }
-
-    public String getCpf() {
-        return cpf;
-    }
-
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
-    }
-
-    public String getTelefone() {
-        return telefone;
-    }
-
-    public void setTelefone(String telefone) {
-        this.telefone = telefone;
-    }
-
-    public String getSenha() {
-        return senha;
-    }
-
-    public void setSenha(String senha) {
-        this.senha = senha;
-    }
-
-    public String getTipoUsuario() {
-        return tipoUsuario;
-    }
-
-    public void setTipoUsuario(String tipoUsuario) {
-        this.tipoUsuario = tipoUsuario;
-    }
-
-    
     public Usuario() {}
+        
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public String getUsuarioLogin() { 
-        return usuarioLogin; 
-    }
-    
-    public void setUsuarioLogin(String usuarioLogin) {
-        this.usuarioLogin = usuarioLogin; 
-    }
-    // ... implementar demais getters e setters
+    public String getCargo() { return cargo; }
+    public void setCargo(String cargo) { this.cargo = cargo; }
 
-    public String getFoto() {
-        return null; // Retorna vazio para não quebrar o DAO
+    public byte[] getFoto() { return foto; }
+    public void setFoto(byte[] foto) { this.foto = foto; }
+
+    public int getIdUsuario() { return idUsuario; }
+    public void setIdUsuario(int idUsuario) { this.idUsuario = idUsuario; }
+
+    public String getNomeCompleto() { return nomeCompleto; }
+    public void setNomeCompleto(String nomeCompleto) { this.nomeCompleto = nomeCompleto; }
+
+    public String getCpf() { return cpf; }
+    public void setCpf(String cpf) { this.cpf = cpf; }
+
+    public String getTelefone() { return telefone; }
+    public void setTelefone(String telefone) { this.telefone = telefone; }
+
+    // Usaremos "setUsuario" no lugar daquele "setUsuarioLogin" que estava a dar erro
+    public String getUsuario() { return usuario; }
+    public void setUsuario(String usuario) { this.usuario = usuario; }
+
+    public String getSenha() { return senha; }
+    public void setSenha(String senha) { this.senha = senha; }
+
+    public String getTipoUsuario() { return tipoUsuario; }
+    public void setTipoUsuario(String tipoUsuario) { this.tipoUsuario = tipoUsuario; }
+
+    @Override
+    public String toString() {
+        return this.nomeCompleto;
     }
 }

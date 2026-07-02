@@ -125,22 +125,29 @@ public class CadastroClientePanel extends JPanel {
         // Ação de Cadastro no Banco de Dados
         btnInscrever.addActionListener(e -> {
             try {
-                usuarioController.cadastrarCliente(
-                    txtNome.getText(),
-                    txtCpf.getText(), // O Controller se encarrega de limpar a máscara
-                    txtTelefone.getText(), // O Controller se encarrega de limpar a máscara
-                    txtUsuario.getText(),
-                    new String(txtSenha.getPassword()),
-                    new String(txtConfirmaSenha.getPassword())
-                );
-                JOptionPane.showMessageDialog(this, "Cadastro realizado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-                parentFrame.trocarTela("LoginCliente"); 
+                // Pegue os textos dos campos da sua tela (substitua pelos nomes reais das suas variáveis)
+                String nome = txtNome.getText();
+                String cpf = txtCpf.getText();
+                String telefone = txtTelefone.getText();
+                String usuario = txtUsuario.getText();
+                String senha = new String(txtSenha.getPassword());
+                String confirmaSenha = new String(txtConfirmaSenha.getPassword());
+
+                // Chama o Controller corrigido
+                UsuarioController controller = new UsuarioController();
+                controller.cadastrarCliente(nome, cpf, telefone, usuario, senha, confirmaSenha);
+
+                JOptionPane.showMessageDialog(this, "Cadastro realizado com sucesso! Bem-vindo!");
+
+                // Aqui você pode limpar os campos ou fechar a tela
+
             } catch (IllegalArgumentException ex) {
-                JOptionPane.showMessageDialog(this, ex.getMessage(), "Aviso", JOptionPane.WARNING_MESSAGE);
+                // Erros de campos vazios ou senhas que não batem
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "Atenção", JOptionPane.WARNING_MESSAGE);
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Erro ao conectar com o banco de dados.", "Erro Crítico", JOptionPane.ERROR_MESSAGE);
-                ex.printStackTrace();
-            }
+                // ERRO REAL DO BANCO MOSTRADO AQUI (em vez daquela mensagem genérica)
+                JOptionPane.showMessageDialog(this, "Erro Crítico: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+}
         });
 
         cardPanel.add(Box.createRigidArea(new Dimension(0, 5)));

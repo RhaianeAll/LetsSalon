@@ -41,6 +41,16 @@ public class MainAdministradorView extends JFrame {
         // Pill Central (Nome do Usuário)
         RoundedPanel pillUser = new RoundedPanel(30, Color.decode("#FF6090"));
         pillUser.setLayout(new FlowLayout(FlowLayout.CENTER, 30, 5));
+        
+        pillUser.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Muda o mouse para a "mãozinha"
+        pillUser.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                dispose(); // Fecha o menu
+                //new EditarDadosAdminView(nomeUsuario, nomeEmpresa).setVisible(true); // Abre a tela de edição
+            }
+        });
+        
         JLabel lblNavName = new JLabel(nomeUsuario);
         lblNavName.setFont(new Font("Segoe UI", Font.BOLD, 16));
         lblNavName.setForeground(Color.WHITE);
@@ -200,6 +210,10 @@ public class MainAdministradorView extends JFrame {
                 else if (texto.equals("Agendamentos")) { // <-- NOVA CONEXÃO AQUI!
                     this.dispose(); 
                     new AgendamentosView(nomeUsuario, nomeEmpresa).setVisible(true);
+                }
+                else if (texto.equals("Relatórios")) { // <-- NOVA CONEXÃO AQUI!
+                    this.dispose(); 
+                    new RelatoriosMenuView(nomeUsuario, nomeEmpresa).setVisible(true);
                 }
                 else {
                     // Mantém o aviso para o botão "Relatórios" que ainda falta
