@@ -265,4 +265,116 @@ public class AgendamentoDAO {
         } catch (SQLException e) { e.printStackTrace(); }
         return lista;
     }
+    
+    // ==========================================
+    // MÉTODOS EXCLUSIVOS DO CLIENTE
+    // ==========================================
+    
+    public List<Agendamento> listarAgendamentosDoCliente(int clienteId, String nomeEmpresa) {
+        List<Agendamento> lista = new ArrayList<>();
+        String sql = "SELECT a.*, f.nome AS nome_funcionario, s.nome AS nome_servico " +
+                     "FROM agendamentos a " +
+                     "JOIN funcionarios f ON a.funcionario_id = f.id_funcionario " +
+                     "JOIN servicos s ON a.servico_id = s.id_servico " +
+                     "JOIN empresas e ON a.empresa_id = e.id_empresa " +
+                     "WHERE a.cliente_id = ? AND e.nome_empresa = ? ORDER BY a.data_agendamento DESC, a.hora DESC";
+        try (Connection conn = Conexao.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, clienteId);
+            stmt.setString(2, nomeEmpresa);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Agendamento a = new Agendamento();
+                    a.setIdAgendamento(rs.getInt("id_agendamento"));
+                    a.setDataAgendamento(rs.getDate("data_agendamento").toLocalDate());
+                    a.setHora(rs.getTime("hora").toLocalTime());
+                    a.setStatus(rs.getString("status"));
+                    a.setNomeFuncionario(rs.getString("nome_funcionario"));
+                    a.setNomeServico(rs.getString("nome_servico"));
+                    lista.add(a);
+                }
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return lista;
+    }
+
+    public int contarPendentesDoCliente(int clienteId, String nomeEmpresa) {
+        String sql = "SELECT COUNT(*) FROM agendamentos a JOIN empresas e ON a.empresa_id = e.id_empresa " +
+                     "WHERE a.cliente_id = ? AND e.nome_empresa = ? AND a.status = 'Pendente'";
+        try (Connection conn = Conexao.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, clienteId);
+            stmt.setString(2, nomeEmpresa);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return 0;
+    }
+    
+    public List<Agendamento> listarPendentesDoFuncionario(int idFuncionario) {
+        List<Agendamento> lista = new ArrayList<>();
+        String sql = "SELECT a.*, u.nome_completo AS nome_cliente, u.telefone AS telefone_cliente, " +
+                     "f.nome AS nome_funcionario, s.nome AS nome_servico " +
+                     "FROM agendamentos a " +
+                     "LEFT JOIN usuarios u ON a.cliente_id = u.id_usuario " +
+                     "LEFT JOIN funcionarios f ON a.funcionario_id = f.id_funcionario " +
+                     "LEFT JOIN servicos s ON a.servico_id = s.id_servico " +
+                     "WHERE a.status = 'Pendente' AND a.funcionario_id = ? ORDER BY a.data_agendamento, a.hora";
+        try (Connection conn = Conexao.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, idFuncionario);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Agendamento a = new Agendamento();
+                    a.setIdAgendamento(rs.getInt("id_agendamento"));
+                    a.setClienteId(rs.getInt("cliente_id"));
+                    a.setFuncionarioId(rs.getInt("funcionario_id"));
+                    a.setServicoId(rs.getInt("servico_id"));
+                    if (rs.getDate("data_agendamento") != null) a.setDataAgendamento(rs.getDate("data_agendamento").toLocalDate());
+                    if (rs.getTime("hora") != null) a.setHora(rs.getTime("hora").toLocalTime());
+                    a.setStatus(rs.getString("status"));
+                    a.setNomeCliente(rs.getString("nome_cliente"));
+                    a.setTelefoneCliente(rs.getString("telefone_cliente"));
+                    a.setNomeFuncionario(rs.getString("nome_funcionario"));
+                    a.setNomeServico(rs.getString("nome_servico"));
+                    lista.add(a);
+                }
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return lista;
+    }
+
+    public List<Agendamento> listarGeraisDoFuncionario(int idFuncionario) {
+        List<Agendamento> lista = new ArrayList<>();
+        String sql = "SELECT a.*, u.nome_completo AS nome_cliente, u.telefone AS telefone_cliente, " +
+                     "f.nome AS nome_funcionario, s.nome AS nome_servico " +
+                     "FROM agendamentos a " +
+                     "LEFT JOIN usuarios u ON a.cliente_id = u.id_usuario " +
+                     "LEFT JOIN funcionarios f ON a.funcionario_id = f.id_funcionario " +
+                     "LEFT JOIN servicos s ON a.servico_id = s.id_servico " +
+                     "WHERE a.status != 'Pendente' AND a.funcionario_id = ? ORDER BY a.data_agendamento ASC, a.hora ASC";
+        try (Connection conn = Conexao.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, idFuncionario);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Agendamento a = new Agendamento();
+                    a.setIdAgendamento(rs.getInt("id_agendamento"));
+                    a.setClienteId(rs.getInt("cliente_id"));
+                    a.setFuncionarioId(rs.getInt("funcionario_id"));
+                    a.setServicoId(rs.getInt("servico_id"));
+                    if (rs.getDate("data_agendamento") != null) a.setDataAgendamento(rs.getDate("data_agendamento").toLocalDate());
+                    if (rs.getTime("hora") != null) a.setHora(rs.getTime("hora").toLocalTime());
+                    a.setStatus(rs.getString("status"));
+                    a.setNomeCliente(rs.getString("nome_cliente"));
+                    a.setTelefoneCliente(rs.getString("telefone_cliente"));
+                    a.setNomeFuncionario(rs.getString("nome_funcionario"));
+                    a.setNomeServico(rs.getString("nome_servico"));
+                    lista.add(a);
+                }
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return lista;
+    }
 }

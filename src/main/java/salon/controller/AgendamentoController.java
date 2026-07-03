@@ -24,6 +24,14 @@ public class AgendamentoController {
     public List<Agendamento> listarAgendamentosGeraisPorEmpresa(String nomeEmpresa) {
         return agendamentoDAO.listarAgendamentosGeraisPorEmpresa(nomeEmpresa);
     }
+    
+    public List<Agendamento> listarConfirmacoesPendentesDoFuncionario(int idFuncionario) {
+        return agendamentoDAO.listarPendentesDoFuncionario(idFuncionario);
+    }
+
+    public List<Agendamento> listarAgendamentosGeraisDoFuncionario(int idFuncionario) {
+        return agendamentoDAO.listarGeraisDoFuncionario(idFuncionario);
+    }
 
     public void solicitarAgendamento(int idCliente, int idFuncionario, int idServico, LocalDate data, LocalTime hora, String nomeEmpresa) {
         if (data.isBefore(LocalDate.now())) {
@@ -88,4 +96,14 @@ public class AgendamentoController {
         // Traz apenas 5 resultados para não lotar a tela inicial
         return agendamentoDAO.listarConcluidosAntigosPorEmpresa(nomeEmpresa, dataLimite, 5);
     }
+    
+    public List<Agendamento> listarAgendamentosDoCliente(int clienteId, String nomeEmpresa) {
+        return agendamentoDAO.listarAgendamentosDoCliente(clienteId, nomeEmpresa);
+    }
+
+    public int contarPendentesDoCliente(int clienteId, String nomeEmpresa) {
+        return agendamentoDAO.contarPendentesDoCliente(clienteId, nomeEmpresa);
+    }
+    
+    
 }

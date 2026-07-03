@@ -16,6 +16,14 @@ public class FuncionarioController {
     public List<Funcionario> listarFuncionarios() {
         return funcionarioDAO.listar();
     }
+    
+    public Funcionario fazerLogin(String login, String senha, String codigoEmpresa) {
+        Funcionario f = funcionarioDAO.autenticar(login, senha, codigoEmpresa);
+        if (f == null) {
+            throw new IllegalArgumentException("Funcionário não encontrado ou Código da Empresa inválido.");
+        }
+        return f;
+    }
 
     public void cadastrarFuncionario(String nome, String cpf, String telefone, String login, String senha, String cargo, int empresaId) {
         if (!ValidadorUtil.camposPreenchidos(nome, cpf, telefone, login, senha, cargo)) {

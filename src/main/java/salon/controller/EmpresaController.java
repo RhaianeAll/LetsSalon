@@ -12,6 +12,10 @@ public class EmpresaController {
     public EmpresaController() {
         this.empresaDAO = new EmpresaDAO();
     }
+    
+    public String buscarNomePorId(int idEmpresa) {
+        return empresaDAO.buscarNomePorId(idEmpresa);
+    }
 
     public void cadastrarEmpresa(String nome, String telefone, String email) {
         if (!ValidadorUtil.camposPreenchidos(nome, telefone, email)) {

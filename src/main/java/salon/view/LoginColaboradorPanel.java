@@ -89,29 +89,37 @@ public class LoginColaboradorPanel extends JPanel {
         btnEntrar.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         btnEntrar.addActionListener(e -> {
-            
+            String usuarioDigitado = txtUsuario.getText().trim();
+            String senhaDigitada = new String(txtSenha.getPassword()).trim();
+            String codigoDigitado = txtCodigo.getText().trim();
+
+            if (usuarioDigitado.isEmpty() || senhaDigitada.isEmpty() || codigoDigitado.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Preencha todos os campos.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
             try {
-                // 1. Pegar os textos (Atenção: verifique se o nome das caixinhas está igual ao do seu NetBeans)
-                String codigoDigitado = txtCodigo.getText().trim(); 
-                String usuarioDigitado = txtUsuario.getText().trim(); 
-                String senhaDigitada = new String(txtSenha.getPassword()).trim(); 
+                // TENTATIVA 1: O Utilizador é o Administrador/Dono do Studio?
+                salon.model.Usuario admin = new salon.controller.UsuarioController().fazerLoginColaborador(usuarioDigitado, senhaDigitada, codigoDigitado);
+                
+                // Sucesso! É o dono. Vai para o Lobby de seleção.
+                SwingUtilities.getWindowAncestor(this).dispose();
+                new salon.view.SelecaoEmpresaView(admin.getUsuario()).setVisible(true);
 
-                // 2. Tenta autenticar exigindo as 3 informações
-                UsuarioController controller = new UsuarioController();
-                Usuario userLogado = controller.fazerLoginColaborador(usuarioDigitado, senhaDigitada, codigoDigitado);
+            } catch (IllegalArgumentException exAdmin) {
+                // TENTATIVA 2: Se falhou, será que é um Funcionário?
+                try {
+                    salon.model.Funcionario func = new salon.controller.FuncionarioController().fazerLogin(usuarioDigitado, senhaDigitada, codigoDigitado);
+                    String nomeEmpresa = new salon.controller.EmpresaController().buscarNomePorId(func.getEmpresaId());
+                    
+                    // Sucesso! É um funcionário. Vai direto para a sua agenda privada.
+                    SwingUtilities.getWindowAncestor(this).dispose();
+                    new salon.view.ColaboradorAgendamentosView(func, nomeEmpresa).setVisible(true);
 
-                // 3. Se não deu erro, abre a seleção de empresa
-                if (userLogado.getTipoUsuario().equals("administrador") || userLogado.getTipoUsuario().equals("colaborador")) {
-                    SwingUtilities.getWindowAncestor(this).dispose(); 
-                    new SelecaoEmpresaView(userLogado.getUsuario()).setVisible(true);
-                } else {
-                    JOptionPane.showMessageDialog(this, "Acesso negado.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                } catch (IllegalArgumentException exFunc) {
+                    // Se falhou em ambos, as credenciais estão erradas.
+                    JOptionPane.showMessageDialog(this, "Credenciais inválidas! Verifique usuário, senha e o código do Studio.", "Erro", JOptionPane.ERROR_MESSAGE);
                 }
-
-            } catch (IllegalArgumentException ex) {
-                JOptionPane.showMessageDialog(this, ex.getMessage(), "Erro de Autenticação", JOptionPane.ERROR_MESSAGE);
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Erro: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -129,11 +137,33 @@ public class LoginColaboradorPanel extends JPanel {
         cardPanel.add(Box.createRigidArea(new Dimension(0, 15)));
         cardPanel.add(txtSenha);
         
+        // ... (resto do código para cima)
+        cardPanel.add(txtSenha);
+        
+        // Espaçamento pequeno entre a senha e o texto de esqueci a senha
+        cardPanel.add(Box.createRigidArea(new Dimension(0, 5))); 
+        
         JLabel lblEsqueci = new JLabel("<html><u>Não lembra sua senha? Clique aqui.</u></html>");
-        lblEsqueci.setFont(new Font("Segoe UI", Font.PLAIN, 10));
-        lblEsqueci.setForeground(Color.decode("#D81B60"));
+        lblEsqueci.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        lblEsqueci.setForeground(Color.DARK_GRAY); // Dá um tom mais elegante
+        lblEsqueci.setAlignmentX(Component.CENTER_ALIGNMENT); // Centraliza perfeitamente
+        
         lblEsqueci.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        lblEsqueci.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                // Abre a tela de recuperação por cima de tudo
+                new RecuperarSenhaView((JFrame) SwingUtilities.getWindowAncestor(lblEsqueci)).setVisible(true);
+            }
+        });
+        
+        // A LINHA MÁGICA QUE FALTAVA PARA APARECER NA TELA:
         cardPanel.add(lblEsqueci);
+        
+        // Espaçamento antes do botão Entrar
+        cardPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        cardPanel.add(btnEntrar);
+        // ... (resto do código para baixo)
         
         cardPanel.add(Box.createRigidArea(new Dimension(0, 25)));
         cardPanel.add(btnEntrar);

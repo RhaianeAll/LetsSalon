@@ -81,13 +81,21 @@ public class LoginClientePanel extends JPanel {
         
         btnEntrar.addActionListener(e -> {
             try {
-                if (loginController.fazerLogin(txtUsuario.getText(), new String(txtSenha.getPassword()))) {
-                    JOptionPane.showMessageDialog(this, "Bem-vindo(a)!");
-                } else {
-                    JOptionPane.showMessageDialog(this, "Credenciais incorretas.", "Erro", JOptionPane.ERROR_MESSAGE);
-                }
+                String usuarioDigitado = txtUsuario.getText().trim();
+                String senhaDigitada = new String(txtSenha.getPassword()).trim();
+                
+                salon.controller.UsuarioController controller = new salon.controller.UsuarioController();
+                salon.model.Usuario userLogado = controller.fazerLoginCliente(usuarioDigitado, senhaDigitada);
+                
+                SwingUtilities.getWindowAncestor(this).dispose(); 
+                
+                // MUDANÇA AQUI: Agora chama a nova tela limpa e segura do cliente!
+                new salon.view.SelecaoEmpresaClienteView(userLogado.getUsuario()).setVisible(true);
+                
+            } catch (IllegalArgumentException ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "Erro de Autenticação", JOptionPane.ERROR_MESSAGE);
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, ex.getMessage(), "Aviso", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Erro: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -100,11 +108,33 @@ public class LoginClientePanel extends JPanel {
         cardPanel.add(Box.createRigidArea(new Dimension(0, 15)));
         cardPanel.add(txtSenha);
         
+        // ... (resto do código para cima)
+        cardPanel.add(txtSenha);
+        
+        // Espaçamento pequeno entre a senha e o texto de esqueci a senha
+        cardPanel.add(Box.createRigidArea(new Dimension(0, 5))); 
+        
         JLabel lblEsqueci = new JLabel("<html><u>Não lembra sua senha? Clique aqui.</u></html>");
-        lblEsqueci.setFont(new Font("Segoe UI", Font.PLAIN, 10));
-        lblEsqueci.setForeground(Color.decode("#D81B60"));
+        lblEsqueci.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        lblEsqueci.setForeground(Color.DARK_GRAY); // Dá um tom mais elegante
+        lblEsqueci.setAlignmentX(Component.CENTER_ALIGNMENT); // Centraliza perfeitamente
+        
         lblEsqueci.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        lblEsqueci.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                // Abre a tela de recuperação por cima de tudo
+                new RecuperarSenhaView((JFrame) SwingUtilities.getWindowAncestor(lblEsqueci)).setVisible(true);
+            }
+        });
+        
+        // A LINHA MÁGICA QUE FALTAVA PARA APARECER NA TELA:
         cardPanel.add(lblEsqueci);
+        
+        // Espaçamento antes do botão Entrar
+        cardPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        cardPanel.add(btnEntrar);
+        // ... (resto do código para baixo)
         
         cardPanel.add(Box.createRigidArea(new Dimension(0, 25)));
         cardPanel.add(btnEntrar);

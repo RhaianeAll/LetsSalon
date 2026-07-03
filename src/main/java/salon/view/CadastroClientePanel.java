@@ -125,7 +125,7 @@ public class CadastroClientePanel extends JPanel {
         // Ação de Cadastro no Banco de Dados
         btnInscrever.addActionListener(e -> {
             try {
-                // Pegue os textos dos campos da sua tela (substitua pelos nomes reais das suas variáveis)
+                // Pegue os textos dos campos da sua tela
                 String nome = txtNome.getText();
                 String cpf = txtCpf.getText();
                 String telefone = txtTelefone.getText();
@@ -133,21 +133,24 @@ public class CadastroClientePanel extends JPanel {
                 String senha = new String(txtSenha.getPassword());
                 String confirmaSenha = new String(txtConfirmaSenha.getPassword());
 
-                // Chama o Controller corrigido
+                // Chama o Controller
                 UsuarioController controller = new UsuarioController();
                 controller.cadastrarCliente(nome, cpf, telefone, usuario, senha, confirmaSenha);
 
                 JOptionPane.showMessageDialog(this, "Cadastro realizado com sucesso! Bem-vindo!");
 
-                // Aqui você pode limpar os campos ou fechar a tela
+                // ---> A MÁGICA AQUI: Redireciona para o Login e limpa as senhas da memória! <---
+                txtSenha.setText("");
+                txtConfirmaSenha.setText("");
+                parentFrame.trocarTela("LoginCliente");
 
             } catch (IllegalArgumentException ex) {
                 // Erros de campos vazios ou senhas que não batem
                 JOptionPane.showMessageDialog(this, ex.getMessage(), "Atenção", JOptionPane.WARNING_MESSAGE);
             } catch (Exception ex) {
-                // ERRO REAL DO BANCO MOSTRADO AQUI (em vez daquela mensagem genérica)
+                // ERRO REAL DO BANCO
                 JOptionPane.showMessageDialog(this, "Erro Crítico: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
-}
+            }
         });
 
         cardPanel.add(Box.createRigidArea(new Dimension(0, 5)));

@@ -101,4 +101,16 @@ public class EmpresaDAO {
         }
         return -1; // Retorna -1 se der erro ou a empresa não for encontrada
     }
+    
+    public String buscarNomePorId(int idEmpresa) {
+        String sql = "SELECT nome_empresa FROM empresas WHERE id_empresa = ?";
+        try (Connection conn = Conexao.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, idEmpresa);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return rs.getString("nome_empresa");
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return "Studio";
+    }
 }

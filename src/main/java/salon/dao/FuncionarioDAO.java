@@ -103,4 +103,30 @@ public class FuncionarioDAO {
         } catch (SQLException e) { e.printStackTrace(); }
         return lista;
     }
+    
+    // Autentica o funcionário garantindo que a senha está correta e que o código da empresa bate com o do Administrador
+    public Funcionario autenticar(String login, String senha, String codigoEmpresa) {
+        String sql = "SELECT f.* FROM funcionarios f " +
+                     "WHERE f.login = ? AND f.senha = ? " +
+                     "AND EXISTS (SELECT 1 FROM usuarios u WHERE u.codigo_empresa = ?)";
+        try (Connection conn = Conexao.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, login.trim());
+            stmt.setString(2, senha.trim());
+            stmt.setString(3, codigoEmpresa.trim());
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Funcionario f = new Funcionario();
+                    f.setIdFuncionario(rs.getInt("id_funcionario"));
+                    f.setNome(rs.getString("nome"));
+                    f.setCargo(rs.getString("cargo"));
+                    f.setLogin(rs.getString("login"));
+                    f.setSenha(rs.getString("senha"));
+                    f.setEmpresaId(rs.getInt("empresa_id"));
+                    return f;
+                }
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return null;
+    }
 }
