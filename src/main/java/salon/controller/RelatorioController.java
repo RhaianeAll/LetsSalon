@@ -10,20 +10,19 @@ public class RelatorioController {
         this.relatorioDAO = new RelatorioDAO();
     }
 
-    public List<Object[]> getRegistroAtendimentos() {
-        return relatorioDAO.gerarRegistroAtendimentos();
+    public List<Object[]> getRegistroAtendimentos(String nomeEmpresa) {
+        return relatorioDAO.gerarRegistroAtendimentos(nomeEmpresa);
     }
     
-    // Adicione no RelatorioController.java
-    public List<Object[]> getRelatorioFinanceiro() {
-        return relatorioDAO.gerarRelatorioFinanceiro();
+    public List<Object[]> getRelatorioFinanceiro(String nomeEmpresa) {
+        return relatorioDAO.gerarRelatorioFinanceiro(nomeEmpresa);
     }
     
-    public List<Object[]> getRelatorioGeral() {
-        return relatorioDAO.gerarRelatorioGeral();
+    public List<Object[]> getRelatorioGeral(String nomeEmpresa) {
+        return relatorioDAO.gerarRelatorioGeral(nomeEmpresa);
     }
 
-    public List<Object[]> getRelatorioParcial() {
-        return relatorioDAO.gerarRelatorioParcial();
+    public List<Object[]> getRelatorioParcial(String nomeEmpresa) {
+        return relatorioDAO.gerarRelatorioParcial(nomeEmpresa);
     }
 }

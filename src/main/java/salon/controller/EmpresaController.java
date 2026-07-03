@@ -13,7 +13,6 @@ public class EmpresaController {
         this.empresaDAO = new EmpresaDAO();
     }
 
-    // CADASTRA
     public void cadastrarEmpresa(String nome, String telefone, String email) {
         if (!ValidadorUtil.camposPreenchidos(nome, telefone, email)) {
             throw new IllegalArgumentException("Todos os campos da empresa (Nome, Telefone e E-mail) são obrigatórios.");
@@ -30,12 +29,10 @@ public class EmpresaController {
         empresaDAO.cadastrar(empresa);
     }
     
-    // LISTA
     public List<Empresa> listarEmpresas() {
         return empresaDAO.listarTodas();
     }
 
-    // ATUALIZA
     public void atualizarEmpresa(int id, String nome, String telefone, String email) {
         if (!ValidadorUtil.camposPreenchidos(nome, telefone, email)) {
             throw new IllegalArgumentException("Todos os campos da empresa são obrigatórios para atualização.");
@@ -48,8 +45,12 @@ public class EmpresaController {
         empresaDAO.atualizar(empresa);
     }
 
-    // EXCLUI
     public void excluirEmpresa(int id) {
         empresaDAO.excluir(id);
+    }
+
+    // NOVO: Método que as Views vão usar para descobrir o ID da empresa logada!
+    public int buscarIdPorNome(String nomeEmpresa) {
+        return empresaDAO.buscarIdPorNome(nomeEmpresa);
     }
 }

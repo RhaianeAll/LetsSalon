@@ -73,9 +73,6 @@ public class AgendamentosView extends JFrame {
         BackgroundPanel mainBg = new BackgroundPanel("/images/grafico_apoio.png", new BorderLayout());
         setContentPane(mainBg);
 
-        // ==========================================
-        // NAVBAR SUPERIOR (RECUPERADA E CORRIGIDA)
-        // ==========================================
         JPanel navbar = new JPanel(new BorderLayout());
         navbar.setBackground(Color.decode("#F48FB1"));
         navbar.setPreferredSize(new Dimension(0, 70));
@@ -92,77 +89,36 @@ public class AgendamentosView extends JFrame {
         lblNavName.setForeground(Color.WHITE);
         pillUser.add(lblNavName);
         
-        JPanel navCenter = new JPanel(new FlowLayout(FlowLayout.CENTER)); 
-        navCenter.setOpaque(false); 
-        navCenter.add(pillUser);
+        JPanel navCenter = new JPanel(new FlowLayout(FlowLayout.CENTER)); navCenter.setOpaque(false); navCenter.add(pillUser);
         
-        JPanel navRight = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0)); 
-        navRight.setOpaque(false);
+        JPanel navRight = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0)); navRight.setOpaque(false);
         JLabel lblStudio = new JLabel(nomeEmpresa); 
         lblStudio.setFont(new Font("Segoe UI", Font.ITALIC, 18)); 
         lblStudio.setForeground(Color.WHITE);
         
         JButton btnVoltar = new JButton("↩ Voltar"); 
-        btnVoltar.setContentAreaFilled(false); 
-        btnVoltar.setBorderPainted(false);
-        btnVoltar.setFont(new Font("Segoe UI", Font.BOLD, 14)); 
-        btnVoltar.setForeground(Color.WHITE); 
-        btnVoltar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnVoltar.setContentAreaFilled(false); btnVoltar.setBorderPainted(false);
+        btnVoltar.setFont(new Font("Segoe UI", Font.BOLD, 14)); btnVoltar.setForeground(Color.WHITE); btnVoltar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnVoltar.addActionListener(e -> { this.dispose(); new MainAdministradorView(nomeUsuario, nomeEmpresa).setVisible(true); });
         
-        // --- Redirecionamento para o menu do colaborador ---
-        btnVoltar.addActionListener(e -> { 
-            this.dispose(); 
-            new MainAdministradorView(nomeUsuario, nomeEmpresa).setVisible(true); 
-        });
-        
-        navRight.add(lblStudio); 
-        navRight.add(btnVoltar);
-        navbar.add(lblNavLogo, BorderLayout.WEST); 
-        navbar.add(navCenter, BorderLayout.CENTER); 
-        navbar.add(navRight, BorderLayout.EAST);
-        
-        mainBg.add(navbar, BorderLayout.NORTH); // Adiciona a barra no topo da tela
+        navRight.add(lblStudio); navRight.add(btnVoltar);
+        navbar.add(lblNavLogo, BorderLayout.WEST); navbar.add(navCenter, BorderLayout.CENTER); navbar.add(navRight, BorderLayout.EAST);
+        mainBg.add(navbar, BorderLayout.NORTH); 
 
-        // ==========================================
-        // CONTEÚDO PRINCIPAL DA TELA
-        // ==========================================
-        JPanel contentPanel = new JPanel();
-        contentPanel.setOpaque(false);
-        contentPanel.setLayout(new BorderLayout(20, 20));
-        contentPanel.setBorder(BorderFactory.createEmptyBorder(40, 60, 40, 60));
-
-        JPanel topPanel = new JPanel(new GridLayout(1, 2, 50, 0));
-        topPanel.setOpaque(false);
-        topPanel.add(criarFormulario());
-        topPanel.add(criarCalendarioVisual());
-        
+        JPanel contentPanel = new JPanel(); contentPanel.setOpaque(false); contentPanel.setLayout(new BorderLayout(20, 20)); contentPanel.setBorder(BorderFactory.createEmptyBorder(40, 60, 40, 60));
+        JPanel topPanel = new JPanel(new GridLayout(1, 2, 50, 0)); topPanel.setOpaque(false);
+        topPanel.add(criarFormulario()); topPanel.add(criarCalendarioVisual());
         JPanel painelBusca = criarBarraDeBusca();
 
-        JPanel bottomPanel = new JPanel();
-        bottomPanel.setOpaque(false);
-        bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
-        bottomPanel.add(criarPainelPendentes());
-        bottomPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-        bottomPanel.add(painelBusca);
-        bottomPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        bottomPanel.add(criarPainelGeral());
+        JPanel bottomPanel = new JPanel(); bottomPanel.setOpaque(false); bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
+        bottomPanel.add(criarPainelPendentes()); bottomPanel.add(Box.createRigidArea(new Dimension(0, 20))); bottomPanel.add(painelBusca);
+        bottomPanel.add(Box.createRigidArea(new Dimension(0, 10))); bottomPanel.add(criarPainelGeral());
 
-        contentPanel.add(topPanel, BorderLayout.NORTH);
-        contentPanel.add(bottomPanel, BorderLayout.CENTER);
-
-        JScrollPane scroll = new JScrollPane(contentPanel);
-        scroll.setOpaque(false); 
-        scroll.getViewport().setOpaque(false); 
-        scroll.setBorder(null);
-        
-        // --- A MÁGICA PARA DEIXAR O SCROLL RÁPIDO E FLUIDO ---
-        scroll.getVerticalScrollBar().setUnitIncrement(25); // O número 25 representa a velocidade (pode aumentar se quiser mais rápido)
-        
+        contentPanel.add(topPanel, BorderLayout.NORTH); contentPanel.add(bottomPanel, BorderLayout.CENTER);
+        JScrollPane scroll = new JScrollPane(contentPanel); scroll.setOpaque(false); scroll.getViewport().setOpaque(false); scroll.setBorder(null); scroll.getVerticalScrollBar().setUnitIncrement(25); 
         mainBg.add(scroll, BorderLayout.CENTER);
         
-        desenharCalendario();
-        carregarComboBoxes();
-        carregarTabelas();
+        desenharCalendario(); carregarComboBoxes(); carregarTabelas();
     }
 
     private JPanel criarFormulario() {
@@ -199,16 +155,14 @@ public class AgendamentosView extends JFrame {
                     JOptionPane.showMessageDialog(this, "Selecione opções válidas.", "Aviso", JOptionPane.WARNING_MESSAGE); return;
                 }
                 
-                agendamentoController.solicitarAgendamento(cli.getIdUsuario(), fun.getIdFuncionario(), ser.getIdServico(), data, hora);
+                agendamentoController.solicitarAgendamento(cli.getIdUsuario(), fun.getIdFuncionario(), ser.getIdServico(), data, hora, this.nomeEmpresa);
                 JOptionPane.showMessageDialog(this, "Agendamento solicitado com sucesso!");
                 carregarTabelas(); limparCampos();
             } catch (Exception ex) { JOptionPane.showMessageDialog(this, ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE); }
         });
 
         btnAtualizar.addActionListener(e -> {
-            if (txtIdAgendamento.getText().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Selecione um agendamento na tabela primeiro.", "Aviso", JOptionPane.WARNING_MESSAGE); return;
-            }
+            if (txtIdAgendamento.getText().isEmpty()) { JOptionPane.showMessageDialog(this, "Selecione um agendamento na tabela primeiro."); return; }
             try {
                 int id = Integer.parseInt(txtIdAgendamento.getText());
                 LocalDate data = LocalDate.parse(txtData.getText(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
@@ -240,137 +194,101 @@ public class AgendamentosView extends JFrame {
     }
 
     private JPanel criarCalendarioVisual() {
-        RoundedPanel p = new RoundedPanel(30, Color.decode("#FFF0F5"));
-        p.setBorder(BorderFactory.createLineBorder(Color.decode("#D81B60"), 3));
-        p.setLayout(new BorderLayout());
-        
+        RoundedPanel p = new RoundedPanel(30, Color.decode("#FFF0F5")); p.setBorder(BorderFactory.createLineBorder(Color.decode("#D81B60"), 3)); p.setLayout(new BorderLayout());
         JPanel header = new JPanel(new BorderLayout()); header.setOpaque(false); header.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         lblMesAno = new JLabel("", SwingConstants.CENTER); lblMesAno.setFont(new Font("Segoe UI Black", Font.BOLD, 22)); lblMesAno.setForeground(Color.decode("#D81B60"));
         JButton btnPrev = new JButton("<"); JButton btnNext = new JButton(">");
-        btnPrev.addActionListener(e -> { mesAtual = mesAtual.minusMonths(1); desenharCalendario(); });
-        btnNext.addActionListener(e -> { mesAtual = mesAtual.plusMonths(1); desenharCalendario(); });
-        header.add(btnPrev, BorderLayout.WEST); header.add(lblMesAno, BorderLayout.CENTER); header.add(btnNext, BorderLayout.EAST);
-        p.add(header, BorderLayout.NORTH);
-
-        JPanel body = new JPanel(new BorderLayout()); body.setOpaque(false);
-        JPanel diasSemana = new JPanel(new GridLayout(1, 7)); diasSemana.setOpaque(false);
+        btnPrev.addActionListener(e -> { mesAtual = mesAtual.minusMonths(1); desenharCalendario(); }); btnNext.addActionListener(e -> { mesAtual = mesAtual.plusMonths(1); desenharCalendario(); });
+        header.add(btnPrev, BorderLayout.WEST); header.add(lblMesAno, BorderLayout.CENTER); header.add(btnNext, BorderLayout.EAST); p.add(header, BorderLayout.NORTH);
+        JPanel body = new JPanel(new BorderLayout()); body.setOpaque(false); JPanel diasSemana = new JPanel(new GridLayout(1, 7)); diasSemana.setOpaque(false);
         String[] dias = {"DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SÁB"};
-        for (String d : dias) {
-            JLabel l = new JLabel(d, SwingConstants.CENTER); l.setFont(new Font("Segoe UI", Font.BOLD, 12)); l.setForeground(Color.decode("#FF6090")); diasSemana.add(l);
-        }
-        body.add(diasSemana, BorderLayout.NORTH);
-        
-        panelDiasCalendario = new JPanel(new GridLayout(0, 7, 5, 5)); panelDiasCalendario.setOpaque(false); panelDiasCalendario.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        body.add(panelDiasCalendario, BorderLayout.CENTER);
-        p.add(body, BorderLayout.CENTER);
+        for (String d : dias) { JLabel l = new JLabel(d, SwingConstants.CENTER); l.setFont(new Font("Segoe UI", Font.BOLD, 12)); l.setForeground(Color.decode("#FF6090")); diasSemana.add(l); }
+        body.add(diasSemana, BorderLayout.NORTH); panelDiasCalendario = new JPanel(new GridLayout(0, 7, 5, 5)); panelDiasCalendario.setOpaque(false); panelDiasCalendario.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        body.add(panelDiasCalendario, BorderLayout.CENTER); p.add(body, BorderLayout.CENTER);
         return p;
     }
 
     private JPanel criarBarraDeBusca() {
-        JPanel searchBar = new JPanel(new BorderLayout()); searchBar.setOpaque(false); 
-        searchBar.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        searchBar.setAlignmentX(Component.LEFT_ALIGNMENT);
-        
+        JPanel searchBar = new JPanel(new BorderLayout()); searchBar.setOpaque(false); searchBar.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40)); searchBar.setAlignmentX(Component.LEFT_ALIGNMENT);
         JPanel pnlBusca = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0)); pnlBusca.setOpaque(false);
-        JLabel lblBusca = new JLabel("Buscar (Data, Nome, Serviço):"); 
-        lblBusca.setFont(new Font("Segoe UI Black", Font.BOLD, 14)); lblBusca.setForeground(Color.decode("#D81B60"));
-        
-        txtBusca = new JTextField(25); 
-        txtBusca.setBorder(BorderFactory.createLineBorder(Color.decode("#FFCDD2"), 2, true));
-        
+        JLabel lblBusca = new JLabel("Buscar (Data, Nome, Serviço):"); lblBusca.setFont(new Font("Segoe UI Black", Font.BOLD, 14)); lblBusca.setForeground(Color.decode("#D81B60"));
+        txtBusca = new JTextField(25); txtBusca.setBorder(BorderFactory.createLineBorder(Color.decode("#FFCDD2"), 2, true));
         txtBusca.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
-            public void insertUpdate(javax.swing.event.DocumentEvent e) { filtrarTabelaGeral(); }
-            public void removeUpdate(javax.swing.event.DocumentEvent e) { filtrarTabelaGeral(); }
-            public void changedUpdate(javax.swing.event.DocumentEvent e) { filtrarTabelaGeral(); }
+            public void insertUpdate(javax.swing.event.DocumentEvent e) { filtrarTabelaGeral(); } public void removeUpdate(javax.swing.event.DocumentEvent e) { filtrarTabelaGeral(); } public void changedUpdate(javax.swing.event.DocumentEvent e) { filtrarTabelaGeral(); }
         });
-
         pnlBusca.add(lblBusca); pnlBusca.add(txtBusca); 
-        
         JLabel lblFiltrar = new JLabel("Filtrar ≡"); lblFiltrar.setFont(new Font("Segoe UI Black", Font.BOLD, 14)); lblFiltrar.setForeground(Color.decode("#D81B60"));
         searchBar.add(pnlBusca, BorderLayout.WEST); searchBar.add(lblFiltrar, BorderLayout.EAST);
-        
         return searchBar;
     }
 
     private void filtrarTabelaGeral() {
-        if (sorterGeral != null) {
-            String texto = txtBusca.getText();
-            if (texto.trim().length() == 0) {
-                sorterGeral.setRowFilter(null);
-            } else {
-                sorterGeral.setRowFilter(RowFilter.regexFilter("(?i)" + texto));
-            }
-        }
+        if (sorterGeral != null) { String texto = txtBusca.getText(); if (texto.trim().length() == 0) { sorterGeral.setRowFilter(null); } else { sorterGeral.setRowFilter(RowFilter.regexFilter("(?i)" + texto)); } }
     }
 
+    // ==========================================
+    // TABELA DE PENDENTES (AGORA COM 2 AÇÕES)
+    // ==========================================
     private JPanel criarPainelPendentes() {
-        JPanel p = new JPanel(new BorderLayout()); p.setOpaque(false);
-        JLabel lbl = new JLabel("Confirmações de Agendamentos Pendentes:");
-        lbl.setFont(new Font("Segoe UI Black", Font.BOLD, 18)); lbl.setForeground(Color.decode("#D81B60"));
-        p.add(lbl, BorderLayout.NORTH);
-
-        String[] col = {"Ação", "Nome do Cliente", "Telefone", "Data", "Hora", "ID"};
-        modelPendentes = new DefaultTableModel(new Object[][]{}, col) { @Override public boolean isCellEditable(int r, int c) { return false; } };
-        tabelaPendentes = new JTable(modelPendentes);
-        tabelaPendentes.setRowHeight(35); tabelaPendentes.getTableHeader().setBackground(Color.decode("#FF6090")); tabelaPendentes.getTableHeader().setForeground(Color.WHITE);
+        JPanel p = new JPanel(new BorderLayout()); p.setOpaque(false); 
+        JLabel lbl = new JLabel("Confirmações de Agendamentos Pendentes:"); 
+        lbl.setFont(new Font("Segoe UI Black", Font.BOLD, 18)); lbl.setForeground(Color.decode("#D81B60")); p.add(lbl, BorderLayout.NORTH);
         
-        tabelaPendentes.getColumnModel().getColumn(5).setMinWidth(0); tabelaPendentes.getColumnModel().getColumn(5).setMaxWidth(0); tabelaPendentes.getColumnModel().getColumn(5).setWidth(0);
+        // Criada a coluna Rejeitar e movido o ID para o índice 6
+        String[] col = {"Confirmar", "Rejeitar", "Nome do Cliente", "Telefone", "Data", "Hora", "ID"};
+        modelPendentes = new DefaultTableModel(new Object[][]{}, col) { @Override public boolean isCellEditable(int r, int c) { return false; } };
+        tabelaPendentes = new JTable(modelPendentes); tabelaPendentes.setRowHeight(35); 
+        tabelaPendentes.getTableHeader().setBackground(Color.decode("#FF6090")); tabelaPendentes.getTableHeader().setForeground(Color.WHITE);
+        
+        // Oculta a coluna de ID (índice 6)
+        tabelaPendentes.getColumnModel().getColumn(6).setMinWidth(0); 
+        tabelaPendentes.getColumnModel().getColumn(6).setMaxWidth(0); 
+        tabelaPendentes.getColumnModel().getColumn(6).setWidth(0);
 
         tabelaPendentes.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                int col = tabelaPendentes.columnAtPoint(e.getPoint());
+                int col = tabelaPendentes.columnAtPoint(e.getPoint()); 
                 int row = tabelaPendentes.rowAtPoint(e.getPoint());
-                if (col == 0 && row != -1) { 
-                    int idAgendamento = Integer.parseInt(tabelaPendentes.getValueAt(row, 5).toString());
-                    if (JOptionPane.showConfirmDialog(null, "Confirmar este agendamento?", "Aviso", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                        try {
-                            agendamentoController.aprovarAgendamento(idAgendamento);
-                            carregarTabelas(); 
-                        } catch (Exception ex) { JOptionPane.showMessageDialog(null, "Erro: " + ex.getMessage()); }
+                
+                if (row != -1) { 
+                    int idAgendamento = Integer.parseInt(tabelaPendentes.getValueAt(row, 6).toString());
+                    
+                    // Coluna 0 (Confirmar)
+                    if (col == 0) {
+                        if (JOptionPane.showConfirmDialog(null, "Confirmar este agendamento?", "Aviso", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                            try { agendamentoController.aprovarAgendamento(idAgendamento); carregarTabelas(); } catch (Exception ex) {}
+                        }
+                    }
+                    // Coluna 1 (Rejeitar)
+                    else if (col == 1) {
+                        if (JOptionPane.showConfirmDialog(null, "Tem a certeza que deseja REJEITAR este agendamento?", "Atenção", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+                            try { agendamentoController.recusarOuCancelarAgendamento(idAgendamento); carregarTabelas(); } catch (Exception ex) {}
+                        }
                     }
                 }
             }
         });
-        
-        JScrollPane scroll = new JScrollPane(tabelaPendentes); scroll.setPreferredSize(new Dimension(0, 200));
-        p.add(scroll, BorderLayout.CENTER);
+        JScrollPane scroll = new JScrollPane(tabelaPendentes); scroll.setPreferredSize(new Dimension(0, 200)); p.add(scroll, BorderLayout.CENTER);
         return p;
     }
 
     private JPanel criarPainelGeral() {
-        JPanel p = new JPanel(new BorderLayout()); p.setOpaque(false);
-        JLabel lbl = new JLabel("Agenda Geral:");
-        lbl.setFont(new Font("Segoe UI Black", Font.BOLD, 18)); lbl.setForeground(Color.decode("#D81B60"));
-        p.add(lbl, BorderLayout.NORTH);
-
+        JPanel p = new JPanel(new BorderLayout()); p.setOpaque(false); JLabel lbl = new JLabel("Agenda Geral:"); lbl.setFont(new Font("Segoe UI Black", Font.BOLD, 18)); lbl.setForeground(Color.decode("#D81B60")); p.add(lbl, BorderLayout.NORTH);
         String[] colGeral = {"Data", "Hora", "Cliente", "Funcionário", "Serviço", "Insumos Necessários", "Status", "ID"};
-        
-        modelGeral = new DefaultTableModel(new Object[][]{}, colGeral) { 
-            @Override public boolean isCellEditable(int r, int c) { return c == 6; } 
-        };
-        
-        tabelaGeral = new JTable(modelGeral);
-        tabelaGeral.setRowHeight(40); tabelaGeral.setSelectionBackground(Color.decode("#FFCDD2")); tabelaGeral.setSelectionForeground(Color.decode("#D81B60"));
-        tabelaGeral.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12)); tabelaGeral.getTableHeader().setBackground(Color.decode("#F5F5F5"));
-        
-        sorterGeral = new TableRowSorter<>(modelGeral);
-        tabelaGeral.setRowSorter(sorterGeral);
-        
+        modelGeral = new DefaultTableModel(new Object[][]{}, colGeral) { @Override public boolean isCellEditable(int r, int c) { return c == 6; } };
+        tabelaGeral = new JTable(modelGeral); tabelaGeral.setRowHeight(40); tabelaGeral.setSelectionBackground(Color.decode("#FFCDD2")); tabelaGeral.setSelectionForeground(Color.decode("#D81B60")); tabelaGeral.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12)); tabelaGeral.getTableHeader().setBackground(Color.decode("#F5F5F5"));
+        sorterGeral = new TableRowSorter<>(modelGeral); tabelaGeral.setRowSorter(sorterGeral);
         tabelaGeral.getColumnModel().getColumn(7).setMinWidth(0); tabelaGeral.getColumnModel().getColumn(7).setMaxWidth(0); tabelaGeral.getColumnModel().getColumn(7).setWidth(0);
 
-        JComboBox<String> cbStatus = new JComboBox<>(new String[]{"Agendado", "Em andamento", "Concluído"});
+        JComboBox<String> cbStatus = new JComboBox<>(new String[]{"Agendado", "Em andamento", "Concluído", "Cancelado"});
         tabelaGeral.getColumnModel().getColumn(6).setCellEditor(new DefaultCellEditor(cbStatus));
 
         modelGeral.addTableModelListener(e -> {
             if (e.getType() == TableModelEvent.UPDATE && e.getColumn() == 6) {
-                int row = e.getFirstRow();
-                int modelRow = tabelaGeral.convertRowIndexToModel(row); 
-                String novoStatus = (String) modelGeral.getValueAt(modelRow, 6);
-                int idAgendamento = Integer.parseInt(modelGeral.getValueAt(modelRow, 7).toString());
-                try {
-                    agendamentoController.alterarStatus(idAgendamento, novoStatus);
-                } catch (Exception ex) { JOptionPane.showMessageDialog(null, "Erro ao atualizar status: " + ex.getMessage()); }
+                int row = e.getFirstRow(); int modelRow = tabelaGeral.convertRowIndexToModel(row); 
+                String novoStatus = (String) modelGeral.getValueAt(modelRow, 6); int idAgendamento = Integer.parseInt(modelGeral.getValueAt(modelRow, 7).toString());
+                try { agendamentoController.alterarStatus(idAgendamento, novoStatus); } catch (Exception ex) {}
             }
         });
         
@@ -380,30 +298,18 @@ public class AgendamentosView extends JFrame {
                 int linhaView = tabelaGeral.getSelectedRow();
                 if (linhaView != -1) {
                     int linha = tabelaGeral.convertRowIndexToModel(linhaView);
-                    txtData.setText(modelGeral.getValueAt(linha, 0).toString());
-                    txtHora.setText(modelGeral.getValueAt(linha, 1).toString());
-                    
-                    selecionarItemCombo(cbCliente, modelGeral.getValueAt(linha, 2).toString());
-                    selecionarItemCombo(cbFuncionario, modelGeral.getValueAt(linha, 3).toString());
-                    selecionarItemCombo(cbServico, modelGeral.getValueAt(linha, 4).toString());
-                    
+                    txtData.setText(modelGeral.getValueAt(linha, 0).toString()); txtHora.setText(modelGeral.getValueAt(linha, 1).toString());
+                    selecionarItemCombo(cbCliente, modelGeral.getValueAt(linha, 2).toString()); selecionarItemCombo(cbFuncionario, modelGeral.getValueAt(linha, 3).toString()); selecionarItemCombo(cbServico, modelGeral.getValueAt(linha, 4).toString());
                     txtIdAgendamento.setText(modelGeral.getValueAt(linha, 7).toString());
                 }
             }
         });
-
-        JScrollPane scroll = new JScrollPane(tabelaGeral); scroll.setBorder(BorderFactory.createLineBorder(Color.decode("#F48FB1"), 4));
-        p.add(scroll, BorderLayout.CENTER);
+        JScrollPane scroll = new JScrollPane(tabelaGeral); scroll.setBorder(BorderFactory.createLineBorder(Color.decode("#F48FB1"), 4)); p.add(scroll, BorderLayout.CENTER);
         return p;
     }
 
     private void selecionarItemCombo(JComboBox<?> combo, String textoProcurado) {
-        for (int i = 0; i < combo.getItemCount(); i++) {
-            if (combo.getItemAt(i).toString().equals(textoProcurado)) {
-                combo.setSelectedIndex(i);
-                return;
-            }
-        }
+        for (int i = 0; i < combo.getItemCount(); i++) { if (combo.getItemAt(i).toString().equals(textoProcurado)) { combo.setSelectedIndex(i); return; } }
     }
 
     private void carregarComboBoxes() {
@@ -415,77 +321,53 @@ public class AgendamentosView extends JFrame {
 
         try {
             for (Usuario u : usuarioController.listarUsuarios()) cbCliente.addItem(u);
-            for (Funcionario f : funcionarioController.listarFuncionarios()) cbFuncionario.addItem(f);
-            for (Servico s : servicoController.listarServicos()) cbServico.addItem(s);
+            for (Funcionario f : funcionarioController.listarFuncionarios(this.nomeEmpresa)) cbFuncionario.addItem(f);
+            for (Servico s : servicoController.listarServicos(this.nomeEmpresa)) cbServico.addItem(s);
         } catch (Exception e) {}
     }
 
     private void desenharCalendario() {
         panelDiasCalendario.removeAll();
-        
-        String nomeMes = mesAtual.getMonth().getDisplayName(TextStyle.FULL, localeBR).toUpperCase();
-        lblMesAno.setText(nomeMes + " " + mesAtual.getYear());
-
-        LocalDate primeiroDia = mesAtual.atDay(1);
-        int diaDaSemanaInicio = primeiroDia.getDayOfWeek().getValue() % 7; 
-        int diasNoMes = mesAtual.lengthOfMonth();
-
+        String nomeMes = mesAtual.getMonth().getDisplayName(TextStyle.FULL, localeBR).toUpperCase(); lblMesAno.setText(nomeMes + " " + mesAtual.getYear());
+        LocalDate primeiroDia = mesAtual.atDay(1); int diaDaSemanaInicio = primeiroDia.getDayOfWeek().getValue() % 7; int diasNoMes = mesAtual.lengthOfMonth();
         for (int i = 0; i < diaDaSemanaInicio; i++) panelDiasCalendario.add(new JLabel(""));
-
         for (int i = 1; i <= diasNoMes; i++) {
-            JButton btnDia = new JButton(String.valueOf(i));
-            btnDia.setFont(new Font("Segoe UI", Font.BOLD, 14)); btnDia.setBackground(Color.WHITE); btnDia.setForeground(Color.decode("#D81B60")); 
-            btnDia.setFocusPainted(false); btnDia.setBorder(BorderFactory.createLineBorder(Color.decode("#FFCDD2")));
-            final int d = i;
-            
-            btnDia.addActionListener(e -> {
-                String dataFormatada = String.format("%02d/%02d/%d", d, mesAtual.getMonthValue(), mesAtual.getYear());
-                txtData.setText(dataFormatada);
-                txtBusca.setText(dataFormatada); 
-            });
+            JButton btnDia = new JButton(String.valueOf(i)); btnDia.setFont(new Font("Segoe UI", Font.BOLD, 14)); btnDia.setBackground(Color.WHITE); btnDia.setForeground(Color.decode("#D81B60")); btnDia.setFocusPainted(false); btnDia.setBorder(BorderFactory.createLineBorder(Color.decode("#FFCDD2")));
+            final int d = i; btnDia.addActionListener(e -> { String dataFormatada = String.format("%02d/%02d/%d", d, mesAtual.getMonthValue(), mesAtual.getYear()); txtData.setText(dataFormatada); txtBusca.setText(dataFormatada); });
             panelDiasCalendario.add(btnDia);
         }
         panelDiasCalendario.revalidate(); panelDiasCalendario.repaint();
     }
 
     private void carregarTabelas() {
-        modelPendentes.setRowCount(0);
-        modelGeral.setRowCount(0);
+        modelPendentes.setRowCount(0); modelGeral.setRowCount(0);
         try {
-            for (Agendamento a : agendamentoController.listarConfirmacoesPendentes()) {
+            for (Agendamento a : agendamentoController.listarConfirmacoesPendentesPorEmpresa(this.nomeEmpresa)) {
                 String data = a.getDataAgendamento().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                modelPendentes.addRow(new Object[]{"✅ Confirmar", a.getNomeCliente(), a.getTelefoneCliente(), data, a.getHora().toString(), a.getIdAgendamento()});
+                
+                // MÁGICA: Agora temos a opção de Confirmar ou Rejeitar!
+                modelPendentes.addRow(new Object[]{"✅ Confirmar", "❌ Rejeitar", a.getNomeCliente(), a.getTelefoneCliente(), data, a.getHora().toString(), a.getIdAgendamento()});
             }
             
-            for (Agendamento a : agendamentoController.listarAgendamentosGerais()) {
+            for (Agendamento a : agendamentoController.listarAgendamentosGeraisPorEmpresa(this.nomeEmpresa)) {
                 String data = a.getDataAgendamento().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                
-                int qtdInsumos = 0;
-                try { qtdInsumos = servicoInsumoController.listarInsumosDoServico(a.getServicoId()).size(); } catch(Exception ignored) {}
+                int qtdInsumos = 0; try { qtdInsumos = servicoInsumoController.listarInsumosDoServico(a.getServicoId()).size(); } catch(Exception ignored) {}
                 String textoInsumos = qtdInsumos > 0 ? qtdInsumos + " itens" : "Nenhum";
-                
                 modelGeral.addRow(new Object[]{data, a.getHora().toString(), a.getNomeCliente(), a.getNomeFuncionario(), a.getNomeServico(), textoInsumos, a.getStatus(), a.getIdAgendamento()});
             }
         } catch (Exception e) {}
     }
 
     private void limparCampos() {
-        txtData.setValue(null); txtHora.setValue(null); txtIdAgendamento.setText("");
-        cbCliente.setSelectedIndex(0); cbFuncionario.setSelectedIndex(0); cbServico.setSelectedIndex(0);
-        txtBusca.setText(""); 
-        tabelaGeral.clearSelection();
+        txtData.setValue(null); txtHora.setValue(null); txtIdAgendamento.setText(""); cbCliente.setSelectedIndex(0); cbFuncionario.setSelectedIndex(0); cbServico.setSelectedIndex(0); txtBusca.setText(""); tabelaGeral.clearSelection();
     }
 
     private JFormattedTextField criarCampoMascara(String m) {
-        try { MaskFormatter mf = new MaskFormatter(m); mf.setPlaceholderCharacter('_'); return new JFormattedTextField(mf); } 
-        catch (Exception e) { return new JFormattedTextField(); }
+        try { MaskFormatter mf = new MaskFormatter(m); mf.setPlaceholderCharacter('_'); return new JFormattedTextField(mf); } catch (Exception e) { return new JFormattedTextField(); }
     }
 
     private void adicionarCombo(JPanel painel, GridBagConstraints gbc, int linha, String textoLabel, JComboBox combo, Font font, Color cor) {
-        JLabel lbl = new JLabel(textoLabel); lbl.setFont(font); lbl.setForeground(cor); lbl.setHorizontalAlignment(SwingConstants.RIGHT);
-        gbc.gridx = 0; gbc.gridy = linha; gbc.weightx = 0.3; painel.add(lbl, gbc);
-        combo.setPreferredSize(new Dimension(300, 35)); combo.setBorder(BorderFactory.createLineBorder(Color.decode("#FFCDD2"), 2, true));
-        combo.setBackground(Color.WHITE);
-        gbc.gridx = 1; gbc.weightx = 0.7; painel.add(combo, gbc);
+        JLabel lbl = new JLabel(textoLabel); lbl.setFont(font); lbl.setForeground(cor); lbl.setHorizontalAlignment(SwingConstants.RIGHT); gbc.gridx = 0; gbc.gridy = linha; gbc.weightx = 0.3; painel.add(lbl, gbc);
+        combo.setPreferredSize(new Dimension(300, 35)); combo.setBorder(BorderFactory.createLineBorder(Color.decode("#FFCDD2"), 2, true)); combo.setBackground(Color.WHITE); gbc.gridx = 1; gbc.weightx = 0.7; painel.add(combo, gbc);
     }
 }

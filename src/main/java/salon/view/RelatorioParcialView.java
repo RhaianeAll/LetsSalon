@@ -32,10 +32,7 @@ public class RelatorioParcialView extends JFrame {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        BackgroundPanel mainBg = new BackgroundPanel("/images/grafico_apoio.png", new BorderLayout());
-        setContentPane(mainBg);
-
-        // --- NAVBAR ---
+        BackgroundPanel mainBg = new BackgroundPanel("/images/grafico_apoio.png", new BorderLayout()); setContentPane(mainBg);
         JPanel navbar = new JPanel(new BorderLayout()); navbar.setBackground(Color.decode("#F48FB1")); navbar.setPreferredSize(new Dimension(0, 70)); navbar.setBorder(BorderFactory.createEmptyBorder(15, 30, 15, 30));
         JLabel lblNavLogo = new JLabel("LET'S SALON 🌿"); lblNavLogo.setFont(new Font("Segoe UI Black", Font.BOLD, 22)); lblNavLogo.setForeground(Color.WHITE);
         RoundedPanel pillUser = new RoundedPanel(30, Color.decode("#FF6090")); pillUser.setLayout(new FlowLayout(FlowLayout.CENTER, 30, 5));
@@ -48,21 +45,16 @@ public class RelatorioParcialView extends JFrame {
         navRight.add(lblStudio); navRight.add(btnVoltar); navbar.add(lblNavLogo, BorderLayout.WEST); navbar.add(navCenter, BorderLayout.CENTER); navbar.add(navRight, BorderLayout.EAST);
         mainBg.add(navbar, BorderLayout.NORTH);
 
-        // --- CONTEÚDO PRINCIPAL ---
         JPanel contentPanel = new JPanel(new BorderLayout(0, 20)); contentPanel.setOpaque(false); contentPanel.setBorder(BorderFactory.createEmptyBorder(30, 50, 40, 50));
         JPanel headerPanel = new JPanel(new BorderLayout()); headerPanel.setOpaque(false);
-        JLabel lblTitle = new JLabel("Relatório Parcial"); lblTitle.setFont(new Font("Segoe UI Black", Font.BOLD, 36)); lblTitle.setForeground(Color.decode("#FF6090"));
-        headerPanel.add(lblTitle, BorderLayout.NORTH);
+        JLabel lblTitle = new JLabel("Relatório Parcial"); lblTitle.setFont(new Font("Segoe UI Black", Font.BOLD, 36)); lblTitle.setForeground(Color.decode("#FF6090")); headerPanel.add(lblTitle, BorderLayout.NORTH);
 
         JPanel toolsPanel = new JPanel(new BorderLayout()); toolsPanel.setOpaque(false); toolsPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 10, 0));
         JPanel pnlBusca = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0)); pnlBusca.setOpaque(false);
         JLabel lblBusca = new JLabel("Buscar/Filtrar:"); lblBusca.setFont(new Font("Segoe UI Black", Font.BOLD, 16)); lblBusca.setForeground(Color.decode("#D81B60"));
         txtBusca = new JTextField(25); txtBusca.setBorder(BorderFactory.createLineBorder(Color.decode("#FFCDD2"), 2, true));
-        
         txtBusca.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
-            public void insertUpdate(javax.swing.event.DocumentEvent e) { filtrar(); }
-            public void removeUpdate(javax.swing.event.DocumentEvent e) { filtrar(); }
-            public void changedUpdate(javax.swing.event.DocumentEvent e) { filtrar(); }
+            public void insertUpdate(javax.swing.event.DocumentEvent e) { filtrar(); } public void removeUpdate(javax.swing.event.DocumentEvent e) { filtrar(); } public void changedUpdate(javax.swing.event.DocumentEvent e) { filtrar(); }
         });
         pnlBusca.add(lblBusca); pnlBusca.add(txtBusca); toolsPanel.add(pnlBusca, BorderLayout.WEST);
 
@@ -70,14 +62,12 @@ public class RelatorioParcialView extends JFrame {
         btnPrint.addActionListener(e -> imprimirRelatorio()); toolsPanel.add(btnPrint, BorderLayout.EAST);
         headerPanel.add(toolsPanel, BorderLayout.SOUTH); contentPanel.add(headerPanel, BorderLayout.NORTH);
 
-        // --- TABELA ---
         String[] colunas = {"Id", "Funcionário(a)", "Serviço", "Qtd Agendamentos", "Qtd Cancelamentos", "Valor Recebido", "Horário Movimentado", "Cliente Frequente"};
         modelRelatorio = new DefaultTableModel(new Object[][]{}, colunas) { @Override public boolean isCellEditable(int r, int c) { return false; } };
         tabelaRelatorio = new JTable(modelRelatorio); tabelaRelatorio.setRowHeight(35); tabelaRelatorio.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12)); tabelaRelatorio.getTableHeader().setBackground(Color.decode("#F5F5F5"));
         
         sorter = new TableRowSorter<>(modelRelatorio); tabelaRelatorio.setRowSorter(sorter);
-        JScrollPane scroll = new JScrollPane(tabelaRelatorio); scroll.setBorder(BorderFactory.createLineBorder(Color.decode("#F48FB1"), 4));
-        contentPanel.add(scroll, BorderLayout.CENTER); mainBg.add(contentPanel, BorderLayout.CENTER);
+        JScrollPane scroll = new JScrollPane(tabelaRelatorio); scroll.setBorder(BorderFactory.createLineBorder(Color.decode("#F48FB1"), 4)); contentPanel.add(scroll, BorderLayout.CENTER); mainBg.add(contentPanel, BorderLayout.CENTER);
         
         carregarDados();
     }
@@ -92,7 +82,7 @@ public class RelatorioParcialView extends JFrame {
     private void carregarDados() {
         modelRelatorio.setRowCount(0);
         try {
-            List<Object[]> linhas = relatorioController.getRelatorioParcial();
+            List<Object[]> linhas = relatorioController.getRelatorioParcial(this.nomeEmpresa); // FILTRADO AQUI!
             for (Object[] linha : linhas) { modelRelatorio.addRow(linha); }
         } catch (Exception e) { JOptionPane.showMessageDialog(this, "Erro: " + e.getMessage()); }
     }

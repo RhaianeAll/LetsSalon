@@ -59,4 +59,14 @@ public class Agendamento {
 
     public String getNomeServico() { return nomeServico; }
     public void setNomeServico(String nomeServico) { this.nomeServico = nomeServico; }
+    
+    private int empresaId;
+
+    public int getEmpresaId() {
+        return empresaId;
+    }
+
+    public void setEmpresaId(int empresaId) {
+        this.empresaId = empresaId;
+    }
 }

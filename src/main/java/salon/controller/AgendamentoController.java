@@ -1,50 +1,64 @@
 package salon.controller;
 
 import salon.dao.AgendamentoDAO;
+import salon.dao.EmpresaDAO;
 import salon.model.Agendamento;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
 public class AgendamentoController {
-
+    
     private AgendamentoDAO agendamentoDAO;
+    private EmpresaDAO empresaDAO;
 
     public AgendamentoController() {
         this.agendamentoDAO = new AgendamentoDAO();
+        this.empresaDAO = new EmpresaDAO();
     }
 
-    public void solicitarAgendamento(int clienteId, int funcionarioId, int servicoId, LocalDate data, LocalTime hora) {
-        // Validação 1: Impede agendamento no passado (opcional, mas recomendado)
+    public List<Agendamento> listarConfirmacoesPendentesPorEmpresa(String nomeEmpresa) {
+        return agendamentoDAO.listarPendentesPorEmpresa(nomeEmpresa);
+    }
+
+    public List<Agendamento> listarAgendamentosGeraisPorEmpresa(String nomeEmpresa) {
+        return agendamentoDAO.listarAgendamentosGeraisPorEmpresa(nomeEmpresa);
+    }
+
+    public void solicitarAgendamento(int idCliente, int idFuncionario, int idServico, LocalDate data, LocalTime hora, String nomeEmpresa) {
         if (data.isBefore(LocalDate.now())) {
             throw new IllegalArgumentException("Não é possível agendar em datas passadas.");
         }
-
-        // Validação 2: Choque de Horários
-        if (agendamentoDAO.isHorarioOcupado(funcionarioId, data, hora)) {
+        
+        // CORREÇÃO: Usando a variável 'idFuncionario' exatamente como foi escrita nos parâmetros acima!
+        if (agendamentoDAO.isHorarioOcupado(idFuncionario, data, hora)) {
             throw new IllegalArgumentException("O(a) profissional já possui um serviço marcado neste horário!");
         }
 
-        // Se passou pelas validações, monta o objeto e salva
+        int idEmpresa = empresaDAO.buscarIdPorNome(nomeEmpresa);
+        
         Agendamento a = new Agendamento();
-        a.setClienteId(clienteId);
-        a.setFuncionarioId(funcionarioId);
-        a.setServicoId(servicoId);
+        a.setClienteId(idCliente);
+        a.setFuncionarioId(idFuncionario); // Aqui também usa o 'idFuncionario' corretamente
+        a.setServicoId(idServico);
         a.setDataAgendamento(data);
         a.setHora(hora);
-        a.setStatus("Pendente"); // Sempre entra como pendente até aprovação do admin
-
+        a.setStatus("Pendente");
+        a.setEmpresaId(idEmpresa);
+        
         agendamentoDAO.cadastrar(a);
     }
-
-    public List<Agendamento> listarConfirmacoesPendentes() {
-        return agendamentoDAO.listarPendentes();
+    
+    public void aprovarAgendamento(int idAgendamento) {
+        agendamentoDAO.atualizarStatus(idAgendamento, "Agendado");
     }
 
-    // Substitua o seu aprovarAgendamento por este:
-    public void aprovarAgendamento(int idAgendamento) {
-        // Quando aprova, o status muda para "Agendado"
-        agendamentoDAO.atualizarStatus(idAgendamento, "Agendado");
+    public void alterarStatus(int idAgendamento, String novoStatus) {
+        agendamentoDAO.atualizarStatus(idAgendamento, novoStatus);
+    }
+    
+    public void excluirAgendamento(int idAgendamento) {
+        agendamentoDAO.excluir(idAgendamento);
     }
     
     public void atualizarAgendamento(int id, int clienteId, int funcionarioId, int servicoId, LocalDate data, LocalTime hora) {
@@ -58,20 +72,20 @@ public class AgendamentoController {
         agendamentoDAO.atualizar(a);
     }
 
-    public void excluirAgendamento(int idAgendamento) {
-        agendamentoDAO.excluir(idAgendamento);
-    }
-
-    // Adicione estes dois novos métodos:
-    public List<Agendamento> listarAgendamentosGerais() {
-        return agendamentoDAO.listarAgendamentosGerais();
-    }
-
-    public void alterarStatus(int idAgendamento, String novoStatus) {
-        agendamentoDAO.atualizarStatus(idAgendamento, novoStatus);
-    }
-    
     public void recusarOuCancelarAgendamento(int idAgendamento) {
         agendamentoDAO.atualizarStatus(idAgendamento, "Cancelado");
+    }
+
+    // --- NOVOS MÉTODOS PARA O DASHBOARD ---
+    
+    public int contarPendentes(String nomeEmpresa) {
+        return agendamentoDAO.contarPendentesPorEmpresa(nomeEmpresa);
+    }
+
+    public List<Agendamento> listarConcluidosAntigos(String nomeEmpresa) {
+        // Calcula a data de 15 dias atrás
+        LocalDate dataLimite = LocalDate.now().minusDays(15);
+        // Traz apenas 5 resultados para não lotar a tela inicial
+        return agendamentoDAO.listarConcluidosAntigosPorEmpresa(nomeEmpresa, dataLimite, 5);
     }
 }

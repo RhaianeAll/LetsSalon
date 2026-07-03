@@ -8,24 +8,35 @@ import java.util.List;
 
 public class InsumoDAO {
 
-    // NOVA FUNÇÃO: Cadastra e devolve o ID!
-    // NOVA FUNÇÃO: Cadastra e devolve o ID usando a forma mais segura do PostgreSQL!
-    public int cadastrarRetornandoId(Insumo insumo) {
-        // Usamos o 'RETURNING id_insumo' direto no código SQL
-        String sql = "INSERT INTO insumos (nome, valor, quantidade, capacidade) VALUES (?, ?, ?, ?) RETURNING id_insumo";
-        
+    // --- 1. CRUD BÁSICO RESTAURADO ---
+    public void cadastrar(Insumo insumo) {
+        String sql = "INSERT INTO insumos (nome, valor, quantidade, capacidade, empresa_id) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = Conexao.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
             stmt.setString(1, insumo.getNome());
             stmt.setDouble(2, insumo.getValor());
             stmt.setInt(3, insumo.getQuantidade());
             stmt.setString(4, insumo.getCapacidade());
-            
-            // Alteramos de executeUpdate() para executeQuery() para conseguir ler o ID que voltou
+            stmt.setInt(5, insumo.getEmpresaId());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Erro ao cadastrar insumo.", e);
+        }
+    }
+
+    public int cadastrarRetornandoId(Insumo insumo) {
+        String sql = "INSERT INTO insumos (nome, valor, quantidade, capacidade, empresa_id) VALUES (?, ?, ?, ?, ?) RETURNING id_insumo";
+        try (Connection conn = Conexao.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, insumo.getNome());
+            stmt.setDouble(2, insumo.getValor());
+            stmt.setInt(3, insumo.getQuantidade());
+            stmt.setString(4, insumo.getCapacidade());
+            stmt.setInt(5, insumo.getEmpresaId());
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getInt("id_insumo"); // Retorna o ID perfeitamente
+                    return rs.getInt("id_insumo");
                 }
             }
         } catch (SQLException e) {
@@ -41,7 +52,6 @@ public class InsumoDAO {
         try (Connection conn = Conexao.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
-            
             while (rs.next()) {
                 Insumo i = new Insumo();
                 i.setIdInsumo(rs.getInt("id_insumo"));
@@ -49,14 +59,13 @@ public class InsumoDAO {
                 i.setValor(rs.getDouble("valor"));
                 i.setQuantidade(rs.getInt("quantidade"));
                 i.setCapacidade(rs.getString("capacidade"));
+                i.setEmpresaId(rs.getInt("empresa_id"));
                 lista.add(i);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        } catch (SQLException e) { e.printStackTrace(); }
         return lista;
     }
-    
+
     public void atualizar(Insumo insumo) {
         String sql = "UPDATE insumos SET nome = ?, valor = ?, quantidade = ?, capacidade = ? WHERE id_insumo = ?";
         try (Connection conn = Conexao.getConnection();
@@ -83,5 +92,28 @@ public class InsumoDAO {
             e.printStackTrace();
             throw new RuntimeException("Erro ao excluir insumo.", e);
         }
+    }
+
+    // --- 2. MÉTODOS MULTI-TENANT (FILTRO POR EMPRESA) ---
+    public List<Insumo> listarEstoquePorEmpresa(String nomeEmpresa) {
+        List<Insumo> lista = new ArrayList<>();
+        String sql = "SELECT i.* FROM insumos i JOIN empresas e ON i.empresa_id = e.id_empresa WHERE e.nome_empresa = ? ORDER BY i.id_insumo";
+        try (Connection conn = Conexao.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, nomeEmpresa);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Insumo i = new Insumo();
+                    i.setIdInsumo(rs.getInt("id_insumo"));
+                    i.setNome(rs.getString("nome"));
+                    i.setValor(rs.getDouble("valor"));
+                    i.setQuantidade(rs.getInt("quantidade"));
+                    i.setCapacidade(rs.getString("capacidade"));
+                    i.setEmpresaId(rs.getInt("empresa_id"));
+                    lista.add(i);
+                }
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return lista;
     }
 }

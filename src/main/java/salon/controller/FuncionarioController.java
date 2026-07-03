@@ -13,7 +13,6 @@ public class FuncionarioController {
         this.funcionarioDAO = new FuncionarioDAO();
     }
     
-    // Método que a View está tentando chamar!
     public List<Funcionario> listarFuncionarios() {
         return funcionarioDAO.listar();
     }
@@ -22,7 +21,6 @@ public class FuncionarioController {
         if (!ValidadorUtil.camposPreenchidos(nome, cpf, telefone, login, senha, cargo)) {
             throw new IllegalArgumentException("Todos os campos do funcionário são obrigatórios.");
         }
-        // Exemplo: if (!ValidadorUtil.isCpfValido(cpf)) { ... } (Mantido caso você tenha essa validação)
         if (empresaId <= 0) {
             throw new IllegalArgumentException("É necessário vincular o funcionário a uma empresa.");
         }
@@ -39,8 +37,8 @@ public class FuncionarioController {
         funcionarioDAO.cadastrar(func);
     }
 
-    public List<Funcionario> listarFuncionarios(int empresaId) {
-        return funcionarioDAO.listarPorEmpresa(empresaId);
+    public List<Funcionario> listarFuncionarios(String nomeEmpresa) {
+        return funcionarioDAO.listarFuncionariosPorEmpresa(nomeEmpresa);
     }
 
     public void atualizarFuncionario(int id, String nome, String cpf, String telefone, String login, String senha, String cargo) {

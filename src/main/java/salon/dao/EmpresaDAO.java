@@ -7,76 +7,98 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EmpresaDAO {
-    
-    // CREATE (Já estava a funcionar perfeitamente!)
-    public void cadastrar(Empresa e) {
+
+    // ==========================================
+    // 1. CRUD BÁSICO DE EMPRESAS
+    // ==========================================
+
+    public void cadastrar(Empresa empresa) {
         String sql = "INSERT INTO empresas (nome_empresa, telefone, email) VALUES (?, ?, ?)";
         try (Connection conn = Conexao.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
+             
+            stmt.setString(1, empresa.getNomeEmpresa());
+            stmt.setString(2, empresa.getTelefoneEmpresa());
+            stmt.setString(3, empresa.getEmailEmpresa());
             
-            stmt.setString(1, e.getNomeEmpresa());
-            stmt.setString(2, e.getTelefoneEmpresa());
-            stmt.setString(3, e.getEmailEmpresa());
             stmt.executeUpdate();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            throw new RuntimeException("Erro ao cadastrar empresa no banco de dados.", ex);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Erro ao cadastrar empresa.", e);
         }
     }
-    
-    // READ (Listar para a tabela - CORRIGIDO PARA id_empresa)
-    public List<Empresa> listarTodas() {
-        String sql = "SELECT * FROM empresas ORDER BY id_empresa"; // Alterado aqui
-        List<Empresa> empresas = new ArrayList<>();
 
+    public List<Empresa> listarTodas() {
+        List<Empresa> lista = new ArrayList<>();
+        String sql = "SELECT * FROM empresas ORDER BY id_empresa";
         try (Connection conn = Conexao.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
-
+             
             while (rs.next()) {
                 Empresa e = new Empresa();
-                e.setIdEmpresa(rs.getInt("id_empresa")); // Alterado aqui
+                e.setIdEmpresa(rs.getInt("id_empresa"));
                 e.setNomeEmpresa(rs.getString("nome_empresa"));
                 e.setTelefoneEmpresa(rs.getString("telefone"));
                 e.setEmailEmpresa(rs.getString("email"));
-                
-                empresas.add(e);
+                lista.add(e);
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            System.err.println("Erro ao listar empresas no DAO: " + ex.getMessage());
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        return empresas;
+        return lista;
     }
 
-    // UPDATE (CORRIGIDO PARA id_empresa)
-    public void atualizar(Empresa e) {
-        String sql = "UPDATE empresas SET nome_empresa = ?, telefone = ?, email = ? WHERE id_empresa = ?"; // Alterado aqui
+    public void atualizar(Empresa empresa) {
+        String sql = "UPDATE empresas SET nome_empresa = ?, telefone = ?, email = ? WHERE id_empresa = ?";
         try (Connection conn = Conexao.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
+             
+            stmt.setString(1, empresa.getNomeEmpresa());
+            stmt.setString(2, empresa.getTelefoneEmpresa());
+            stmt.setString(3, empresa.getEmailEmpresa());
+            stmt.setInt(4, empresa.getIdEmpresa());
             
-            stmt.setString(1, e.getNomeEmpresa());
-            stmt.setString(2, e.getTelefoneEmpresa());
-            stmt.setString(3, e.getEmailEmpresa());
-            stmt.setInt(4, e.getIdEmpresa());
             stmt.executeUpdate();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            throw new RuntimeException("Erro ao atualizar empresa no banco de dados.", ex);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Erro ao atualizar empresa.", e);
         }
     }
 
-    // DELETE (CORRIGIDO PARA id_empresa)
     public void excluir(int idEmpresa) {
-        String sql = "DELETE FROM empresas WHERE id_empresa = ?"; // Alterado aqui
+        String sql = "DELETE FROM empresas WHERE id_empresa = ?";
         try (Connection conn = Conexao.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
+             
             stmt.setInt(1, idEmpresa);
             stmt.executeUpdate();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            throw new RuntimeException("Erro ao excluir empresa no banco de dados.", ex);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Erro ao excluir empresa.", e);
         }
+    }
+
+    // ==========================================
+    // 2. MÉTODO PARA A ARQUITETURA MULTI-TENANT
+    // ==========================================
+    
+    // Converte o nome da empresa que vem da tela (View) no ID real dela no banco de dados
+    public int buscarIdPorNome(String nomeEmpresa) {
+        String sql = "SELECT id_empresa FROM empresas WHERE nome_empresa = ?";
+        try (Connection conn = Conexao.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             
+            stmt.setString(1, nomeEmpresa);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("id_empresa");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1; // Retorna -1 se der erro ou a empresa não for encontrada
     }
 }

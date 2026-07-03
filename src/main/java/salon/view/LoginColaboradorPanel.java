@@ -91,34 +91,28 @@ public class LoginColaboradorPanel extends JPanel {
         btnEntrar.addActionListener(e -> {
             
             try {
-                // 1. Pega o que o utilizador digitou na tela
-                String usuarioDigitado = txtUsuario.getText(); 
-                String senhaDigitada = new String(txtSenha.getPassword()); 
+                // 1. Pegar os textos (Atenção: verifique se o nome das caixinhas está igual ao do seu NetBeans)
+                String codigoDigitado = txtCodigo.getText().trim(); 
+                String usuarioDigitado = txtUsuario.getText().trim(); 
+                String senhaDigitada = new String(txtSenha.getPassword()).trim(); 
 
-                // 2. TENTA autenticar com senha obrigatória
+                // 2. Tenta autenticar exigindo as 3 informações
                 UsuarioController controller = new UsuarioController();
-                Usuario userLogado = controller.fazerLogin(usuarioDigitado, senhaDigitada);
+                Usuario userLogado = controller.fazerLoginColaborador(usuarioDigitado, senhaDigitada, codigoDigitado);
 
-                // 3. Verifica se é administrador ou colaborador
+                // 3. Se não deu erro, abre a seleção de empresa
                 if (userLogado.getTipoUsuario().equals("administrador") || userLogado.getTipoUsuario().equals("colaborador")) {
-
-                    // Fecha a tela de login
                     SwingUtilities.getWindowAncestor(this).dispose(); 
-
-                    // --- AQUI ESTÁ A CORREÇÃO ---
-                    // Em vez de ir para o MainAdministradorView, enviamos para a Seleção de Empresa!
                     new SelecaoEmpresaView(userLogado.getUsuario()).setVisible(true);
-
                 } else {
-                    JOptionPane.showMessageDialog(this, "Acesso negado. Esta área é restrita a colaboradores.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Acesso negado.", "Aviso", JOptionPane.WARNING_MESSAGE);
                 }
 
             } catch (IllegalArgumentException ex) {
-                // A senha errada cai aqui
                 JOptionPane.showMessageDialog(this, ex.getMessage(), "Erro de Autenticação", JOptionPane.ERROR_MESSAGE);
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Erro interno no sistema: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
-}
+                JOptionPane.showMessageDialog(this, "Erro: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         RoundedButton btnInscrever = new RoundedButton("INSCREVA-SE");

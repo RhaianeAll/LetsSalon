@@ -29,10 +29,10 @@ public class UsuarioDAO {
         }
     }
 
-    // Método de Autenticação Unificado e Seguro
+    // Método de Autenticação Unificado e Seguro (Diferencia Maiúsculas de Minúsculas)
     public Usuario autenticar(String login, String senha) {
-        // Procura APENAS na tabela de usuários, ignorando maiúsculas/minúsculas no nome
-        String sql = "SELECT * FROM usuarios WHERE LOWER(usuario) = LOWER(?) AND senha = ?";
+        // Removido o LOWER para forçar a busca exata (RhaianeAll != rhaianeAll)
+        String sql = "SELECT * FROM usuarios WHERE usuario = ? AND senha = ?";
         
         try (Connection conn = Conexao.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -46,7 +46,6 @@ public class UsuarioDAO {
                     u.setIdUsuario(rs.getInt("id_usuario"));
                     u.setNomeCompleto(rs.getString("nome_completo"));
                     u.setUsuario(rs.getString("usuario"));
-                    // O banco diz qual é a permissão real desta pessoa (cliente, colaborador ou administrador)
                     u.setTipoUsuario(rs.getString("tipo_usuario")); 
                     return u;
                 }
@@ -54,7 +53,7 @@ public class UsuarioDAO {
         } catch (SQLException e) { 
             e.printStackTrace(); 
         }
-        return null; // Se chegou aqui, a senha está errada ou a pessoa não existe!
+        return null;
     }
 
     public List<Usuario> listarClientes() {
@@ -194,10 +193,9 @@ public class UsuarioDAO {
     }
     
     // Verifica se o nome de usuário já existe no banco.
-    // O "idIgnorado" serve para a tela de Edição (para ele não acusar que o seu próprio nome já está em uso).
-    // Na hora do cadastro novo, passamos 0 no idIgnorado.
     public boolean verificarUsuarioExistente(String nomeUsuario, int idIgnorado) {
-        String sql = "SELECT COUNT(*) FROM usuarios WHERE LOWER(usuario) = LOWER(?) AND id_usuario != ?";
+        // Removido o LOWER para permitir a criação de "Admin" e "admin" como contas diferentes
+        String sql = "SELECT COUNT(*) FROM usuarios WHERE usuario = ? AND id_usuario != ?";
         
         try (Connection conn = Conexao.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -208,7 +206,7 @@ public class UsuarioDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     int quantidade = rs.getInt(1);
-                    return quantidade > 0; // Retorna VERDADEIRO se o nome já estiver em uso
+                    return quantidade > 0;
                 }
             }
         } catch (SQLException e) {
@@ -217,9 +215,10 @@ public class UsuarioDAO {
         return false;
     }
     
-    // 1. Busca os dados do usuário para preencher a tela de edição
+    // Busca os dados do usuário para preencher a tela de edição
     public Usuario buscarUsuarioPorLogin(String login) {
-        String sql = "SELECT * FROM usuarios WHERE LOWER(usuario) = LOWER(?)";
+        // Removido o LOWER para buscar exatamente como foi digitado
+        String sql = "SELECT * FROM usuarios WHERE usuario = ?";
         
         try (Connection conn = Conexao.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -235,7 +234,6 @@ public class UsuarioDAO {
                     u.setUsuario(rs.getString("usuario"));
                     u.setTipoUsuario(rs.getString("tipo_usuario"));
                     
-                    // Proteção: caso as colunas email, cargo ou foto estejam vazias/inexistentes
                     try { u.setFoto(rs.getBytes("foto")); } catch (Exception ignore) {}
                     try { u.setEmail(rs.getString("email")); } catch (Exception ignore) {}
                     try { u.setCargo(rs.getString("cargo")); } catch (Exception ignore) {}
@@ -278,6 +276,41 @@ public class UsuarioDAO {
         } catch (SQLException e) { 
             throw new RuntimeException("Erro ao atualizar o banco de dados: " + e.getMessage()); 
         }
+    }
+    
+    // Grava o código de 4 dígitos vinculado ao usuário
+    public void atualizarCodigoEmpresa(String login, String codigo) {
+        String sql = "UPDATE usuarios SET codigo_empresa = ? WHERE usuario = ?";
+        try (Connection conn = Conexao.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, codigo);
+            stmt.setString(2, login);
+            stmt.executeUpdate();
+        } catch (SQLException e) { e.printStackTrace(); }
+    }
+
+    // Login super rigoroso: Exige Usuário + Senha + Código da Empresa!
+    public Usuario autenticarColaborador(String login, String senha, String codigo) {
+        String sql = "SELECT * FROM usuarios WHERE usuario = ? AND senha = ? AND codigo_empresa = ?";
+        try (Connection conn = Conexao.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             
+            stmt.setString(1, login.trim());
+            stmt.setString(2, senha.trim());
+            stmt.setString(3, codigo.trim());
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Usuario u = new Usuario();
+                    u.setIdUsuario(rs.getInt("id_usuario"));
+                    u.setNomeCompleto(rs.getString("nome_completo"));
+                    u.setUsuario(rs.getString("usuario"));
+                    u.setTipoUsuario(rs.getString("tipo_usuario"));
+                    return u; // Só deixa entrar se as 3 coisas estiverem corretas!
+                }
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return null;
     }
     
 }

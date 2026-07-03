@@ -1,6 +1,7 @@
 package salon.controller;
 
 import salon.dao.FinanceiroDAO;
+import salon.dao.EmpresaDAO;
 import salon.model.Financeiro;
 import salon.util.ValidadorUtil;
 
@@ -12,12 +13,14 @@ import java.util.List;
 public class FinanceiroController {
 
     private FinanceiroDAO financeiroDAO;
+    private EmpresaDAO empresaDAO;
 
     public FinanceiroController() {
         this.financeiroDAO = new FinanceiroDAO();
+        this.empresaDAO = new EmpresaDAO();
     }
 
-    public void registrarMovimentacao(String tipo, String descricao, String categoria, String valorStr, String dataStr, Integer funcionarioId, Integer servicoId, String custoInsumosStr) {
+    public void registrarMovimentacao(String tipo, String descricao, String categoria, String valorStr, String dataStr, Integer funcionarioId, Integer servicoId, String custoInsumosStr, String nomeEmpresa) {
         
         if (!ValidadorUtil.camposPreenchidos(tipo, descricao, valorStr, dataStr)) {
             throw new IllegalArgumentException("Tipo, Descrição, Valor e Data são obrigatórios.");
@@ -34,13 +37,11 @@ public class FinanceiroController {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             LocalDate data = LocalDate.parse(dataStr, formatter);
 
-            // Cálculo dinâmico do lucro
             double lucro = 0.0;
-            if (tipo.equalsIgnoreCase("entrada")) {
-                lucro = valor - custoInsumos;
-            } else {
-                lucro = -valor; // Se for saída, é contabilizado como valor negativo no balanço
-            }
+            if (tipo.equalsIgnoreCase("entrada")) { lucro = valor - custoInsumos; } 
+            else { lucro = -valor; }
+
+            int idEmpresa = empresaDAO.buscarIdPorNome(nomeEmpresa);
 
             Financeiro f = new Financeiro();
             f.setTipo(tipo.toLowerCase());
@@ -52,6 +53,7 @@ public class FinanceiroController {
             f.setServicoId(servicoId);
             f.setCustoInsumos(custoInsumos);
             f.setLucro(lucro);
+            f.setEmpresaId(idEmpresa); // Blinda a finança à empresa
 
             financeiroDAO.cadastrar(f);
 
@@ -61,10 +63,8 @@ public class FinanceiroController {
             throw new IllegalArgumentException("Formato de data inválido. Use DD/MM/AAAA.");
         }
     }
-    
-    
 
-    public List<Financeiro> obterRelatorioGeral() {
-        return financeiroDAO.listarRelatorio();
+    public List<Financeiro> obterRelatorioGeral(String nomeEmpresa) {
+        return financeiroDAO.listarRelatorio(nomeEmpresa);
     }
 }

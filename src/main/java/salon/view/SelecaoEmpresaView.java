@@ -16,6 +16,8 @@ import salon.view.components.RoundedPanel;
 // Importações do seu Banco e Controller!
 import salon.controller.EmpresaController;
 import salon.model.Empresa;
+import salon.controller.UsuarioController;
+import salon.model.Usuario;
 
 public class SelecaoEmpresaView extends JFrame {
 
@@ -91,6 +93,19 @@ public class SelecaoEmpresaView extends JFrame {
         lblAvatar.setOpaque(true);
         lblAvatar.setBackground(Color.decode("#E0E0E0"));
         lblAvatar.setBorder(BorderFactory.createLineBorder(Color.WHITE, 4));
+
+        // --- AQUI ESTÁ A MÁGICA DA FOTO INSERIDA ---
+        Usuario userLogado = new UsuarioController().buscarUsuarioPorLogin(nomeUsuarioLogado);
+        
+        if (userLogado != null && userLogado.getFoto() != null && userLogado.getFoto().length > 0) {
+            ImageIcon icon = new ImageIcon(userLogado.getFoto());
+            Image img = icon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH); 
+            lblAvatar.setIcon(new ImageIcon(img));
+            lblAvatar.setText(""); // Remove o texto "IMG"
+            lblAvatar.setOpaque(false); // Tira o fundo cinza
+            lblAvatar.setBorder(BorderFactory.createLineBorder(Color.decode("#F48FB1"), 3, true)); // Borda arredondada rosa
+        }
+        // ---------------------------------------------
 
         JPanel infoProfile = new JPanel(new GridLayout(2, 1));
         infoProfile.setOpaque(false);

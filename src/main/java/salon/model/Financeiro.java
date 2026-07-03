@@ -13,10 +13,12 @@ public class Financeiro {
     private Integer servicoId; // Pode ser null
     private double custoInsumos;
     private double lucro;
+    private int empresaId;
+    
 
     public Financeiro() {}
 
-    public Financeiro(int id, String tipo, String descricao, String categoria, double valor, LocalDate data, Integer funcionarioId, Integer servicoId, double custoInsumos, double lucro) {
+    public Financeiro(int id, String tipo, String descricao, String categoria, double valor, LocalDate data, Integer funcionarioId, Integer servicoId, double custoInsumos, double lucro, int empresaId) {
         this.id = id;
         this.tipo = tipo;
         this.descricao = descricao;
@@ -27,6 +29,7 @@ public class Financeiro {
         this.servicoId = servicoId;
         this.custoInsumos = custoInsumos;
         this.lucro = lucro;
+        this.empresaId = empresaId;
     }
 
     public int getId() { return id; }
@@ -58,4 +61,7 @@ public class Financeiro {
 
     public double getLucro() { return lucro; }
     public void setLucro(double lucro) { this.lucro = lucro; }
+    
+    public int getEmpresaId() { return empresaId; }
+    public void setEmpresaId(int empresaId) { this.empresaId = empresaId; }
 }

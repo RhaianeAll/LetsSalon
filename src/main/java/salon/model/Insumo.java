@@ -6,6 +6,7 @@ public class Insumo {
     private double valor;
     private int quantidade;
     private String capacidade;
+    private int empresaId; // Nova variável para separar por empresa!
 
     public Insumo() {}
 
@@ -31,4 +32,7 @@ public class Insumo {
 
     public String getCapacidade() { return capacidade; }
     public void setCapacidade(String capacidade) { this.capacidade = capacidade; }
+
+    public int getEmpresaId() { return empresaId; }
+    public void setEmpresaId(int empresaId) { this.empresaId = empresaId; }
 }
