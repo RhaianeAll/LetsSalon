@@ -167,7 +167,6 @@ public class TelaPrincipal extends JFrame {
     modeloTabela = new DefaultTableModel(colunas, 0);
 
     tabelaAtendimentos = new JTable(modeloTabela);
-    painelTabela.setVisible(false);
 
     tabelaAtendimentos.setRowHeight(28);
 
@@ -176,8 +175,9 @@ public class TelaPrincipal extends JFrame {
 
     JScrollPane scrollTabela = new JScrollPane(tabelaAtendimentos);
 
-    painelTabela.add(scrollTabela);
-
+painelTabela.add(
+        scrollTabela,
+        BorderLayout.CENTER);
     painelCentro.add(painelTabela, BorderLayout.CENTER);
 
     add(painelCentro, BorderLayout.CENTER);
@@ -256,12 +256,20 @@ for (Object[] linha : atendimentos) {
 }
 String funcao = colaboradorLogado.getFuncaoColaborador();
 
-boolean isAdmin =
+boolean podeVerHistorico =
         funcao != null &&
-        (funcao.equalsIgnoreCase("ADMIN") ||
-         funcao.equalsIgnoreCase("ADMINISTRADOR") ||
-         funcao.equalsIgnoreCase("Dono"));
+        (
+            funcao.equalsIgnoreCase("ADMIN") ||
+            funcao.equalsIgnoreCase("ADMINISTRADOR") ||
+            funcao.equalsIgnoreCase("ADMINISTRADORA") ||
+            funcao.equalsIgnoreCase("DONO") ||
+            funcao.equalsIgnoreCase("DONA") ||
+            funcao.equalsIgnoreCase("PROFISSIONAL") ||
+            funcao.equalsIgnoreCase("COLABORADOR")
+        );
 
-painelTabela.setVisible(isAdmin);
+painelTabela.setVisible(podeVerHistorico);
+
+System.out.println("Função: " + colaboradorLogado.getFuncaoColaborador());
 }
 }

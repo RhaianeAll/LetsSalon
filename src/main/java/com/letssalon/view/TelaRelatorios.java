@@ -9,6 +9,8 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 import com.letssalon.util.CoresUtil;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TelaRelatorios extends JFrame {
 
@@ -19,12 +21,21 @@ public class TelaRelatorios extends JFrame {
 
     private AtendimentoDAO atendimentoDAO = new AtendimentoDAO();
     private ColaboradorDAO colaboradorDAO = new ColaboradorDAO();
+    
+    private JLabel lblTopFunc;
+    private JLabel lblTopCliente;
+    private JLabel lblHorarioPico;
 
-    public TelaRelatorios(Colaborador colaborador) {
-        this.colaboradorLogado = colaborador;
-        initComponents();
-        carregarDados();
-    }
+   public TelaRelatorios(Colaborador colaborador) {
+
+    this.colaboradorLogado = colaborador;
+
+    initComponents(); // UI primeiro
+
+    SwingUtilities.invokeLater(() -> {
+        carregarDados(); // dados depois
+    });
+   }
 
     private void initComponents() {
         setTitle("Let's Salon - Relatórios");
@@ -72,7 +83,7 @@ public class TelaRelatorios extends JFrame {
         txtBuscarResumo = new JTextField(20);
         painelBuscaResumo.add(txtBuscarResumo);
         JButton btnBuscarResumo = new JButton("🔍");
-        btnBuscarResumo.addActionListener(e -> carregarDados());
+        btnBuscarResumo.addActionListener(e -> carregarResumo());
         painelBuscaResumo.add(btnBuscarResumo);
 
         JButton btnExportar = new JButton("📄 Exportar");
@@ -82,6 +93,28 @@ public class TelaRelatorios extends JFrame {
         painelBuscaResumo.add(btnExportar);
 
         painelResumo.add(painelBuscaResumo, BorderLayout.NORTH);
+        JPanel painelInsights = new JPanel(new FlowLayout(FlowLayout.LEFT));
+painelInsights.setBackground(CoresUtil.ROSA_FUNDO);
+
+lblTopFunc = new JLabel();
+lblTopFunc.setForeground(new Color(201, 72, 105));
+lblTopFunc.setFont(new Font("Arial", Font.BOLD, 12));
+
+lblTopCliente = new JLabel();
+lblTopCliente.setForeground(new Color(201, 72, 105));
+lblTopCliente.setFont(new Font("Arial", Font.BOLD, 12));
+
+JLabel lblHorarioPico = new JLabel();
+lblHorarioPico.setForeground(new Color(201, 72, 105));
+lblHorarioPico.setFont(new Font("Arial", Font.BOLD, 12));
+
+painelInsights.add(lblHorarioPico);
+
+painelInsights.add(lblTopFunc);
+painelInsights.add(new JLabel("   |   "));
+painelInsights.add(lblTopCliente);
+
+painelResumo.add(painelInsights, BorderLayout.SOUTH);
 
         String[] colunasResumo = {
             "Id Funcionário", "Funcionário(a)",
@@ -111,8 +144,7 @@ public class TelaRelatorios extends JFrame {
         txtBuscarAtendimentos = new JTextField(20);
         painelBuscaAtend.add(txtBuscarAtendimentos);
         JButton btnBuscarAtend = new JButton("🔍");
-        btnBuscarAtend.addActionListener(e -> carregarDados());
-        painelBuscaAtend.add(btnBuscarAtend);
+        btnBuscarAtend.addActionListener(e -> carregarAtendimentos());        painelBuscaAtend.add(btnBuscarAtend);
         painelAtendimentos.add(painelBuscaAtend, BorderLayout.NORTH);
 
         String[] colunasAtend = {
@@ -149,56 +181,91 @@ public class TelaRelatorios extends JFrame {
         carregarAtendimentos();
     }
 
-    private void carregarResumo() {
-        modeloResumo.setRowCount(0);
-        List<Colaborador> colaboradores = colaboradorDAO.listar();
+private void carregarResumo() {
 
-        for (Colaborador c : colaboradores) {
-            // Filtra atendimentos do colaborador
-            List<Atendimento> atendimentos = atendimentoDAO.listar();
-            int qtdServicos = 0;
-            double valorBruto = 0;
-            double valorLiquido = 0;
-            int totalInsumos = 0;
+    modeloResumo.setRowCount(0);
 
-            for (Atendimento a : atendimentos) {
-                if (a.getIdColaborador() == c.getIdColaborador()) {
-                    qtdServicos++;
-                    valorBruto += a.getValorArrecadado();
-                    valorLiquido += (a.getValorArrecadado() - a.getCustoInsumo());
-                    totalInsumos += a.getQtdAplicacoes();
-                }
-            }
+    String filtro = txtBuscarResumo.getText();
 
-            modeloResumo.addRow(new Object[]{
-                c.getIdColaborador(),
-                c.getNomeColaborador(),
-                qtdServicos,
-                qtdServicos, // clientes atendidos = qtd de serviços nesse modelo
-                totalInsumos,
-                String.format("R$ %.2f", valorBruto),
-                String.format("R$ %.2f", valorLiquido)
-            });
-        }
-    }
+    List<Colaborador> colaboradores = colaboradorDAO.listar();
+    List<Atendimento> atendimentos = atendimentoDAO.listar();
+    // 🏆 cálculos inteligentes
+    String funcionarioTop = calcularFuncionarioMaisProdutivo(colaboradores, atendimentos);
+    String clienteTop = calcularClienteMaisFrequente(atendimentos);
+    String horarioPico = calcularHorarioPico(atendimentos);
+    
+    for (Colaborador c : colaboradores) {
 
-    private void carregarAtendimentos() {
-        modeloAtendimentos.setRowCount(0);
-        List<Atendimento> atendimentos = atendimentoDAO.listar();
+        // 🔍 FILTRO AQUI (nome do funcionário)
+        if (!passaFiltro(c.getNomeColaborador(), filtro)) continue;
+
+        int qtdServicos = 0;
+        double valorBruto = 0;
+        double valorLiquido = 0;
+        int totalInsumos = 0;
 
         for (Atendimento a : atendimentos) {
-            modeloAtendimentos.addRow(new Object[]{
-                a.getIdColaborador(),
-                "-", // nome do colaborador (pode buscar pelo id)
-                a.getCodigoServico(),
-                a.getCodigoInsumo(),
-                a.getQtdAplicacoes(),
-                a.getCpfCliente(),
-                a.getDataHora(),
-                String.format("R$ %.2f", a.getValorArrecadado())
-            });
+
+            if (a.getIdColaborador() == c.getIdColaborador()) {
+
+                qtdServicos++;
+                valorBruto += a.getValorArrecadado();
+                valorLiquido += (a.getValorArrecadado() - a.getCustoInsumo());
+                totalInsumos += a.getQtdAplicacoes();
+            }
         }
+
+        modeloResumo.addRow(new Object[]{
+            c.getIdColaborador(),
+            c.getNomeColaborador(),
+            qtdServicos,
+            qtdServicos,
+            totalInsumos,
+            String.format("R$ %.2f", valorBruto),
+            String.format("R$ %.2f", valorLiquido)
+        });
     }
+    lblTopFunc.setText("🏆 Funcionário mais produtivo: " + funcionarioTop);
+    lblTopCliente.setText("⭐ Cliente mais frequente: " + clienteTop);
+    lblHorarioPico.setText("⏰ Pico de atendimento: " + horarioPico);
+}
+
+private void carregarAtendimentos() {
+
+    modeloAtendimentos.setRowCount(0);
+
+    String filtro = txtBuscarAtendimentos.getText();
+
+    List<Atendimento> atendimentos = atendimentoDAO.listar();
+    List<Colaborador> colaboradores = colaboradorDAO.listar();
+
+    Map<Integer, String> nomeColaboradorMap = new HashMap<>();
+
+    for (Colaborador c : colaboradores) {
+        nomeColaboradorMap.put(c.getIdColaborador(), c.getNomeColaborador());
+    }
+
+    for (Atendimento a : atendimentos) {
+
+        String textoBusca =
+                a.getCpfCliente() + " " +
+                a.getCodigoServico() + " " +
+                a.getCodigoInsumo();
+
+        if (!passaFiltro(textoBusca, filtro)) continue;
+
+        modeloAtendimentos.addRow(new Object[]{
+            a.getIdColaborador(),
+            nomeColaboradorMap.getOrDefault(a.getIdColaborador(), "-"),
+            a.getCodigoServico(),
+            a.getCodigoInsumo(),
+            a.getQtdAplicacoes(),
+            a.getCpfCliente(),
+            a.getDataHora(),
+            String.format("R$ %.2f", a.getValorArrecadado())
+        });
+    }
+}
 
     private void exportarRelatorio() {
         JOptionPane.showMessageDialog(this,
@@ -215,4 +282,85 @@ public class TelaRelatorios extends JFrame {
         tabela.setGridColor(CoresUtil.ROSA_SECUNDARIO);
         tabela.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
     }
+    private boolean passaFiltro(String texto, String filtro) {
+    if (filtro == null || filtro.trim().isEmpty()) return true;
+    return texto.toLowerCase().contains(filtro.toLowerCase());
+}
+    private String calcularFuncionarioMaisProdutivo(List<Colaborador> colaboradores, List<Atendimento> atendimentos) {
+
+    int melhorQtd = 0;
+    String nomeMelhor = "-";
+
+    for (Colaborador c : colaboradores) {
+
+        int qtd = 0;
+
+        for (Atendimento a : atendimentos) {
+            if (a.getIdColaborador() == c.getIdColaborador()) {
+                qtd++;
+            }
+        }
+
+        if (qtd > melhorQtd) {
+            melhorQtd = qtd;
+            nomeMelhor = c.getNomeColaborador();
+        }
+    }
+
+    return nomeMelhor + " (" + melhorQtd + " atendimentos)";
+}
+    private String calcularClienteMaisFrequente(List<Atendimento> atendimentos) {
+
+    Map<String, Integer> contagemClientes = new HashMap<>();
+
+    for (Atendimento a : atendimentos) {
+
+        String cliente = a.getCpfCliente();
+
+        contagemClientes.put(
+            cliente,
+            contagemClientes.getOrDefault(cliente, 0) + 1
+        );
+    }
+
+    String melhorCliente = "-";
+    int maior = 0;
+
+    for (Map.Entry<String, Integer> entry : contagemClientes.entrySet()) {
+
+        if (entry.getValue() > maior) {
+            maior = entry.getValue();
+            melhorCliente = entry.getKey();
+        }
+    }
+
+    return melhorCliente + " (" + maior + " visitas)";
+}
+    private String calcularHorarioPico(List<Atendimento> atendimentos) {
+
+    Map<Integer, Integer> mapaHoras = new HashMap<>();
+
+    for (Atendimento a : atendimentos) {
+
+        // supondo formato: "2026-07-03 14:30:00"
+        String dataHora = a.getDataHora().toString();
+
+        int hora = Integer.parseInt(dataHora.substring(11, 13));
+
+        mapaHoras.put(hora, mapaHoras.getOrDefault(hora, 0) + 1);
+    }
+
+    int melhorHora = 0;
+    int maior = 0;
+
+    for (Map.Entry<Integer, Integer> entry : mapaHoras.entrySet()) {
+
+        if (entry.getValue() > maior) {
+            maior = entry.getValue();
+            melhorHora = entry.getKey();
+        }
+    }
+
+    return melhorHora + "h (" + maior + " atendimentos)";
+}
 }

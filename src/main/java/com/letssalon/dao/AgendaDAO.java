@@ -688,6 +688,8 @@ public List<Object[]> listarFinalizadosAntigos(int codigoEmpresa) {
         stmt.setInt(1, codigoEmpresa);
 
         ResultSet rs = stmt.executeQuery();
+        
+        System.out.println("Empresa: " + codigoEmpresa);
 
         DateTimeFormatter formatoData =
                 DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -696,6 +698,16 @@ public List<Object[]> listarFinalizadosAntigos(int codigoEmpresa) {
                 DateTimeFormatter.ofPattern("HH:mm");
 
         while (rs.next()) {
+            
+            System.out.println(
+    rs.getString("nome_cliente")
+    + " | "
+    + rs.getDate("data")
+    + " | "
+    + rs.getString("nome_servico")
+    + " | "
+    + rs.getString("nome_colaborador")
+);
 
             LocalDate data =
                     rs.getDate("data").toLocalDate();
@@ -737,6 +749,10 @@ public List<Object[]> listarFinalizadosAntigos(int codigoEmpresa) {
         );
 
     }
+    
+    System.out.println(
+    "Total encontrados: " + lista.size()
+);
 
     return lista;
 }
