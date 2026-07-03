@@ -18,7 +18,6 @@ public class TelaCadastroColaborador extends JFrame {
     private JTextField txtId, txtNome, txtEmailColaborador;
     private JFormattedTextField txtCpf, txtTelefone;
     private JPasswordField txtSenha;
-    private JComboBox<String> cmbServicos;
     private JButton btnCadastrar, btnAtualizar, btnExcluir, btnLimpar, btnVoltar;
     private JTable tabelaColaboradores;
     private DefaultTableModel modeloTabela;
@@ -84,7 +83,7 @@ public class TelaCadastroColaborador extends JFrame {
         gbc.gridwidth = 1;
         gbc.gridx = 0; gbc.gridy = 2;
         painelForm.add(new JLabel("CPF:"), gbc);
-        txtCpf = new JFormattedTextField(15);
+        txtCpf = MascaraUtil.criarCampoCPF();
         txtCpf.setToolTipText("Ex: 000.000.000-00");
         gbc.gridx = 1;
         painelForm.add(txtCpf, gbc);
@@ -92,7 +91,7 @@ public class TelaCadastroColaborador extends JFrame {
         // Telefone
         gbc.gridx = 2;
         painelForm.add(new JLabel("Telefone:"), gbc);
-        txtTelefone = new JFormattedTextField(15);
+        txtTelefone = MascaraUtil.criarCampoTelefone();
         txtTelefone.setToolTipText("Ex: 49 99999999");
         gbc.gridx = 3;
         painelForm.add(txtTelefone, gbc);
@@ -111,18 +110,6 @@ public class TelaCadastroColaborador extends JFrame {
         gbc.gridx = 3;
         painelForm.add(txtSenha, gbc);
 
-       // Serviços
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        painelForm.add(new JLabel("Especialidade:"), gbc);
-
-        cmbServicos = new JComboBox<>();
-        gbc.gridx = 1;
-        gbc.gridwidth = 3;
-        painelForm.add(cmbServicos, gbc);
-
-        gbc.gridwidth = 1;
-
         // Botões
         JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
         painelBotoes.setBackground(CoresUtil.ROSA_FUNDO);
@@ -139,7 +126,7 @@ public class TelaCadastroColaborador extends JFrame {
         painelBotoes.add(btnLimpar);
         painelBotoes.add(btnVoltar);
 
-        gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 4;
+        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 4;
         painelForm.add(painelBotoes, gbc);
 
         add(painelForm, BorderLayout.NORTH);
@@ -158,7 +145,7 @@ public class TelaCadastroColaborador extends JFrame {
         painelBusca.add(btnBuscar);
         painelTabela.add(painelBusca, BorderLayout.NORTH);
 
-        String[] colunas = {"Id", "Nome", "CPF", "Telefone", "Especialidade"};
+        String[] colunas = {"Id", "Nome", "CPF", "Telefone"};
         modeloTabela = new DefaultTableModel(colunas, 0);
         tabelaColaboradores = new JTable(modeloTabela);
         tabelaColaboradores.setRowHeight(28);
@@ -183,26 +170,33 @@ public class TelaCadastroColaborador extends JFrame {
     }
 
     private void carregarTabela() {
-        modeloTabela.setRowCount(0);
-        List<Colaborador> lista = colaboradorDAO.listarPorEmpresa(colaboradorLogado.getCodigoEmpresa());
-        for (Colaborador c : lista) {
-            modeloTabela.addRow(new Object[]{
-                c.getIdColaborador(),
-                c.getNomeColaborador(),
-                c.getCpfColaborador(),
-                c.getTelefoneColaborador(),
-                c.getFuncaoColaborador()
-            });
-        }
+
+    modeloTabela.setRowCount(0);
+
+    List<Colaborador> lista =
+            colaboradorDAO.listarPorEmpresa(
+                    colaboradorLogado.getCodigoEmpresa()
+            );
+
+    for (Colaborador c : lista) {
+
+        modeloTabela.addRow(new Object[]{
+            c.getIdColaborador(),
+            c.getNomeColaborador(),
+            c.getCpfColaborador(),
+            c.getTelefoneColaborador()
+        });
+
     }
-    private void carregarTabelaFiltrada() {
-        
+
+}
+private void carregarTabelaFiltrada() {
+
     System.out.println("BUSCA ACIONADA");
 
     modeloTabela.setRowCount(0);
 
-    String busca =
-            txtBuscar.getText().trim();
+    String busca = txtBuscar.getText().trim();
 
     List<Colaborador> lista =
             colaboradorDAO.buscarPorNomeOuCpf(
@@ -211,6 +205,8 @@ public class TelaCadastroColaborador extends JFrame {
             );
 
     for (Colaborador c : lista) {
+
+        c.setFuncaoColaborador("Profissional");
 
         modeloTabela.addRow(new Object[]{
             c.getIdColaborador(),
@@ -285,8 +281,10 @@ if (sucesso) {
         c.setCpfColaborador(txtCpf.getText().trim());
         c.setTelefoneColaborador(txtTelefone.getText().trim());
         c.setEmailColaborador(txtEmailColaborador.getText().trim());
+        c.setFuncaoColaborador("Profissional");
         c.setCodigoEmpresa(colaboradorLogado.getCodigoEmpresa());
 
+        c.setFuncaoColaborador("Profissional");
         colaboradorDAO.atualizar(c);
         carregarTabela();
         limparCampos();

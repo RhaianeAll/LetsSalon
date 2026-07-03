@@ -15,6 +15,7 @@ import java.awt.*;
 import java.util.List;
 import com.letssalon.util.CoresUtil;
 import javax.swing.table.DefaultTableCellRenderer;
+import java.awt.Component;
 
 public class TelaAgendaCliente extends JFrame {
 
@@ -42,6 +43,7 @@ public class TelaAgendaCliente extends JFrame {
         initComponents();
         carregarDados();
     }
+
 
     private void initComponents() {
         setTitle("Let's Salon - Meus Agendamentos");
@@ -114,6 +116,7 @@ public class TelaAgendaCliente extends JFrame {
         // Botões
         JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 5));
         painelBotoes.setBackground(CoresUtil.ROSA_FUNDO);
+   
 
         btnAgendar = criarBotao("Agendar", new Color(201, 72, 105));
 
@@ -134,20 +137,34 @@ public class TelaAgendaCliente extends JFrame {
             new Color(201, 72, 105)
         ));
 
-        String[] colunas = {"Data", "Hora", "Profissional", "Serviço", "Status"};
+        String[] colunas = {"ID","Data", "Hora", "Profissional", "Serviço", "Status","Empresa"};
         modeloTabela = new DefaultTableModel(colunas, 0);
         tabelaMeusAgendamentos = new JTable(modeloTabela);
         
+        // Esconde a coluna ID (usada apenas internamente)
+        tabelaMeusAgendamentos.getColumnModel()
+            .getColumn(0)
+            .setMinWidth(0);
+
+        tabelaMeusAgendamentos.getColumnModel()
+            .getColumn(0)
+            .setMaxWidth(0);
+
+        tabelaMeusAgendamentos.getColumnModel()
+            .getColumn(0)
+            .setPreferredWidth(0);
+        
         // Define uma largura inicial para cada coluna
-        tabelaMeusAgendamentos.getColumnModel().getColumn(0).setPreferredWidth(80);   // Data
+        tabelaMeusAgendamentos.getColumnModel().getColumn(1).setPreferredWidth(90);   // Data
 
-        tabelaMeusAgendamentos.getColumnModel().getColumn(1).setPreferredWidth(60);   // Hora
+        tabelaMeusAgendamentos.getColumnModel().getColumn(2).setPreferredWidth(70);   // Hora
 
-        tabelaMeusAgendamentos.getColumnModel().getColumn(2).setPreferredWidth(180);  // Profissional
+        tabelaMeusAgendamentos.getColumnModel().getColumn(3).setPreferredWidth(220);  // Profissional
 
-        tabelaMeusAgendamentos.getColumnModel().getColumn(3).setPreferredWidth(220);  // Serviço
+        tabelaMeusAgendamentos.getColumnModel().getColumn(4).setPreferredWidth(180);  // Serviço
 
-        tabelaMeusAgendamentos.getColumnModel().getColumn(4).setPreferredWidth(110);  // Status
+        tabelaMeusAgendamentos.getColumnModel().getColumn(5).setPreferredWidth(120);  // Status
+        tabelaMeusAgendamentos.getColumnModel().getColumn(6).setPreferredWidth(220);
         
         // Renderizador para centralizar o texto
         DefaultTableCellRenderer centralizado =
@@ -158,28 +175,21 @@ public class TelaAgendaCliente extends JFrame {
         // Centraliza Data
         tabelaMeusAgendamentos
         .getColumnModel()
-        .getColumn(0)
+        .getColumn(1)
         .setCellRenderer(centralizado);
 
         // Centraliza Hora
         tabelaMeusAgendamentos
         .getColumnModel()
-        .getColumn(1)
+        .getColumn(2)
         .setCellRenderer(centralizado);
 
         // Centraliza Status
         tabelaMeusAgendamentos
         .getColumnModel()
-        .getColumn(4)
+        .getColumn(5)
         .setCellRenderer(centralizado);
 
-        tabelaMeusAgendamentos.getColumnModel()
-        .getColumn(0)
-        .setMaxWidth(0);
-
-        tabelaMeusAgendamentos.getColumnModel()
-        .getColumn(0)
-        .setWidth(0);
         tabelaMeusAgendamentos.setRowHeight(28);
         tabelaMeusAgendamentos.getTableHeader().setBackground(new Color(201, 72, 105));
         tabelaMeusAgendamentos.getTableHeader().setForeground(Color.WHITE);
@@ -187,6 +197,8 @@ public class TelaAgendaCliente extends JFrame {
         tabelaMeusAgendamentos.setBackground(Color.WHITE);
         tabelaMeusAgendamentos.setGridColor(CoresUtil.ROSA_SECUNDARIO);
 
+        configurarRendererStatus();
+        
         painelTabela.add(new JScrollPane(tabelaMeusAgendamentos));
         
         // Painel de botões da tabela
@@ -229,6 +241,70 @@ public class TelaAgendaCliente extends JFrame {
             dispose();
         });
     }
+            // Personaliza a cor do Status de cada agendamento
+    private void configurarRendererStatus() {
+
+    tabelaMeusAgendamentos
+            .getColumnModel()
+            .getColumn(5)
+            .setCellRenderer(new DefaultTableCellRenderer() {
+
+        @Override
+        public Component getTableCellRendererComponent(
+                JTable table,
+                Object value,
+                boolean isSelected,
+                boolean hasFocus,
+                int row,
+                int column) {
+
+            Component c = super.getTableCellRendererComponent(
+                    table,
+                    value,
+                    isSelected,
+                    hasFocus,
+                    row,
+                    column);
+
+            // Centraliza o texto
+            setHorizontalAlignment(SwingConstants.CENTER);
+
+            // Mantém a seleção padrão
+            if (isSelected) {
+                return c;
+            }
+
+            // Fundo branco para todas as linhas
+            c.setBackground(Color.WHITE);
+
+            String status = value.toString();
+
+            switch (status) {
+
+                case "CONFIRMADO":
+                    c.setForeground(new Color(0, 140, 0));
+                    break;
+
+                case "PENDENTE":
+                    c.setForeground(new Color(230, 150, 0));
+                    break;
+
+                case "CANCELADO":
+                    c.setForeground(Color.RED);
+                    break;
+
+                case "FINALIZADO":
+                    c.setForeground(Color.GRAY);
+                    break;
+
+                default:
+                    c.setForeground(Color.BLACK);
+            }
+
+            return c;
+        }
+    });
+}
 
     private void carregarDados() {
         // Limpa o ComboBox antes de carregar novamente
@@ -260,15 +336,39 @@ public class TelaAgendaCliente extends JFrame {
         // Carrega agendamentos do cliente logado
         modeloTabela.setRowCount(0);
 
+System.out.println(
+    "CPF cliente logado: "
+    + clienteLogado.getCpfCliente()
+);
+
 List<Object[]> agendamentos =
         agendaDAO.listarPorCliente(
                 clienteLogado.getCpfCliente()
         );
 
+System.out.println(
+    "Quantidade encontrada: "
+    + agendamentos.size()
+);
+
 for (Object[] linha : agendamentos) {
+
+    System.out.println(
+        java.util.Arrays.toString(linha)
+    );
 
     modeloTabela.addRow(linha);
 }
+System.out.println(
+    "Modelo da tabela: " + tabelaMeusAgendamentos.getModel().getRowCount()
+);
+
+System.out.println(
+    "Modelo utilizado: " + modeloTabela.getRowCount()
+);
+System.out.println(
+    "Linhas na tabela: " + modeloTabela.getRowCount()
+);
     }
 
     private void realizarAgendamento() {

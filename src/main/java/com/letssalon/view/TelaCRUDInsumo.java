@@ -131,12 +131,13 @@ private void carregarTabela() {
     modeloTabela.setRowCount(0);
 
     List<Insumo> lista =
-            insumoDAO.listar();
+            insumoDAO.listarPorEmpresa(
+                    colaboradorLogado.getCodigoEmpresa()
+            );
 
     for (Insumo i : lista) {
 
-        modeloTabela.addRow(
-            new Object[]{
+        modeloTabela.addRow(new Object[]{
 
                 i.getCodigoInsumo(),
 
@@ -147,9 +148,11 @@ private void carregarTabela() {
                 i.getQuantidadeInsumo(),
 
                 i.getCapacidade()
-            }
-        );
+
+        });
+
     }
+
 }
 
     private void cadastrar() {
@@ -244,16 +247,29 @@ private void atualizar() {
                 colaboradorLogado.getCodigoEmpresa()
         );
 
-        insumoDAO.atualizar(i);
+boolean sucesso = insumoDAO.atualizar(i);
 
-        carregarTabela();
+if (sucesso) {
 
-        limparCampos();
+    carregarTabela();
 
-        JOptionPane.showMessageDialog(
-                this,
-                "Insumo atualizado com sucesso!"
-        );
+    limparCampos();
+
+    JOptionPane.showMessageDialog(
+            this,
+            "Insumo atualizado com sucesso!"
+    );
+
+} else {
+
+    JOptionPane.showMessageDialog(
+            this,
+            "Erro ao atualizar insumo!",
+            "Erro",
+            JOptionPane.ERROR_MESSAGE
+    );
+
+}
     }
 private void excluir() {
 
@@ -267,19 +283,33 @@ private void excluir() {
         return;
     }
 
-    insumoDAO.excluir(
+boolean sucesso = insumoDAO.excluir(
         Integer.parseInt(
-            txtCodigo.getText()
+                txtCodigo.getText()
         )
-    );
+);
+
+if (sucesso) {
 
     carregarTabela();
 
     limparCampos();
-     JOptionPane.showMessageDialog(
-                this,
-                "Insumo excluído com sucesso!"
-        );
+
+    JOptionPane.showMessageDialog(
+            this,
+            "Insumo excluído com sucesso!"
+    );
+
+} else {
+
+    JOptionPane.showMessageDialog(
+            this,
+            "Não é possível excluir este insumo.\nExistem serviços utilizando-o.",
+    "Erro",
+            JOptionPane.ERROR_MESSAGE
+    );
+
+}
 }
 private void selecionarLinha() {
 

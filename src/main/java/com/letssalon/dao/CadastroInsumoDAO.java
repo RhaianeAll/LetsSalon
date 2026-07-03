@@ -24,16 +24,52 @@ public class CadastroInsumoDAO {
         }
     }
 
-    public void excluir(int codigoInsumo, int codigoServico) {
-        String sql = "DELETE FROM cadastro_insumo WHERE codigo_insumo=? AND codigo_servico=?";
-        try (Connection conn = Conexao.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, codigoInsumo);
-            stmt.setInt(2, codigoServico);
-            stmt.executeUpdate();
-            System.out.println("Registro excluído com sucesso!");
-        } catch (SQLException e) {
-            System.out.println("Erro ao excluir: " + e.getMessage());
-        }
+ public boolean excluir(int codigoInsumo, int codigoServico) {
+
+    String sql = "DELETE FROM cadastro_insumo WHERE codigo_insumo=? AND codigo_servico=?";
+
+    try (
+        Connection conn = Conexao.conectar();
+        PreparedStatement stmt = conn.prepareStatement(sql)
+    ) {
+
+        stmt.setInt(1, codigoInsumo);
+        stmt.setInt(2, codigoServico);
+
+        return stmt.executeUpdate() > 0;
+
+    } catch (SQLException e) {
+
+        System.out.println("Erro ao excluir: " + e.getMessage());
+
+        return false;
     }
 }
+        public ResultSet listarRelacionamentos() {
+
+    String sql =
+        "SELECT ci.codigo_insumo, " +
+        "i.nome_insumo, " +
+        "ci.rende_aplicacoes, " +
+        "ci.codigo_servico, " +
+        "s.nome_servico " +
+        "FROM cadastro_insumo ci " +
+        "INNER JOIN insumo i ON i.codigo_insumo = ci.codigo_insumo " +
+        "INNER JOIN servico s ON s.codigo_servico = ci.codigo_servico";
+
+    try {
+
+        Connection conn = Conexao.conectar();
+
+        PreparedStatement stmt = conn.prepareStatement(sql);
+
+        return stmt.executeQuery();
+
+    } catch (SQLException e) {
+
+        System.out.println("Erro ao listar relacionamento: " + e.getMessage());
+
+        return null;
+    }
+}
+    }

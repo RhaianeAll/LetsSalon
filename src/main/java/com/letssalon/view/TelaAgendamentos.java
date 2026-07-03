@@ -191,25 +191,33 @@ public class TelaAgendamentos extends JFrame {
 
         String[] colunasAgendamentos = {
     "ID",
+    "CPF",
+    "ID Colaborador",
+    "ID Serviço",
     "Data",
     "Hora",
     "Cliente",
     "Profissional",
-    "Serviço",
-    };
+    "Serviço"
+};
         modeloAgendamentos = new DefaultTableModel(colunasAgendamentos, 0);
         tabelaAgendamentos = new JTable(modeloAgendamentos);
-        tabelaAgendamentos.getColumnModel()
-                  .getColumn(0)
-                  .setMinWidth(0);
+        
+        for (int i = 0; i < 4; i++) {
 
-        tabelaAgendamentos.getColumnModel()
-                  .getColumn(0)
-                  .setMaxWidth(0);
+    tabelaAgendamentos.getColumnModel()
+            .getColumn(i)
+            .setMinWidth(0);
 
-        tabelaAgendamentos.getColumnModel()
-                  .getColumn(0)
-                  .setWidth(0);
+    tabelaAgendamentos.getColumnModel()
+            .getColumn(i)
+            .setMaxWidth(0);
+
+    tabelaAgendamentos.getColumnModel()
+            .getColumn(i)
+            .setWidth(0);
+}
+        
         tabelaAgendamentos.setRowHeight(28);
         estilizarTabela(tabelaAgendamentos);
         painelPrincipal.add(new JScrollPane(tabelaAgendamentos));
@@ -222,7 +230,7 @@ public class TelaAgendamentos extends JFrame {
     
         // Ações
         btnCadastrar.addActionListener(e -> cadastrarAgendamento());
-        btnAtualizar.addActionListener(e -> carregarDados());
+        btnAtualizar.addActionListener(e -> atualizarAgendamento());
         btnExcluir.addActionListener(e -> excluirAgendamento());
         btnLimpar.addActionListener(e -> limparCampos());
         btnVoltar.addActionListener(e -> dispose());
@@ -431,6 +439,98 @@ if (sucesso) {
     );
 }
     }
+    
+    private void atualizarAgendamento() {
+
+    int linha = tabelaAgendamentos.getSelectedRow();
+
+    if (linha == -1) {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Selecione um agendamento para atualizar!"
+        );
+
+        return;
+    }
+
+    Agenda agenda = new Agenda();
+
+    agenda.setIdAgendamento(
+            Integer.parseInt(
+                    modeloAgendamentos.getValueAt(linha, 0).toString()
+            )
+    );
+
+    agenda.setData(txtData.getText().trim());
+    agenda.setHorario(txtHora.getText().trim());
+
+    String cliente =
+            cmbCliente.getSelectedItem().toString();
+
+    agenda.setCpfCliente(
+            cliente.split(" - ")[0]
+    );
+
+    String colaborador =
+            cmbColaborador.getSelectedItem().toString();
+
+    agenda.setIdColaborador(
+            Integer.parseInt(
+                    colaborador.split(" - ")[0]
+            )
+    );
+
+    String servico =
+            cmbServico.getSelectedItem().toString();
+
+    agenda.setCodigoServico(
+            Integer.parseInt(
+                    servico.split(" - ")[0]
+            )
+    );
+    
+boolean conflito =
+        agendaDAO.verificarConflitoHorarioAtualizacao(
+                agenda.getIdAgendamento(),
+                agenda.getData(),
+                agenda.getHorario(),
+                agenda.getIdColaborador()
+        );
+
+if (conflito) {
+
+    JOptionPane.showMessageDialog(
+            this,
+            "Este horário já está ocupado."
+    );
+
+    return;
+}
+
+    boolean sucesso =
+            agendaDAO.atualizar(agenda);
+
+    if (sucesso) {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Agendamento atualizado com sucesso!"
+        );
+
+        carregarDados();
+        limparCampos();
+
+    } else {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Erro ao atualizar agendamento!"
+        );
+
+    }
+
+}
 
     private void confirmarAgendamentoPendente() {
         int linha = tabelaPendentes.getSelectedRow();
@@ -527,13 +627,57 @@ if (sucesso) {
 }
 
     private void selecionarLinha() {
-        int linha = tabelaAgendamentos.getSelectedRow();
-        if (linha != -1) {
-            txtData.setText(modeloAgendamentos.getValueAt(linha, 1).toString());
-            txtHora.setText(modeloAgendamentos.getValueAt(linha, 2).toString());
-            cmbCliente.setSelectedIndex(0);
+
+    int linha = tabelaAgendamentos.getSelectedRow();
+
+    if (linha == -1) {
+        return;
+    }
+
+    txtData.setText(
+            modeloAgendamentos.getValueAt(linha, 4).toString());
+
+    txtHora.setText(
+            modeloAgendamentos.getValueAt(linha, 5).toString());
+
+    String cpf =
+            modeloAgendamentos.getValueAt(linha, 1).toString();
+
+    for (int i = 0; i < cmbCliente.getItemCount(); i++) {
+
+        if (cmbCliente.getItemAt(i).startsWith(cpf + " -")) {
+
+            cmbCliente.setSelectedIndex(i);
+            break;
         }
     }
+
+    int idColaborador =
+            Integer.parseInt(
+                    modeloAgendamentos.getValueAt(linha, 2).toString());
+
+    for (int i = 0; i < cmbColaborador.getItemCount(); i++) {
+
+        if (cmbColaborador.getItemAt(i).startsWith(idColaborador + " -")) {
+
+            cmbColaborador.setSelectedIndex(i);
+            break;
+        }
+    }
+
+    int idServico =
+            Integer.parseInt(
+                    modeloAgendamentos.getValueAt(linha, 3).toString());
+
+    for (int i = 0; i < cmbServico.getItemCount(); i++) {
+
+        if (cmbServico.getItemAt(i).startsWith(idServico + " -")) {
+
+            cmbServico.setSelectedIndex(i);
+            break;
+        }
+    }
+}
 
     private void limparCampos() {
         txtData.setText("");

@@ -4,6 +4,7 @@ import com.letssalon.dao.AgendaDAO;
 import com.letssalon.dao.EmpresaDAO;
 import com.letssalon.model.Agenda;
 import com.letssalon.model.Colaborador;
+import com.letssalon.model.Empresa;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -16,6 +17,7 @@ public class TelaPrincipal extends JFrame {
 
     private Colaborador colaboradorLogado;
     private JLabel lblNome, lblFuncao, lblEmpresa;
+    private JPanel painelTabela;
     private JButton btnAgendamentos, btnCadastroProfissionais;
     private JButton btnCadastroServicos, btnEstoque;
     private JButton btnCadastroInsumos, btnRelatorios;
@@ -141,7 +143,7 @@ public class TelaPrincipal extends JFrame {
 
     // TABELA
 
-    JPanel painelTabela = new JPanel(new BorderLayout());
+    painelTabela = new JPanel(new BorderLayout());
     painelTabela.setBackground(CoresUtil.ROSA_FUNDO);
 
     painelTabela.setBorder(BorderFactory.createTitledBorder(
@@ -165,6 +167,7 @@ public class TelaPrincipal extends JFrame {
     modeloTabela = new DefaultTableModel(colunas, 0);
 
     tabelaAtendimentos = new JTable(modeloTabela);
+    painelTabela.setVisible(false);
 
     tabelaAtendimentos.setRowHeight(28);
 
@@ -224,33 +227,41 @@ public class TelaPrincipal extends JFrame {
     lblNome.setText(colaboradorLogado.getNomeColaborador());
     lblFuncao.setText(colaboradorLogado.getFuncaoColaborador());
     
-     // Busca o nome da empresa pelo código
-    EmpresaDAO empresaDAO = new EmpresaDAO();
-    empresaDAO.listar().stream()
-        .filter(e -> e.getCodigoEmpresa() == colaboradorLogado.getCodigoEmpresa())
-        .findFirst()
-        .ifPresent(e -> lblEmpresa.setText(e.getNomeEmpresa() + "  "));
+ // Busca o nome da empresa pelo código
+EmpresaDAO empresaDAO = new EmpresaDAO();
+
+Empresa empresa = empresaDAO.buscarPorCodigo(
+        colaboradorLogado.getCodigoEmpresa());
+
+if (empresa != null) {
+
+    lblEmpresa.setText(
+            empresa.getNomeEmpresa() + "  ");
+
+}
  
-    // Preenche tabela de atendimentos realizados há mais de 15 dias
-    AgendaDAO agendaDAO = new AgendaDAO();
-    modeloTabela.setRowCount(0);
-    java.time.LocalDate limite = java.time.LocalDate.now().minusDays(15);
-    for (Agenda a : agendaDAO.listar()) {
-        if (!"CONFIRMADO".equals(a.getStatus())) continue;
-        try {
-            // data no formato dd/MM/yyyy
-            java.time.format.DateTimeFormatter fmt = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            java.time.LocalDate dataAgenda = java.time.LocalDate.parse(a.getData(), fmt);
-            if (dataAgenda.isBefore(limite)) {
-                long diasAtras = java.time.temporal.ChronoUnit.DAYS.between(dataAgenda, java.time.LocalDate.now());
-                modeloTabela.addRow(new Object[]{
-                    a.getCpfCliente(), "-",
-                    a.getData() + " " + a.getHorario(),
-                    a.getIdColaborador(), a.getCodigoServico(),
-                    diasAtras + " dias atrás"
-                });
-            }
-        } catch (Exception ignored) {}
-    }
+   // Preenche tabela de atendimentos realizados há mais de 15 dias
+AgendaDAO agendaDAO = new AgendaDAO();
+
+modeloTabela.setRowCount(0);
+
+List<Object[]> atendimentos =
+        agendaDAO.listarFinalizadosAntigos(
+                colaboradorLogado.getCodigoEmpresa());
+
+for (Object[] linha : atendimentos) {
+
+    modeloTabela.addRow(linha);
+
+}
+String funcao = colaboradorLogado.getFuncaoColaborador();
+
+boolean isAdmin =
+        funcao != null &&
+        (funcao.equalsIgnoreCase("ADMIN") ||
+         funcao.equalsIgnoreCase("ADMINISTRADOR") ||
+         funcao.equalsIgnoreCase("Dono"));
+
+painelTabela.setVisible(isAdmin);
 }
 }

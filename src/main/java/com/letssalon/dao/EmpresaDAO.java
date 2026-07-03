@@ -89,4 +89,51 @@ public class EmpresaDAO {
         return false;
         }
     }
+    public Empresa buscarPorCodigo(int codigoEmpresa) {
+
+    String sql =
+        "SELECT * FROM empresa WHERE codigo_empresa = ?";
+
+    try (
+        Connection conn = Conexao.conectar();
+        PreparedStatement stmt = conn.prepareStatement(sql)
+    ) {
+
+        stmt.setInt(1, codigoEmpresa);
+
+        ResultSet rs = stmt.executeQuery();
+
+        if (rs.next()) {
+
+            Empresa empresa = new Empresa();
+
+            empresa.setCodigoEmpresa(
+                    rs.getInt("codigo_empresa"));
+
+            empresa.setNomeEmpresa(
+                    rs.getString("nome_empresa"));
+
+            empresa.setTelefoneEmpresa(
+                    rs.getString("telefone_empresa"));
+
+            empresa.setEmailEmpresa(
+                    rs.getString("email_empresa"));
+
+            empresa.setEnderecoEmpresa(
+                    rs.getString("endereco_empresa"));
+
+            return empresa;
+        }
+
+    } catch (SQLException e) {
+
+        System.out.println(
+            "Erro ao buscar empresa: "
+            + e.getMessage()
+        );
+
+    }
+
+    return null;
+}
 }

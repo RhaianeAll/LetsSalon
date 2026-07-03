@@ -13,6 +13,7 @@ import java.awt.*;
 import java.util.List;
 import com.letssalon.util.CoresUtil;
 import com.letssalon.util.BotaoUtil;
+import java.sql.ResultSet;
 
 public class TelaCadastroInsumo extends JFrame {
 
@@ -139,6 +140,7 @@ public class TelaCadastroInsumo extends JFrame {
         btnExcluir.addActionListener(e -> excluir());
         btnLimpar.addActionListener(e -> limparCampos());
         btnVoltar.addActionListener(e -> dispose());
+        tabelaInsumos.getSelectionModel().addListSelectionListener(e -> selecionarLinha());
     }
 
     private void carregarCombos() {
@@ -156,20 +158,30 @@ private void carregarTabela() {
 
     modeloTabela.setRowCount(0);
 
-    List<Insumo> lista =
-            insumoDAO.listarPorEmpresa(
-                    colaboradorLogado.getCodigoEmpresa()
-            );
+    try {
 
-    for (Insumo i : lista) {
+        ResultSet rs = cadastroInsumoDAO.listarRelacionamentos();
 
-        modeloTabela.addRow(new Object[]{
-            i.getCodigoInsumo(),
-            i.getNomeInsumo(),
-            "-",
-            "-"
-        });
+        while (rs != null && rs.next()) {
+
+            modeloTabela.addRow(new Object[]{
+
+                rs.getInt("codigo_insumo"),
+
+                rs.getString("nome_insumo"),
+
+                rs.getInt("rende_aplicacoes"),
+
+                rs.getString("nome_servico")
+            });
+        }
+
+    } catch (Exception e) {
+
+        System.out.println(e.getMessage());
+
     }
+
 }
     private void carregarTabelaFiltrada() {
 
@@ -251,18 +263,69 @@ private void carregarTabela() {
     );
 }
 
-    private void excluir() {
-        int linha = tabelaInsumos.getSelectedRow();
-        if (linha == -1) {
-            JOptionPane.showMessageDialog(this, "Selecione um insumo!", "Atenção", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        int confirmacao = JOptionPane.showConfirmDialog(this, "Deseja excluir?", "Confirmar", JOptionPane.YES_NO_OPTION);
-        if (confirmacao == JOptionPane.YES_OPTION) {
-            carregarTabela();
-            JOptionPane.showMessageDialog(this, "Excluído com sucesso!");
-        }
+ private void excluir() {
+
+    int linha = tabelaInsumos.getSelectedRow();
+
+    if (linha == -1) {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Selecione um registro!"
+        );
+
+        return;
     }
+
+    int confirmacao = JOptionPane.showConfirmDialog(
+            this,
+            "Deseja realmente excluir este relacionamento?",
+            "Confirmação",
+            JOptionPane.YES_NO_OPTION
+    );
+
+    if (confirmacao != JOptionPane.YES_OPTION) {
+        return;
+    }
+
+    int codigoInsumo = Integer.parseInt(
+            modeloTabela.getValueAt(linha, 0).toString()
+    );
+
+    String itemServico = cmbServico.getSelectedItem().toString();
+
+    int codigoServico = Integer.parseInt(
+            itemServico.split(" - ")[0]
+    );
+
+    boolean sucesso = cadastroInsumoDAO.excluir(
+            codigoInsumo,
+            codigoServico
+    );
+
+    if (sucesso) {
+
+        carregarTabela();
+
+        limparCampos();
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Relacionamento excluído com sucesso!"
+        );
+
+    } else {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Erro ao excluir relacionamento!",
+                "Erro",
+                JOptionPane.ERROR_MESSAGE
+        );
+
+    }
+
+}
 
     private void limparCampos() {
         txtRendeAplicacoes.setText("");
@@ -277,4 +340,46 @@ private void carregarTabela() {
         tabela.setBackground(Color.WHITE);
         tabela.setGridColor(CoresUtil.ROSA_SECUNDARIO);
     }
+private void selecionarLinha() {
+
+    int linha = tabelaInsumos.getSelectedRow();
+
+    if (linha == -1) {
+        return;
+    }
+
+    // Seleciona o insumo
+    String codigoInsumo = modeloTabela.getValueAt(linha, 0).toString();
+
+    for (int i = 0; i < cmbInsumo.getItemCount(); i++) {
+
+        String item = cmbInsumo.getItemAt(i);
+
+        if (item.startsWith(codigoInsumo + " -")) {
+
+            cmbInsumo.setSelectedIndex(i);
+            break;
+        }
+    }
+
+    // Preenche rende aplicações
+    txtRendeAplicacoes.setText(
+            modeloTabela.getValueAt(linha, 2).toString()
+    );
+
+    // Seleciona o serviço
+    String nomeServico = modeloTabela.getValueAt(linha, 3).toString();
+
+    for (int i = 0; i < cmbServico.getItemCount(); i++) {
+
+        String item = cmbServico.getItemAt(i);
+
+        if (item.endsWith(" - " + nomeServico)) {
+
+            cmbServico.setSelectedIndex(i);
+            break;
+        }
+    }
+
+}
 }

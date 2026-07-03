@@ -179,11 +179,11 @@ public class TelaInscricao extends JFrame {
         colaborador.setTelefoneColaborador(txtTelefone.getText().trim());
         colaborador.setFuncaoColaborador(txtFuncao.getText().trim());
         colaborador.setEmailColaborador(txtEmailColaborador.getText().trim());
-        String senhaCriptografada = SenhaUtil.criptografarSenha(senha);
-        colaborador.setSenhaColaborador(senhaCriptografada);
+        colaborador.setSenhaColaborador(senha);
         colaborador.setPerfil("administrador");
         colaborador.setCodigoEmpresa(codigoEmpresa);
-
+        
+        
         new ColaboradorDAO().cadastrar(colaborador);
 
         JOptionPane.showMessageDialog(this,

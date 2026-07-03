@@ -60,11 +60,62 @@ public class AgendaDAO {
         return false;
     }
 }
+    public boolean atualizar(Agenda agenda) {
+
+    String sql =
+        "UPDATE agenda SET " +
+        "cpf_cliente = ?, " +
+        "data = ?, " +
+        "horario = ?, " +
+        "id_colaborador = ?, " +
+        "codigo_servico = ? " +
+        "WHERE id_agendamento = ?";
+
+    try (
+        Connection conn = Conexao.conectar();
+        PreparedStatement stmt = conn.prepareStatement(sql)
+    ) {
+
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        LocalDate data =
+                LocalDate.parse(
+                        agenda.getData(),
+                        formatter
+                );
+
+        LocalTime horario =
+                LocalTime.parse(
+                        agenda.getHorario()
+                );
+
+        stmt.setString(1, agenda.getCpfCliente());
+        stmt.setDate(2, java.sql.Date.valueOf(data));
+        stmt.setTime(3, java.sql.Time.valueOf(horario));
+        stmt.setInt(4, agenda.getIdColaborador());
+        stmt.setInt(5, agenda.getCodigoServico());
+        stmt.setInt(6, agenda.getIdAgendamento());
+
+        return stmt.executeUpdate() > 0;
+
+    } catch (Exception e) {
+
+        System.out.println(
+                "Erro ao atualizar agendamento: "
+                + e.getMessage()
+        );
+
+        return false;
+    }
+}
 
     public List<Agenda> listar() {
         List<Agenda> lista = new ArrayList<>();
-        String sql = "SELECT * FROM agenda " +
-                     "WHERE status = ('CONFIRMADO')";
+       String sql =
+    "SELECT * FROM agenda " +
+    "WHERE status <> 'CANCELADO' " +
+    "AND status <> 'FINALIZADO'";
         try (Connection conn = Conexao.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -91,13 +142,16 @@ public class AgendaDAO {
     List<Object[]> lista = new ArrayList<>();
 
     String sql =
-        "SELECT " +
-        "a.id_agendamento, " +
-        "a.data, " +
-        "a.horario, " +
-        "c.nome_cliente, " +
-        "col.nome_colaborador, " +
-        "s.nome_servico " +
+    "SELECT " +
+    "a.id_agendamento, " +
+    "a.cpf_cliente, " +
+    "a.id_colaborador, " +
+    "a.codigo_servico, " +
+    "a.data, " +
+    "a.horario, " +
+    "c.nome_cliente, " +
+    "col.nome_colaborador, " +
+    "s.nome_servico " +   
         "FROM agenda a " +
         "INNER JOIN cliente c " +
         "ON a.cpf_cliente = c.cpf_cliente " +
@@ -134,14 +188,17 @@ public class AgendaDAO {
         rs.getTime("horario")
           .toLocalTime()
           .format(formatoHora);
-            lista.add(new Object[]{
-                rs.getInt("id_agendamento"),
-                dataFormatada,
-                horaFormatada,
-                rs.getString("nome_cliente"),
-                rs.getString("nome_colaborador"),
-                rs.getString("nome_servico")
-            });
+lista.add(new Object[]{
+    rs.getInt("id_agendamento"),
+    rs.getString("cpf_cliente"),
+    rs.getInt("id_colaborador"),
+    rs.getInt("codigo_servico"),
+    dataFormatada,
+    horaFormatada,
+    rs.getString("nome_cliente"),
+    rs.getString("nome_colaborador"),
+    rs.getString("nome_servico")
+});
         }
 
     } catch (SQLException e) {
@@ -289,7 +346,63 @@ public boolean confirmar(int idAgendamento) {
 
         return false;
     }
-}
+    }
+    
+        public boolean verificarConflitoHorarioAtualizacao(
+        int idAgendamento,
+        String data,
+        String horario,
+        int idColaborador
+) {
+
+    String sql =
+        "SELECT * FROM agenda " +
+        "WHERE data = ? " +
+        "AND horario = ? " +
+        "AND id_colaborador = ? " +
+        "AND id_agendamento <> ? " +
+        "AND status <> 'CANCELADO'";
+
+    try (
+        Connection conn = Conexao.conectar();
+        PreparedStatement stmt = conn.prepareStatement(sql)
+    ) {
+
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        LocalDate dataAgenda =
+                LocalDate.parse(data, formatter);
+
+        LocalTime horaAgenda =
+                LocalTime.parse(horario);
+
+        stmt.setDate(
+                1,
+                java.sql.Date.valueOf(dataAgenda));
+
+        stmt.setTime(
+                2,
+                java.sql.Time.valueOf(horaAgenda));
+
+        stmt.setInt(3, idColaborador);
+
+        stmt.setInt(4, idAgendamento);
+
+        ResultSet rs = stmt.executeQuery();
+
+        return rs.next();
+
+    } catch (Exception e) {
+
+        System.out.println(
+                "Erro ao verificar conflito: "
+                + e.getMessage());
+
+        return false;
+    }
+        }
+
     public boolean finalizar(int idAgendamento) {
 
     String sql =
@@ -396,9 +509,12 @@ public boolean confirmar(int idAgendamento) {
     String sql =
         "SELECT " +
         "a.id_agendamento, " +
-        "a.data, " +
-        "a.horario, " +
-        "c.nome_cliente, " +
+"a.cpf_cliente, " +
+"a.id_colaborador, " +
+"a.codigo_servico, " +
+"a.data, " +
+"a.horario, " +
+"c.nome_cliente, " +
         "col.nome_colaborador, " +
         "s.nome_servico " +
         "FROM agenda a " +
@@ -430,14 +546,33 @@ public boolean confirmar(int idAgendamento) {
 
         while (rs.next()) {
 
-            lista.add(new Object[]{
-                rs.getInt("id_agendamento"),
-                rs.getDate("data"),
-                rs.getTime("horario"),
-                rs.getString("nome_cliente"),
-                rs.getString("nome_colaborador"),
-                rs.getString("nome_servico")
-            });
+            DateTimeFormatter formatoData =
+        DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+DateTimeFormatter formatoHora =
+        DateTimeFormatter.ofPattern("HH:mm");
+
+String data =
+        rs.getDate("data")
+          .toLocalDate()
+          .format(formatoData);
+
+String hora =
+        rs.getTime("horario")
+          .toLocalTime()
+          .format(formatoHora);
+
+lista.add(new Object[]{
+    rs.getInt("id_agendamento"),
+    rs.getString("cpf_cliente"),
+    rs.getInt("id_colaborador"),
+    rs.getInt("codigo_servico"),
+    data,
+    hora,
+    rs.getString("nome_cliente"),
+    rs.getString("nome_colaborador"),
+    rs.getString("nome_servico")
+});
         }
 
     } catch (SQLException e) {
@@ -462,14 +597,17 @@ public List<Object[]> listarPorCliente(String cpfCliente) {
         "a.horario, " +
         "col.nome_colaborador, " +
         "s.nome_servico, " +
-        "a.status " +
+        "a.status, " +
+        "e.nome_empresa " +
         "FROM agenda a " +
         "INNER JOIN colaborador col " +
         "ON a.id_colaborador = col.id_colaborador " +
         "INNER JOIN servico s " +
         "ON a.codigo_servico = s.codigo_servico " +
+        "INNER JOIN empresa e " +
+        "ON a.codigo_empresa = e.codigo_empresa " +
         "WHERE a.cpf_cliente = ? " +
-        "ORDER BY a.data, a.horario";
+        "ORDER BY a.data DESC, a.horario DESC";
 
     try (
         Connection conn = Conexao.conectar();
@@ -481,39 +619,123 @@ public List<Object[]> listarPorCliente(String cpfCliente) {
         ResultSet rs = stmt.executeQuery();
 
         DateTimeFormatter formatoData =
-            DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         DateTimeFormatter formatoHora =
-            DateTimeFormatter.ofPattern("HH:mm");
+                DateTimeFormatter.ofPattern("HH:mm");
 
         while (rs.next()) {
 
-            String dataFormatada =
-                rs.getDate("data")
-                  .toLocalDate()
-                  .format(formatoData);
+            String data =
+                    rs.getDate("data")
+                      .toLocalDate()
+                      .format(formatoData);
 
-            String horaFormatada =
-                rs.getTime("horario")
-                  .toLocalTime()
-                  .format(formatoHora);
+            String hora =
+                    rs.getTime("horario")
+                      .toLocalTime()
+                      .format(formatoHora);
 
             lista.add(new Object[]{
-                rs.getInt("id_agendamento"),
-                dataFormatada,
-                horaFormatada,
-                rs.getString("nome_colaborador"),
-                rs.getString("nome_servico"),
-                rs.getString("status")
+                    rs.getInt("id_agendamento"),
+                    data,
+                    hora,
+                    rs.getString("nome_colaborador"),
+                    rs.getString("nome_servico"),
+                    rs.getString("status"),
+                    rs.getString("nome_empresa")
             });
         }
 
     } catch (SQLException e) {
 
         System.out.println(
-            "Erro ao listar agendamentos do cliente: "
+                "Erro ao listar agendamentos do cliente: "
+                + e.getMessage()
+        );
+    }
+
+    return lista;
+}
+public List<Object[]> listarFinalizadosAntigos(int codigoEmpresa) {
+
+    List<Object[]> lista = new ArrayList<>();
+
+    String sql =
+        "SELECT " +
+        "c.nome_cliente, " +
+        "c.telefone_cliente, " +
+        "a.data, " +
+        "a.horario, " +
+        "col.nome_colaborador, " +
+        "s.nome_servico " +
+        "FROM agenda a " +
+        "INNER JOIN cliente c " +
+        "ON a.cpf_cliente = c.cpf_cliente " +
+        "INNER JOIN colaborador col " +
+        "ON a.id_colaborador = col.id_colaborador " +
+        "INNER JOIN servico s " +
+        "ON a.codigo_servico = s.codigo_servico " +
+        "WHERE a.codigo_empresa = ? " +
+        "AND a.status = 'FINALIZADO' " +
+        "ORDER BY a.data";
+
+    try (
+        Connection conn = Conexao.conectar();
+        PreparedStatement stmt = conn.prepareStatement(sql)
+    ) {
+
+        stmt.setInt(1, codigoEmpresa);
+
+        ResultSet rs = stmt.executeQuery();
+
+        DateTimeFormatter formatoData =
+                DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        DateTimeFormatter formatoHora =
+                DateTimeFormatter.ofPattern("HH:mm");
+
+        while (rs.next()) {
+
+            LocalDate data =
+                    rs.getDate("data").toLocalDate();
+
+            long dias =
+                    java.time.temporal.ChronoUnit.DAYS
+                            .between(data, LocalDate.now());
+
+            if (dias >= 15) {
+
+                lista.add(new Object[]{
+
+                    rs.getString("nome_cliente"),
+
+                    rs.getString("telefone_cliente"),
+
+                    data.format(formatoData)
+                    + " "
+                    + rs.getTime("horario")
+                          .toLocalTime()
+                          .format(formatoHora),
+
+                    rs.getString("nome_colaborador"),
+
+                    rs.getString("nome_servico"),
+
+                    dias + " dias atrás"
+                });
+
+            }
+
+        }
+
+    } catch (SQLException e) {
+
+        System.out.println(
+            "Erro ao listar atendimentos: "
             + e.getMessage()
         );
+
     }
 
     return lista;

@@ -330,7 +330,7 @@ if (sucesso) {
         s.setValorServico(Double.parseDouble(txtValor.getText().replace(",", ".")));
         s.setDuracaoAproximada(txtDuracao.getText().trim());
         s.setQuantidadeInsumo(txtQuantidade.getText().isEmpty() ? 0 : Integer.parseInt(txtQuantidade.getText()));
-   
+        s.setCodigoEmpresa(colaboradorLogado.getCodigoEmpresa());
         
        
         if (cmbColaborador.getSelectedItem() != null) {
@@ -344,14 +344,36 @@ if (sucesso) {
     s.setIdColaborador(
             Integer.parseInt(idStr)
     );
-}
-        
-        servicoDAO.atualizar(s);
-        carregarTabela();
-        limparCampos();
-        JOptionPane.showMessageDialog(this, "Serviço atualizado com sucesso!");
-    }
+        }
+    if (cmbInsumos.getSelectedItem() != null) {
+            String codStr = cmbInsumos.getSelectedItem().toString().split(" - ")[0];
+            s.setCodigoInsumo(Integer.parseInt(codStr));
+        }
 
+        
+boolean sucesso = servicoDAO.atualizar(s);
+
+if (sucesso) {
+
+    carregarTabela();
+    limparCampos();
+
+    JOptionPane.showMessageDialog(
+        this,
+        "Serviço atualizado com sucesso!"
+    );
+
+} else {
+
+    JOptionPane.showMessageDialog(
+        this,
+        "Erro ao atualizar serviço!",
+        "Erro",
+        JOptionPane.ERROR_MESSAGE
+    );
+}
+
+    }
     private void excluir() {
         if (txtCodigo.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Selecione um serviço na tabela!", "Atenção", JOptionPane.WARNING_MESSAGE);
@@ -359,31 +381,101 @@ if (sucesso) {
         }
         int confirmacao = JOptionPane.showConfirmDialog(this, "Deseja excluir este serviço?", "Confirmar", JOptionPane.YES_NO_OPTION);
         if (confirmacao == JOptionPane.YES_OPTION) {
-            servicoDAO.excluir(Integer.parseInt(txtCodigo.getText()));
-            carregarTabela();
-            limparCampos();
-            JOptionPane.showMessageDialog(this, "Serviço excluído com sucesso!");
+            boolean sucesso = servicoDAO.excluir(
+        Integer.parseInt(txtCodigo.getText())
+);
+
+if (sucesso) {
+
+    carregarTabela();
+    limparCampos();
+
+    JOptionPane.showMessageDialog(
+            this,
+            "Serviço excluído com sucesso!"
+    );
+
+} else {
+
+    JOptionPane.showMessageDialog(
+            this,
+            "Não foi possível excluir este serviço.\nEle possui agendamentos vinculados.",
+            "Erro",
+            JOptionPane.ERROR_MESSAGE
+    );
+}
+    }
+    }
+
+private void selecionarLinha() {
+
+    int linha = tabelaServicos.getSelectedRow();
+
+    if (linha == -1) {
+        return;
+    }
+
+    int codigoServico = Integer.parseInt(
+            modeloTabela.getValueAt(linha, 0).toString()
+    );
+
+    Servico s = servicoDAO.buscarPorCodigo(codigoServico);
+
+    if (s == null) {
+        return;
+    }
+
+    txtCodigo.setText(String.valueOf(s.getCodigoServico()));
+    txtNome.setText(s.getNomeServico());
+    txtValor.setText(String.valueOf(s.getValorServico()));
+    txtDuracao.setText(s.getDuracaoAproximada());
+    txtQuantidade.setText(String.valueOf(s.getQuantidadeInsumo()));
+
+    // Seleciona o insumo correto
+    for (int i = 0; i < cmbInsumos.getItemCount(); i++) {
+
+        String item = cmbInsumos.getItemAt(i);
+
+        if (item.startsWith(s.getCodigoInsumo() + " -")) {
+
+            cmbInsumos.setSelectedIndex(i);
+            break;
+
         }
     }
 
-    private void selecionarLinha() {
-        int linha = tabelaServicos.getSelectedRow();
-        if (linha != -1) {
-            txtCodigo.setText(modeloTabela.getValueAt(linha, 0).toString());
-            txtNome.setText(modeloTabela.getValueAt(linha, 1).toString());
-            txtValor.setText(modeloTabela.getValueAt(linha, 2).toString());
-            txtDuracao.setText(modeloTabela.getValueAt(linha, 3).toString());
+    // Seleciona o colaborador correto
+    for (int i = 0; i < cmbColaborador.getItemCount(); i++) {
+
+        String item = cmbColaborador.getItemAt(i);
+
+        if (item.startsWith(s.getIdColaborador() + " -")) {
+
+            cmbColaborador.setSelectedIndex(i);
+            break;
+
         }
     }
 
-    private void limparCampos() {
-        txtCodigo.setText("");
-        txtNome.setText("");
-        txtValor.setText("");
-        txtDuracao.setText("");
-        txtQuantidade.setText("");
+}
+
+private void limparCampos() {
+
+    txtCodigo.setText("");
+    txtNome.setText("");
+    txtValor.setText("");
+    txtDuracao.setText("");
+    txtQuantidade.setText("");
+
+    if (cmbInsumos.getItemCount() > 0) {
         cmbInsumos.setSelectedIndex(0);
     }
+
+    if (cmbColaborador.getItemCount() > 0) {
+        cmbColaborador.setSelectedIndex(0);
+    }
+
+}
 
     private void estilizarTabela(JTable tabela) {
         tabela.getTableHeader().setBackground(new Color(201, 72, 105));

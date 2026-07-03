@@ -53,6 +53,7 @@ public class ClienteDAO {
         stmt.setString(7, senhaHash);
         stmt.setString(8, cliente.getPerfil());
 
+
         int linhas = stmt.executeUpdate();
 
         return linhas > 0;
@@ -86,6 +87,7 @@ public class ClienteDAO {
     public List<Cliente> listar() {
         List<Cliente> lista = new ArrayList<>();
         String sql = "SELECT * FROM cliente";
+
         try (Connection conn = Conexao.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -225,20 +227,19 @@ public Cliente buscarPorLogin(String email, String senha) {
         return false;
     }
 }
-    public List<Cliente> buscar(String filtro) {
+public List<Cliente> buscar(String filtro) {
 
     List<Cliente> lista = new ArrayList<>();
 
     String sql =
         "SELECT * FROM cliente " +
-        "WHERE nome_cliente ILIKE ? " +
+        "WHERE nome_cliente ILIKE ?" +
         "OR cpf_cliente ILIKE ? " +
         "OR email_cliente ILIKE ?";
 
     try (
         Connection conn = Conexao.conectar();
-        PreparedStatement stmt =
-            conn.prepareStatement(sql)
+        PreparedStatement stmt = conn.prepareStatement(sql)
     ) {
 
         String pesquisa = "%" + filtro + "%";
@@ -253,43 +254,21 @@ public Cliente buscarPorLogin(String email, String senha) {
 
             Cliente c = new Cliente();
 
-            c.setCpfCliente(
-                rs.getString("cpf_cliente")
-            );
-
-            c.setNomeCliente(
-                rs.getString("nome_cliente")
-            );
-
-            c.setEnderecoCliente(
-                rs.getString("endereco_cliente")
-            );
-
-            c.setTelefoneCliente(
-                rs.getString("telefone_cliente")
-            );
-
-            c.setEmailCliente(
-                rs.getString("email_cliente")
-            );
-
-            c.setDataNascimento(
-                rs.getString("data_nascimento")
-            );
-
-            c.setPerfil(
-                rs.getString("perfil")
-            );
+            c.setCpfCliente(rs.getString("cpf_cliente"));
+            c.setNomeCliente(rs.getString("nome_cliente"));
+            c.setEnderecoCliente(rs.getString("endereco_cliente"));
+            c.setTelefoneCliente(rs.getString("telefone_cliente"));
+            c.setEmailCliente(rs.getString("email_cliente"));
+            c.setDataNascimento(rs.getString("data_nascimento"));
+            c.setPerfil(rs.getString("perfil"));
 
             lista.add(c);
         }
 
     } catch (SQLException e) {
 
-        System.out.println(
-            "Erro ao buscar clientes: "
-            + e.getMessage()
-        );
+        System.out.println("Erro ao buscar clientes: " + e.getMessage());
+
     }
 
     return lista;

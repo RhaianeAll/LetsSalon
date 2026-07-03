@@ -249,33 +249,38 @@ public class ColaboradorDAO {
         return lista;
     }
 
-    public boolean atualizar(Colaborador colaborador) {
-        String sql = "UPDATE colaborador SET cpf_colaborador=?, nome_colaborador=?, funcao_colaborador=?, telefone_colaborador=?, foto_colaborador=?, senha_colaborador=?, perfil=?, codigo_empresa=? WHERE id_colaborador=?";
-        try (Connection conn = Conexao.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, colaborador.getCpfColaborador());
-            stmt.setString(2, colaborador.getNomeColaborador());
-            stmt.setString(3, colaborador.getFuncaoColaborador());
-            stmt.setString(4, colaborador.getTelefoneColaborador());
-            stmt.setString(5, colaborador.getFotoColaborador());
-            stmt.setString(6, colaborador.getSenhaColaborador());
-            stmt.setString(7, colaborador.getPerfil());
-            stmt.setInt(8, colaborador.getCodigoEmpresa());
-            stmt.setInt(9, colaborador.getIdColaborador());
-            int linhas = stmt.executeUpdate();
+public boolean atualizar(Colaborador colaborador) {
 
-        return linhas > 0;
+    String sql =
+        "UPDATE colaborador SET " +
+        "cpf_colaborador=?, " +
+        "nome_colaborador=?, " +
+        "funcao_colaborador=?, " +
+        "telefone_colaborador=?, " +
+        "foto_colaborador=?, " +
+        "codigo_empresa=? " +
+        "WHERE id_colaborador=?";
 
-    } catch(SQLException e){
+    try (
+        Connection conn = Conexao.conectar();
+        PreparedStatement stmt = conn.prepareStatement(sql)
+    ) {
 
-        System.out.println(
-            "Erro ao atualizar colaborador: " + e.getMessage()
-        );
+        stmt.setString(1, colaborador.getCpfColaborador());
+        stmt.setString(2, colaborador.getNomeColaborador());
+        stmt.setString(3, colaborador.getFuncaoColaborador());
+        stmt.setString(4, colaborador.getTelefoneColaborador());
+        stmt.setString(5, colaborador.getFotoColaborador());
+        stmt.setInt(6, colaborador.getCodigoEmpresa());
+        stmt.setInt(7, colaborador.getIdColaborador());
 
+        return stmt.executeUpdate() > 0;
+
+    } catch (SQLException e) {
+        System.out.println("Erro ao atualizar colaborador: " + e.getMessage());
         return false;
-        }
     }
-
+}
     public boolean excluir(int idColaborador) {
         String sql = "DELETE FROM colaborador WHERE id_colaborador=?";
         try (Connection conn = Conexao.conectar();

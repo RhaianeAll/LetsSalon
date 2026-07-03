@@ -211,15 +211,13 @@ public class InsumoDAO {
         return false;
         }
     }
-    public Insumo buscarPorCodigo(int codigoInsumo) {
+public Insumo buscarPorCodigo(int codigoInsumo) {
 
-    String sql =
-        "SELECT * FROM insumo WHERE codigo_insumo = ?";
+    String sql = "SELECT * FROM insumo WHERE codigo_insumo = ?";
 
     try (
-        Connection conn = Conexao.conectar();
-        PreparedStatement stmt =
-                conn.prepareStatement(sql)
+            Connection conn = Conexao.conectar();
+            PreparedStatement stmt = conn.prepareStatement(sql)
     ) {
 
         stmt.setInt(1, codigoInsumo);
@@ -230,13 +228,12 @@ public class InsumoDAO {
 
             Insumo i = new Insumo();
 
-            i.setCodigoInsumo(
-                    rs.getInt("codigo_insumo")
-            );
-
-            i.setNomeInsumo(
-                    rs.getString("nome_insumo")
-            );
+            i.setCodigoInsumo(rs.getInt("codigo_insumo"));
+            i.setNomeInsumo(rs.getString("nome_insumo"));
+            i.setValorInsumo(rs.getDouble("valor_insumo"));
+            i.setQuantidadeInsumo(rs.getInt("quantidade_insumo"));
+            i.setCapacidade(rs.getString("capacidade"));
+            i.setCodigoEmpresa(rs.getInt("codigo_empresa"));
 
             return i;
         }
@@ -244,8 +241,8 @@ public class InsumoDAO {
     } catch (SQLException e) {
 
         System.out.println(
-            "Erro ao buscar insumo: "
-            + e.getMessage()
+                "Erro ao buscar insumo: "
+                + e.getMessage()
         );
     }
 

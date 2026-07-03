@@ -233,5 +233,44 @@ public List<Servico> listarPorEmpresa(int codigoEmpresa) {
 
     return lista;
 }
+    public Servico buscarPorCodigo(int codigoServico) {
+
+    String sql = "SELECT * FROM servico WHERE codigo_servico = ?";
+
+    try (
+        Connection conn = Conexao.conectar();
+        PreparedStatement stmt = conn.prepareStatement(sql)
+    ) {
+
+        stmt.setInt(1, codigoServico);
+
+        ResultSet rs = stmt.executeQuery();
+
+        if (rs.next()) {
+
+            Servico s = new Servico();
+
+            s.setCodigoServico(rs.getInt("codigo_servico"));
+            s.setNomeServico(rs.getString("nome_servico"));
+            s.setValorServico(rs.getDouble("valor_servico"));
+            s.setDuracaoAproximada(rs.getString("duracao_aproximada"));
+            s.setIdColaborador(rs.getInt("id_colaborador"));
+            s.setCodigoInsumo(rs.getInt("codigo_insumo"));
+            s.setQuantidadeInsumo(rs.getInt("quantidade_insumo"));
+            s.setCodigoEmpresa(rs.getInt("codigo_empresa"));
+
+            return s;
+        }
+
+    } catch (SQLException e) {
+
+        System.out.println(
+                "Erro ao buscar serviço: "
+                + e.getMessage()
+        );
+    }
+
+    return null;
+}
 }
         
