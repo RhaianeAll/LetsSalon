@@ -9,7 +9,6 @@ import com.letssalon.util.SenhaUtil;
 import com.letssalon.util.CPFUtil;
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 import com.letssalon.util.CoresUtil;
 import com.letssalon.util.BotaoUtil;
 

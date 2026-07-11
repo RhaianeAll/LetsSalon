@@ -104,7 +104,7 @@ lblTopCliente = new JLabel();
 lblTopCliente.setForeground(new Color(201, 72, 105));
 lblTopCliente.setFont(new Font("Arial", Font.BOLD, 12));
 
-JLabel lblHorarioPico = new JLabel();
+lblHorarioPico = new JLabel();
 lblHorarioPico.setForeground(new Color(201, 72, 105));
 lblHorarioPico.setFont(new Font("Arial", Font.BOLD, 12));
 

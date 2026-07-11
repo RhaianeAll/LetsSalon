@@ -16,6 +16,7 @@ public class TelaCadastroColaborador extends JFrame {
 
     private Colaborador colaboradorLogado;
     private JTextField txtId, txtNome, txtEmailColaborador;
+    private JComboBox<String> cbFuncao;
     private JFormattedTextField txtCpf, txtTelefone;
     private JPasswordField txtSenha;
     private JButton btnCadastrar, btnAtualizar, btnExcluir, btnLimpar, btnVoltar;
@@ -32,7 +33,7 @@ public class TelaCadastroColaborador extends JFrame {
     }
 
     private void initComponents() {
-        setTitle("Let's Salon - Cadastro de Profissionais");
+        setTitle("Let's Salon - Cadastro de Colaboradores");
         setSize(850, 650);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -44,7 +45,7 @@ public class TelaCadastroColaborador extends JFrame {
         painelTopo.setBackground(CoresUtil.ROSA_PRINCIPAL);
         painelTopo.setPreferredSize(new Dimension(850, 50));
 
-        JLabel lblTitulo = new JLabel("  Cadastro de Profissionais");
+        JLabel lblTitulo = new JLabel("  Cadastro de Colaboradores");
         lblTitulo.setFont(new Font("Arial", Font.BOLD, 20));
         lblTitulo.setForeground(Color.WHITE);
         painelTopo.add(lblTitulo, BorderLayout.WEST);
@@ -96,8 +97,30 @@ public class TelaCadastroColaborador extends JFrame {
         gbc.gridx = 3;
         painelForm.add(txtTelefone, gbc);
 
+        // Função
+gbc.gridx = 0;
+gbc.gridy = 3;
+painelForm.add(new JLabel("Função:"), gbc);
+
+cbFuncao = new JComboBox<>();
+
+cbFuncao.addItem("Administrador");
+cbFuncao.addItem("Gerente");
+cbFuncao.addItem("Recepcionista");
+cbFuncao.addItem("Cabeleireiro");
+cbFuncao.addItem("Barbeiro");
+cbFuncao.addItem("Manicure");
+cbFuncao.addItem("Pedicure");
+cbFuncao.addItem("Maquiador");
+cbFuncao.addItem("Esteticista");
+cbFuncao.addItem("Designer de Sobrancelhas");
+cbFuncao.addItem("Massoterapeuta");
+
+gbc.gridx = 1;
+painelForm.add(cbFuncao, gbc);
+        
         // Usuário
-        gbc.gridx = 0; gbc.gridy = 3;
+        gbc.gridx = 0; gbc.gridy = 4;
         painelForm.add(new JLabel("Usuário:"), gbc);
         txtEmailColaborador = new JTextField(15);
         gbc.gridx = 1;
@@ -107,7 +130,7 @@ public class TelaCadastroColaborador extends JFrame {
         gbc.gridx = 2;
         painelForm.add(new JLabel("Senha:"), gbc);
         txtSenha = new JPasswordField(15);
-        gbc.gridx = 3;
+        gbc.gridx = 5;
         painelForm.add(txtSenha, gbc);
 
         // Botões
@@ -126,7 +149,7 @@ public class TelaCadastroColaborador extends JFrame {
         painelBotoes.add(btnLimpar);
         painelBotoes.add(btnVoltar);
 
-        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 4;
+        gbc.gridx = 0; gbc.gridy = 6; gbc.gridwidth = 4;
         painelForm.add(painelBotoes, gbc);
 
         add(painelForm, BorderLayout.NORTH);
@@ -145,7 +168,14 @@ public class TelaCadastroColaborador extends JFrame {
         painelBusca.add(btnBuscar);
         painelTabela.add(painelBusca, BorderLayout.NORTH);
 
-        String[] colunas = {"Id", "Nome", "CPF", "Telefone"};
+        String[] colunas = {
+    "Id",
+    "Nome",
+    "Função",
+    "CPF",
+    "Telefone",
+    "E-mail"
+};
         modeloTabela = new DefaultTableModel(colunas, 0);
         tabelaColaboradores = new JTable(modeloTabela);
         tabelaColaboradores.setRowHeight(28);
@@ -180,12 +210,14 @@ public class TelaCadastroColaborador extends JFrame {
 
     for (Colaborador c : lista) {
 
-        modeloTabela.addRow(new Object[]{
-            c.getIdColaborador(),
-            c.getNomeColaborador(),
-            c.getCpfColaborador(),
-            c.getTelefoneColaborador()
-        });
+       modeloTabela.addRow(new Object[]{
+    c.getIdColaborador(),
+    c.getNomeColaborador(),
+    c.getFuncaoColaborador(),
+    c.getCpfColaborador(),
+    c.getTelefoneColaborador(),
+    c.getEmailColaborador()
+});
 
     }
 
@@ -196,7 +228,7 @@ private void carregarTabelaFiltrada() {
 
     modeloTabela.setRowCount(0);
 
-    String busca = txtBuscar.getText().trim();
+    String busca = txtBuscar.getText().trim().replaceAll("\\s+", " ");
 
     List<Colaborador> lista =
             colaboradorDAO.buscarPorNomeOuCpf(
@@ -206,15 +238,14 @@ private void carregarTabelaFiltrada() {
 
     for (Colaborador c : lista) {
 
-        c.setFuncaoColaborador("Profissional");
-
         modeloTabela.addRow(new Object[]{
-            c.getIdColaborador(),
-            c.getNomeColaborador(),
-            c.getCpfColaborador(),
-            c.getTelefoneColaborador(),
-            c.getFuncaoColaborador()
-        });
+    c.getIdColaborador(),
+    c.getNomeColaborador(),
+    c.getFuncaoColaborador(),
+    c.getCpfColaborador(),
+    c.getTelefoneColaborador(),
+    c.getEmailColaborador()
+});
     }
 }
 
@@ -236,6 +267,8 @@ private void carregarTabelaFiltrada() {
 }
         Colaborador c = new Colaborador();
         c.setNomeColaborador(txtNome.getText().trim());
+        c.setFuncaoColaborador(
+            cbFuncao.getSelectedItem().toString());
         c.setCpfColaborador(txtCpf.getText().trim());
         c.setTelefoneColaborador(txtTelefone.getText().trim());
         c.setEmailColaborador(txtEmailColaborador.getText().trim());
@@ -255,14 +288,14 @@ if (sucesso) {
 
     JOptionPane.showMessageDialog(
         this,
-        "Profissional cadastrado com sucesso!"
+        "Colaborador cadastrado com sucesso!"
     );
 
 } else {
 
     JOptionPane.showMessageDialog(
         this,
-        "Erro ao cadastrar profissional!",
+        "Erro ao cadastrar colaborador!",
         "Erro",
         JOptionPane.ERROR_MESSAGE
     );
@@ -272,48 +305,63 @@ if (sucesso) {
 
     private void atualizar() {
         if (txtId.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Selecione um profissional na tabela!", "Atenção", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Selecione um colaboradores na tabela!", "Atenção", JOptionPane.WARNING_MESSAGE);
             return;
         }
         Colaborador c = new Colaborador();
         c.setIdColaborador(Integer.parseInt(txtId.getText()));
         c.setNomeColaborador(txtNome.getText().trim());
+        c.setFuncaoColaborador(
+            cbFuncao.getSelectedItem().toString());
         c.setCpfColaborador(txtCpf.getText().trim());
         c.setTelefoneColaborador(txtTelefone.getText().trim());
         c.setEmailColaborador(txtEmailColaborador.getText().trim());
-        c.setFuncaoColaborador("Profissional");
         c.setCodigoEmpresa(colaboradorLogado.getCodigoEmpresa());
 
-        c.setFuncaoColaborador("Profissional");
         colaboradorDAO.atualizar(c);
         carregarTabela();
         limparCampos();
-        JOptionPane.showMessageDialog(this, "Profissional atualizado com sucesso!");
+        JOptionPane.showMessageDialog(this, "Colaborador atualizado com sucesso!");
     }
 
     private void excluir() {
         if (txtId.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Selecione um profissional na tabela!", "Atenção", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Selecione um colaborador na tabela!", "Atenção", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        int confirmacao = JOptionPane.showConfirmDialog(this, "Deseja excluir este profissional?", "Confirmar", JOptionPane.YES_NO_OPTION);
+        int confirmacao = JOptionPane.showConfirmDialog(this, "Deseja excluir este colaborador?", "Confirmar", JOptionPane.YES_NO_OPTION);
         if (confirmacao == JOptionPane.YES_OPTION) {
             colaboradorDAO.excluir(Integer.parseInt(txtId.getText()));
             carregarTabela();
             limparCampos();
-            JOptionPane.showMessageDialog(this, "Profissional excluído com sucesso!");
+            JOptionPane.showMessageDialog(this, "Colaborador excluído com sucesso!");
         }
     }
 
     private void selecionarLinha() {
-        int linha = tabelaColaboradores.getSelectedRow();
-        if (linha != -1) {
-            txtId.setText(modeloTabela.getValueAt(linha, 0).toString());
-            txtNome.setText(modeloTabela.getValueAt(linha, 1).toString());
-            txtCpf.setText(modeloTabela.getValueAt(linha, 2).toString());
-            txtTelefone.setText(modeloTabela.getValueAt(linha, 3).toString());
-        }
+
+    int linha = tabelaColaboradores.getSelectedRow();
+
+    if (linha == -1) {
+        return;
     }
+
+    txtId.setText(modeloTabela.getValueAt(linha, 0).toString());
+
+    txtNome.setText(modeloTabela.getValueAt(linha, 1).toString());
+
+    cbFuncao.setSelectedItem(
+            modeloTabela.getValueAt(linha, 2).toString());
+
+    txtCpf.setText(
+            modeloTabela.getValueAt(linha, 3).toString());
+
+    txtTelefone.setText(
+            modeloTabela.getValueAt(linha, 4).toString());
+
+    txtEmailColaborador.setText(
+            modeloTabela.getValueAt(linha, 5).toString());
+}
 
     private void limparCampos() {
         txtId.setText("");

@@ -73,6 +73,7 @@ public class ColaboradorDAO {
                 c.setFotoColaborador(rs.getString("foto_colaborador"));
                 c.setPerfil(rs.getString("perfil"));
                 c.setCodigoEmpresa(rs.getInt("codigo_empresa"));
+                c.setEmailColaborador(rs.getString("email_colaborador"));
                 lista.add(c);
             }
         } catch (SQLException e) {
@@ -89,22 +90,28 @@ public class ColaboradorDAO {
     List<Colaborador> lista = new ArrayList<>();
 
     String sql =
-        "SELECT * FROM colaborador " +
-        "WHERE codigo_empresa = ? " +
-        "AND (" +
-        "LOWER(nome_colaborador) LIKE LOWER(?) " +
-        "OR cpf_colaborador LIKE ?" +
-        ")";
+    "SELECT * FROM colaborador " +
+    "WHERE codigo_empresa = ? " +
+    "AND (" +
+    "LOWER(unaccent(nome_colaborador)) LIKE LOWER(unaccent(?)) " +
+    "OR cpf_colaborador LIKE ? " +
+    "OR LOWER(unaccent(funcao_colaborador)) LIKE LOWER(unaccent(?)) " +
+    "OR LOWER(unaccent(email_colaborador)) LIKE LOWER(unaccent(?)) " +
+    ")";
 
     try (
         Connection conn = Conexao.conectar();
         PreparedStatement stmt =
                 conn.prepareStatement(sql)
     ) {
-
-        stmt.setInt(1, codigoEmpresa);
-        stmt.setString(2, "%" + busca + "%");
-        stmt.setString(3, "%" + busca + "%");
+        
+        String pesquisa = "%" + busca + "%";
+        
+stmt.setInt(1, codigoEmpresa);
+stmt.setString(2, pesquisa);
+stmt.setString(3, pesquisa);
+stmt.setString(4, pesquisa);
+stmt.setString(5, pesquisa);
 
         ResultSet rs = stmt.executeQuery();
 
@@ -131,6 +138,7 @@ public class ColaboradorDAO {
             c.setFuncaoColaborador(
                 rs.getString("funcao_colaborador")
             );
+            c.setEmailColaborador(rs.getString("email_colaborador"));
 
             lista.add(c);
         }
@@ -210,6 +218,7 @@ public class ColaboradorDAO {
             c.setCodigoEmpresa(
                 rs.getInt("codigo_empresa")
             );
+            c.setEmailColaborador(rs.getString("email_colaborador"));
 
             lista.add(c);
         }
@@ -241,6 +250,7 @@ public class ColaboradorDAO {
                 c.setFotoColaborador(rs.getString("foto_colaborador"));
                 c.setPerfil(rs.getString("perfil"));
                 c.setCodigoEmpresa(rs.getInt("codigo_empresa"));
+                c.setEmailColaborador(rs.getString("email_colaborador"));
                 lista.add(c);
             }
         } catch (SQLException e) {
@@ -252,27 +262,29 @@ public class ColaboradorDAO {
 public boolean atualizar(Colaborador colaborador) {
 
     String sql =
-        "UPDATE colaborador SET " +
-        "cpf_colaborador=?, " +
-        "nome_colaborador=?, " +
-        "funcao_colaborador=?, " +
-        "telefone_colaborador=?, " +
-        "foto_colaborador=?, " +
-        "codigo_empresa=? " +
-        "WHERE id_colaborador=?";
+    "UPDATE colaborador SET " +
+    "cpf_colaborador=?, " +
+    "nome_colaborador=?, " +
+    "funcao_colaborador=?, " +
+    "telefone_colaborador=?, " +
+    "email_colaborador=?, " +
+    "foto_colaborador=?, " +
+    "codigo_empresa=? " +
+    "WHERE id_colaborador=?";
 
     try (
         Connection conn = Conexao.conectar();
         PreparedStatement stmt = conn.prepareStatement(sql)
     ) {
 
-        stmt.setString(1, colaborador.getCpfColaborador());
-        stmt.setString(2, colaborador.getNomeColaborador());
-        stmt.setString(3, colaborador.getFuncaoColaborador());
-        stmt.setString(4, colaborador.getTelefoneColaborador());
-        stmt.setString(5, colaborador.getFotoColaborador());
-        stmt.setInt(6, colaborador.getCodigoEmpresa());
-        stmt.setInt(7, colaborador.getIdColaborador());
+stmt.setString(1, colaborador.getCpfColaborador());
+stmt.setString(2, colaborador.getNomeColaborador());
+stmt.setString(3, colaborador.getFuncaoColaborador());
+stmt.setString(4, colaborador.getTelefoneColaborador());
+stmt.setString(5, colaborador.getEmailColaborador());
+stmt.setString(6, colaborador.getFotoColaborador());
+stmt.setInt(7, colaborador.getCodigoEmpresa());
+stmt.setInt(8, colaborador.getIdColaborador());
 
         return stmt.executeUpdate() > 0;
 
