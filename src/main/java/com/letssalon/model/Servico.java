@@ -2,14 +2,33 @@
 package com.letssalon.model;
 
 public class Servico {
-    private int codigoServico;
-    private String nomeServico;
-    private double valorServico;
-    private String duracaoAproximada;
-    private int idColaborador;
-    private int codigoInsumo;
-    private int quantidadeInsumo;
-    private int codigoEmpresa;
+   private int codigoServico;
+private String nomeServico;
+private double valorServico;
+private String duracaoAproximada;
+private int idColaborador;
+private int codigoInsumo;
+private int quantidadeInsumo;
+private int codigoEmpresa;
+
+private String nomeColaborador;
+private String nomeInsumo;
+
+    public void setNomeColaborador(String nomeColaborador) {
+        this.nomeColaborador = nomeColaborador;
+    }
+
+    public void setNomeInsumo(String nomeInsumo) {
+        this.nomeInsumo = nomeInsumo;
+    }
+
+    public String getNomeColaborador() {
+        return nomeColaborador;
+    }
+
+    public String getNomeInsumo() {
+        return nomeInsumo;
+    }
 
        public Servico() {
 }

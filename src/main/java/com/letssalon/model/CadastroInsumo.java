@@ -5,6 +5,8 @@ public class CadastroInsumo {
     private int codigoInsumo;
     private int rendeAplicacoes;
     private int codigoServico;
+    private String nomeInsumo;
+    private String nomeServico;        
 
      public CadastroInsumo() {
 }
@@ -38,5 +40,19 @@ public class CadastroInsumo {
     public void setCodigoServico(int codigoServico) {
         this.codigoServico = codigoServico;
     }
-    
+    public String getNomeInsumo() {
+    return nomeInsumo;
+}
+
+public void setNomeInsumo(String nomeInsumo) {
+    this.nomeInsumo = nomeInsumo;
+}
+
+public String getNomeServico() {
+    return nomeServico;
+}
+
+public void setNomeServico(String nomeServico) {
+    this.nomeServico = nomeServico;
+}
 }

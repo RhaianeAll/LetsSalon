@@ -172,7 +172,15 @@ public class TelaCadastroServico extends JFrame {
         painelBusca.add(btnBuscar);
         painelTabela.add(painelBusca, BorderLayout.NORTH);
 
-        String[] colunas = {"Código", "Nome do Serviço", "Valor", "Duração Aproximada", "Insumos Necessários", "Quantidade"};
+           String[] colunas = {
+            "Código",
+            "Serviço",
+            "Profissional",
+            "Valor",
+            "Duração",
+            "Insumo",
+            "Qtd."
+            };        
         modeloTabela = new DefaultTableModel(colunas, 0);
         tabelaServicos = new JTable(modeloTabela);
         tabelaServicos.setRowHeight(28);
@@ -231,14 +239,15 @@ public class TelaCadastroServico extends JFrame {
                         .getCodigoEmpresa()
         );
         for (Servico s : lista) {
-            modeloTabela.addRow(new Object[]{
-                s.getCodigoServico(),
-                s.getNomeServico(),
-                s.getValorServico(),
-                s.getDuracaoAproximada(),
-                s.getCodigoInsumo(),
-                s.getQuantidadeInsumo()
-            });
+modeloTabela.addRow(new Object[]{
+    s.getCodigoServico(),
+    s.getNomeServico(),
+    s.getNomeColaborador(),
+    s.getValorServico(),
+    s.getDuracaoAproximada(),
+    s.getNomeInsumo(),
+    s.getQuantidadeInsumo()
+});
         }
     }
     private void carregarTabelaFiltrada() {
@@ -257,13 +266,14 @@ public class TelaCadastroServico extends JFrame {
     for (Servico s : lista) {
 
         modeloTabela.addRow(new Object[]{
-            s.getCodigoServico(),
-            s.getNomeServico(),
-            s.getValorServico(),
-            s.getDuracaoAproximada(),
-            s.getCodigoInsumo(),
-            s.getQuantidadeInsumo()
-        });
+    s.getCodigoServico(),
+    s.getNomeServico(),
+    s.getNomeColaborador(),
+    s.getValorServico(),
+    s.getDuracaoAproximada(),
+    s.getNomeInsumo(),
+    s.getQuantidadeInsumo()
+});
     }
 }
 

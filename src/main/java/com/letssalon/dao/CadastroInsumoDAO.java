@@ -72,4 +72,59 @@ public class CadastroInsumoDAO {
         return null;
     }
 }
+     public java.util.List<CadastroInsumo> listar() {
+
+    java.util.List<CadastroInsumo> lista = new java.util.ArrayList<>();
+
+    String sql =
+        "SELECT " +
+        "ci.codigo_insumo, " +
+        "i.nome_insumo, " +
+        "ci.rende_aplicacoes, " +
+        "ci.codigo_servico, " +
+        "s.nome_servico " +
+        "FROM cadastro_insumo ci " +
+        "INNER JOIN insumo i " +
+        "ON ci.codigo_insumo = i.codigo_insumo " +
+        "INNER JOIN servico s " +
+        "ON ci.codigo_servico = s.codigo_servico " +
+        "ORDER BY i.nome_insumo";
+
+    try (
+        Connection conn = Conexao.conectar();
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        ResultSet rs = stmt.executeQuery()
+    ) {
+
+        while (rs.next()) {
+
+            CadastroInsumo ci = new CadastroInsumo();
+
+            ci.setCodigoInsumo(
+                    rs.getInt("codigo_insumo"));
+
+            ci.setNomeInsumo(
+                    rs.getString("nome_insumo"));
+
+            ci.setRendeAplicacoes(
+                    rs.getInt("rende_aplicacoes"));
+
+            ci.setCodigoServico(
+                    rs.getInt("codigo_servico"));
+
+            ci.setNomeServico(
+                    rs.getString("nome_servico"));
+
+            lista.add(ci);
+        }
+
+    } catch (SQLException e) {
+
+        System.out.println(
+                "Erro ao listar relacionamento: "
+                + e.getMessage());
+    }
+
+    return lista;
+}   
     }

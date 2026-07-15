@@ -58,8 +58,15 @@ public List<Servico> listarPorEmpresa(int codigoEmpresa) {
     List<Servico> lista = new ArrayList<>();
 
     String sql =
-        "SELECT * FROM servico " +
-        "WHERE codigo_empresa = ?";
+    "SELECT s.*, " +
+    "c.nome_colaborador, " +
+    "i.nome_insumo " +
+    "FROM servico s " +
+    "LEFT JOIN colaborador c " +
+    "ON s.id_colaborador = c.id_colaborador " +
+    "LEFT JOIN insumo i " +
+    "ON s.codigo_insumo = i.codigo_insumo " +
+    "WHERE s.codigo_empresa = ?";
 
     try (
         Connection conn = Conexao.conectar();
@@ -105,6 +112,14 @@ public List<Servico> listarPorEmpresa(int codigoEmpresa) {
 
             s.setCodigoEmpresa(
                 rs.getInt("codigo_empresa")
+            );
+            
+            s.setNomeColaborador(
+            rs.getString("nome_colaborador")
+            );
+
+            s.setNomeInsumo(
+            rs.getString("nome_insumo")
             );
 
             lista.add(s);

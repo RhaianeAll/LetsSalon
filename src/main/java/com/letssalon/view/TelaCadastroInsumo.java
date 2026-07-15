@@ -145,11 +145,13 @@ public class TelaCadastroInsumo extends JFrame {
 
     private void carregarCombos() {
         cmbInsumo.removeAllItems();
-        for (Insumo i : insumoDAO.listar()) {
+        for (Insumo i : insumoDAO.listarPorEmpresa(
+        colaboradorLogado.getCodigoEmpresa())) {
             cmbInsumo.addItem(i.getCodigoInsumo() + " - " + i.getNomeInsumo());
         }
         cmbServico.removeAllItems();
-        for (Servico s : servicoDAO.listar()) {
+        for (Servico s : servicoDAO.listarPorEmpresa(
+        colaboradorLogado.getCodigoEmpresa())) {
             cmbServico.addItem(s.getCodigoServico() + " - " + s.getNomeServico());
         }
     }
@@ -158,30 +160,20 @@ private void carregarTabela() {
 
     modeloTabela.setRowCount(0);
 
-    try {
+    List<CadastroInsumo> lista =
+            cadastroInsumoDAO.listar();
 
-        ResultSet rs = cadastroInsumoDAO.listarRelacionamentos();
+    for (CadastroInsumo ci : lista) {
 
-        while (rs != null && rs.next()) {
+        modeloTabela.addRow(new Object[]{
 
-            modeloTabela.addRow(new Object[]{
+            ci.getCodigoInsumo(),
+            ci.getNomeInsumo(),
+            ci.getRendeAplicacoes(),
+            ci.getNomeServico()
 
-                rs.getInt("codigo_insumo"),
-
-                rs.getString("nome_insumo"),
-
-                rs.getInt("rende_aplicacoes"),
-
-                rs.getString("nome_servico")
-            });
-        }
-
-    } catch (Exception e) {
-
-        System.out.println(e.getMessage());
-
+        });
     }
-
 }
     private void carregarTabelaFiltrada() {
 
