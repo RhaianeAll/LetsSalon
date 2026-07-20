@@ -283,6 +283,17 @@ modeloTabela.addRow(new Object[]{
             return;
         }
         Servico s = new Servico();
+        if (servicoDAO.existeServico(
+        txtNome.getText().trim(),
+        colaboradorLogado.getCodigoEmpresa())) {
+
+    JOptionPane.showMessageDialog(
+            this,
+            "Este serviço já está cadastrado."
+    );
+
+    return;
+}
         s.setNomeServico(txtNome.getText().trim());
         s.setValorServico(Double.parseDouble(txtValor.getText().replace(",", ".")));
         s.setDuracaoAproximada(txtDuracao.getText().trim());
@@ -306,6 +317,19 @@ modeloTabela.addRow(new Object[]{
             s.setCodigoInsumo(Integer.parseInt(codStr));
         }
 
+        if (servicoDAO.existeServico(
+        s.getNomeServico(),
+        s.getCodigoEmpresa())) {
+
+    JOptionPane.showMessageDialog(
+        this,
+        "Este serviço já está cadastrado.\n\nSelecione-o na tabela para adicionar outro profissional.",
+        "Serviço existente",
+        JOptionPane.INFORMATION_MESSAGE
+    );
+
+    return;
+}
        boolean sucesso = servicoDAO.cadastrar(s);
 
 if (sucesso) {

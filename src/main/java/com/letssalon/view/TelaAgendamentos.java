@@ -3,6 +3,7 @@ package com.letssalon.view;
 import com.letssalon.dao.AgendaDAO;
 import com.letssalon.dao.ClienteDAO;
 import com.letssalon.dao.ColaboradorDAO;
+import com.letssalon.dao.ServicoColaboradorDAO;
 import com.letssalon.dao.ServicoDAO;
 import com.letssalon.model.Agenda;
 import com.letssalon.model.Cliente;
@@ -33,6 +34,7 @@ public class TelaAgendamentos extends JFrame {
     private ClienteDAO clienteDAO = new ClienteDAO();
     private ColaboradorDAO colaboradorDAO = new ColaboradorDAO();
     private ServicoDAO servicoDAO = new ServicoDAO();
+    private ServicoColaboradorDAO servicoColaboradorDAO = new ServicoColaboradorDAO();
 
     public TelaAgendamentos(Colaborador colaborador) {
         this.colaboradorLogado = colaborador;
@@ -116,6 +118,7 @@ public class TelaAgendamentos extends JFrame {
         gbc.gridx = 2;
         painelForm.add(new JLabel("Serviço:"), gbc);
         cmbServico = new JComboBox<>();
+        cmbServico.addActionListener(e -> carregarProfissionaisPorServico());
         gbc.gridx = 3;
         painelForm.add(cmbServico, gbc);
 
@@ -260,12 +263,6 @@ public class TelaAgendamentos extends JFrame {
             c.getCpfCliente() + " - " + c.getNomeCliente()
     );
 }
-        // Carrega colaboradores no combo (somente da empresa logada)
-        cmbColaborador.removeAllItems();
-        List<Colaborador> colaboradores = colaboradorDAO.listarPorEmpresa(colaboradorLogado.getCodigoEmpresa());
-        for (Colaborador c : colaboradores) {
-            cmbColaborador.addItem(c.getIdColaborador() + " - " + c.getNomeColaborador());
-        }
 
         // Carrega serviços no combo
         cmbServico.removeAllItems();
@@ -276,6 +273,11 @@ public class TelaAgendamentos extends JFrame {
         for (Servico s : servicos) {
             cmbServico.addItem(s.getCodigoServico() + " - " + s.getNomeServico());
         }
+        cmbServico.addActionListener(e -> carregarProfissionaisPorServico());
+        if (cmbServico.getItemCount() > 0) {
+    cmbServico.setSelectedIndex(0);
+    carregarProfissionaisPorServico();
+}
 
         // Carrega agendamentos na tabela
         modeloAgendamentos.setRowCount(0);
@@ -676,6 +678,48 @@ if (conflito) {
             cmbServico.setSelectedIndex(i);
             break;
         }
+    }
+    carregarProfissionaisPorServico();
+    for (int i = 0; i < cmbColaborador.getItemCount(); i++) {
+
+    String item = cmbColaborador.getItemAt(i);
+
+    if (item.startsWith(idColaborador + " -")) {
+
+        cmbColaborador.setSelectedIndex(i);
+        break;
+    }
+}
+}
+private void carregarProfissionaisPorServico() {
+
+    if (cmbServico.getSelectedItem() == null) {
+        return;
+    }
+
+    String texto =
+            cmbServico.getSelectedItem().toString();
+
+    int codigoServico =
+            Integer.parseInt(
+                    texto.split(" - ")[0]);
+
+    cmbColaborador.removeAllItems();
+
+    List<Colaborador> lista =
+            servicoColaboradorDAO.listarPorServico(codigoServico);
+
+    for (Colaborador c : lista) {
+
+        cmbColaborador.addItem(
+                c.getIdColaborador()
+                + " - "
+                + c.getNomeColaborador()
+        );
+    }
+
+    if (cmbColaborador.getItemCount() > 0) {
+        cmbColaborador.setSelectedIndex(0);
     }
 }
 

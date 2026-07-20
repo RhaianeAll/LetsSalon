@@ -350,4 +350,48 @@ public Colaborador buscarPorLogin(String email, String senha, int codigoEmpresa)
 
     return null;
 }
+public List<Colaborador> listarPorServico(int codigoServico) {
+
+    List<Colaborador> lista = new ArrayList<>();
+
+    String sql =
+        "SELECT DISTINCT c.* " +
+        "FROM colaborador c " +
+        "INNER JOIN servico s " +
+        "ON c.id_colaborador = s.id_colaborador " +
+        "WHERE s.codigo_servico = ? " +
+        "ORDER BY c.nome_colaborador";
+
+    try (
+        Connection conn = Conexao.conectar();
+        PreparedStatement stmt = conn.prepareStatement(sql)
+    ) {
+
+        stmt.setInt(1, codigoServico);
+
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+
+            Colaborador colaborador = new Colaborador();
+
+            colaborador.setIdColaborador(
+                    rs.getInt("id_colaborador"));
+
+            colaborador.setNomeColaborador(
+                    rs.getString("nome_colaborador"));
+
+            lista.add(colaborador);
+        }
+
+    } catch (SQLException e) {
+
+        System.out.println(
+            "Erro ao listar profissionais do serviço: "
+            + e.getMessage()
+        );
+    }
+
+    return lista;
+}
 }

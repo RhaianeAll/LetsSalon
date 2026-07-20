@@ -1,5 +1,6 @@
 package com.letssalon.dao;
 
+import com.letssalon.model.Colaborador;
 import com.letssalon.model.Servico;
 import com.letssalon.util.Conexao;
 import java.sql.*;
@@ -248,6 +249,36 @@ public List<Servico> listarPorEmpresa(int codigoEmpresa) {
 
     return lista;
 }
+    public boolean existeServico(String nome, int codigoEmpresa) {
+
+    String sql =
+        "SELECT 1 " +
+        "FROM servico " +
+        "WHERE LOWER(nome_servico)=LOWER(?) " +
+        "AND codigo_empresa=?";
+
+    try (
+        Connection conn = Conexao.conectar();
+        PreparedStatement stmt = conn.prepareStatement(sql)
+    ) {
+
+        stmt.setString(1, nome);
+        stmt.setInt(2, codigoEmpresa);
+
+        ResultSet rs = stmt.executeQuery();
+
+        return rs.next();
+
+    } catch (SQLException e) {
+
+        System.out.println(
+            "Erro ao verificar serviço: "
+            + e.getMessage()
+        );
+
+        return false;
+    }
+}
     public Servico buscarPorCodigo(int codigoServico) {
 
     String sql = "SELECT * FROM servico WHERE codigo_servico = ?";
@@ -286,6 +317,6 @@ public List<Servico> listarPorEmpresa(int codigoEmpresa) {
     }
 
     return null;
-}
+    }
 }
         
